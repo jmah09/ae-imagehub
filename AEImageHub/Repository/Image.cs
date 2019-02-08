@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace AEImageHub.Repository
 {
-    public class Repository
+    public class Image
     {
 
         public void GetData()

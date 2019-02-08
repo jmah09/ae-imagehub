@@ -11,7 +11,7 @@ namespace AEImageHub.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private Repository.Repository repo;
+        private Repository.Image repo;
        
         private static string[] Summaries = new[]
         {
@@ -20,7 +20,7 @@ namespace AEImageHub.Controllers
 
         public SampleDataController()
         {
-            repo = new Repository.Repository();
+            repo = new Repository.Image();
         }
 
         [HttpGet("[action]")]
