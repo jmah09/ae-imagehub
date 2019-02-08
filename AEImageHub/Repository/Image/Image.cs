@@ -3,19 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using AEImageHub.DI.SQLServerConnection;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Configuration;
+using Microsoft.EntityFrameworkCore;
 
-namespace AEImageHub.Repository
+namespace AEImageHub.Repository.Image
 {
-    public class User
+    public class Image : IImage
     {
+        DbContext _DbContext;
+
+        public Image(DbContext context)
+        {
+            _DbContext = context;
+        }
 
         public void GetData()
         {
-            using (SqlConnection connection = new SqlConnection(SQLConnection.getConnectionString()))
+            Debug.WriteLine("\nQuery data example:");
+            using (SqlConnection connection = new SqlConnection(_DbContext.Database.GetDbConnection().ConnectionString))
             {
+                Debug.WriteLine(_DbContext.Database.GetDbConnection().ConnectionString);
                 Debug.WriteLine("\nQuery data example:");
                 Debug.WriteLine("=========================================\n");
                 Debug.WriteLine("Image_id/user_id/image_name/size");
@@ -37,6 +46,6 @@ namespace AEImageHub.Repository
                 connection.Close();
             }
         }
+
     }
 }
-

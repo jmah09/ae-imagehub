@@ -7,18 +7,18 @@ using AEImageHub.DI.SQLServerConnection;
 using System.Data.SqlClient;
 using System.Diagnostics;
 
-namespace AEImageHub.Repository
+namespace AEImageHub.Repository.User
 {
-    public class Image
+    public class User
     {
 
         public void GetData()
         {
             using (SqlConnection connection = new SqlConnection(SQLConnection.getConnectionString()))
             {
-                Console.WriteLine("\nQuery data example:");
-                Console.WriteLine("=========================================\n");
-                Console.WriteLine("Image_id/user_id/image_name/size");
+                Debug.WriteLine("\nQuery data example:");
+                Debug.WriteLine("=========================================\n");
+                Debug.WriteLine("Image_id/user_id/image_name/size");
                 connection.Open();
                 StringBuilder sb = new StringBuilder();
                 sb.Append("SELECT *");
@@ -30,13 +30,13 @@ namespace AEImageHub.Repository
                     {
                         while (reader.Read())
                         {
-                            Console.WriteLine("{0}, {1}, {2}, {3}", reader[0], reader[1], reader[2], reader[3]);
+                            Debug.WriteLine("{0}, {1}, {2}, {3}", reader[0], reader[1], reader[2], reader[3]);
                         }
                     }
                 }
                 connection.Close();
             }
         }
-
     }
 }
+
