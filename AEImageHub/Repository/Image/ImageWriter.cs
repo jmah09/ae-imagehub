@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography;
 
 namespace AEImageHub.Repository.Image
 {
@@ -36,6 +37,30 @@ namespace AEImageHub.Repository.Image
             return WriterHelper.GetImageFormat(fileBytes) != WriterHelper.ImageFormat.unknown;
         }
 
+        private String getHash(IFormFile file)
+        {
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
+            {
+                file.CopyTo(ms);
+                fileBytes = ms.ToArray();
+            }
+            // hash the bytes
+            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+            byte[] hash = md5.ComputeHash(fileBytes);
+
+            // make a hex string of the hash for display or whatever
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in hash)
+            {
+                sb.Append(b.ToString("x2").ToLower());
+            }
+
+
+            return sb.ToString();
+
+        }
+
         /// <summary>
         /// Method to write file onto the disk
         /// </summary>
@@ -47,10 +72,10 @@ namespace AEImageHub.Repository.Image
             try
             {
                 var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-                fileName = Guid.NewGuid().ToString() + extension; //Create a new Name 
+                fileName = getHash(file) + extension; //Create a new Name 
                 Console.Write(fileName);
                 //for the file due to security reasons.
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", fileName);
                 Console.Write(path);
                 using (var bits = new FileStream(path, FileMode.Create))
                 {

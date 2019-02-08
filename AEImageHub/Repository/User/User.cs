@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using AEImageHub.DI.SQLServerConnection;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace AEImageHub.Repository.User
 {
     public class User
     {
+        DbContext _DbContext;
+
+        public User(DbContext context)
+        {
+            _DbContext = context;
+        }
 
         public void GetData()
         {
-            using (SqlConnection connection = new SqlConnection(SQLConnection.getConnectionString()))
+            using (SqlConnection connection = new SqlConnection(_DbContext.Database.GetDbConnection().ConnectionString))
             {
                 Debug.WriteLine("\nQuery data example:");
                 Debug.WriteLine("=========================================\n");
