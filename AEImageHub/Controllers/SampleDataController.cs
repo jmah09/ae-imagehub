@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AEImageHub.Repository;
+using AEImageHub.Repository.Image;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -11,23 +11,23 @@ namespace AEImageHub.Controllers
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
-        private Repository.Image repo;
+        private readonly IImage _repo;
        
         private static string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public SampleDataController()
+        public SampleDataController(IImage repo)
         {
-            repo = new Repository.Image();
+            _repo = repo;
         }
 
         [HttpGet("[action]")]
         public IEnumerable<WeatherForecast> WeatherForecasts()
         {
             //Debug.WriteLine("Connecting to SQL server ....");
-            repo.GetData();
+            _repo.GetData();
 
 
 

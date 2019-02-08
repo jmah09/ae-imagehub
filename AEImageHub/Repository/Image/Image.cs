@@ -3,19 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using AEImageHub.DI.SQLServerConnection;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
-namespace AEImageHub.Repository
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+
+namespace AEImageHub.Repository.Image
 {
-    public class User
+    public class Image : IImage
     {
+        DbContext _dbContext;
+        IImageWriter _imageWriter;
+
+        public Image(DbContext context, IImageWriter imageWriter)
+        {
+            _dbContext = context;
+            _imageWriter = imageWriter;
+        }
 
         public void GetData()
         {
-            using (SqlConnection connection = new SqlConnection(SQLConnection.getConnectionString()))
+            Debug.WriteLine("\nQuery data example:");
+            using (SqlConnection connection = new SqlConnection(_dbContext.Database.GetDbConnection().ConnectionString))
             {
+                Debug.WriteLine(_dbContext.Database.GetDbConnection().ConnectionString);
                 Debug.WriteLine("\nQuery data example:");
                 Debug.WriteLine("=========================================\n");
                 Debug.WriteLine("Image_id/user_id/image_name/size");
@@ -37,6 +50,13 @@ namespace AEImageHub.Repository
                 connection.Close();
             }
         }
+
+
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            var result = await _imageWriter.UploadImage(file);
+            return new ObjectResult(result);
+        }
+
     }
 }
-
