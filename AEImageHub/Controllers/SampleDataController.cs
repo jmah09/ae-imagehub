@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using AEImageHub.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AEImageHub.Controllers
-{
+{    
     [Route("api/[controller]")]
     public class SampleDataController : Controller
     {
