@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using AEImageHub.Repository.Image;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AEImageHub
 {
@@ -37,6 +38,19 @@ namespace AEImageHub
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            
+            // Azure AD authentication
+            // todo - configure cookies
+            services
+                .AddAuthentication(sharedOptions =>
+                {
+                    sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = Configuration["AzureAd:ClientId"];
+                    options.Authority = $"{Configuration["AzureAd:Instance"]}{Configuration["AzureAd:TenantId"]}";
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +84,8 @@ namespace AEImageHub
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+            
+            app.UseAuthentication();
         }
     }
 }
