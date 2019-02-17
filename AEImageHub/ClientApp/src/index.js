@@ -1,7 +1,8 @@
 import { runWithAdal } from 'react-adal';
 import {authContext, getToken} from './adalConfig';
 
-const DO_NOT_LOGIN = false;
+const DO_NOT_LOGIN = true;
+
 
 runWithAdal(authContext, () => {
 

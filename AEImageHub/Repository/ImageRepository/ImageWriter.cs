@@ -5,26 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
+using AEImageHub.Repository;
 
-namespace AEImageHub.Repository.Image
+namespace AEImageHub.Repository
 {
     public class ImageWriter : IImageWriter
     {
-        public async Task<string> UploadImage(IFormFile file)
+        public string StoreImage(IFormFile file)
         {
             if (CheckIfImageFile(file))
             {
-                return await WriteFile(file);
+                return WriteFile(file);
             }
-
-            return "Invalid image file";
+            else
+            {
+                throw new InvalidImageTypeException();
+            }
         }
 
         /// <summary>
         /// Method to check if file is image file
         /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
         private bool CheckIfImageFile(IFormFile file)
         {
             byte[] fileBytes;
@@ -37,7 +38,10 @@ namespace AEImageHub.Repository.Image
             return WriterHelper.GetImageFormat(fileBytes) != WriterHelper.ImageFormat.unknown;
         }
 
-        private String getHash(IFormFile file)
+        /// <summary>
+        /// Method to convert file to MD5 hash
+        /// </summary>
+        public static String GetImageHash(IFormFile file)
         {
             byte[] fileBytes;
             using (var ms = new MemoryStream())
@@ -55,38 +59,23 @@ namespace AEImageHub.Repository.Image
             {
                 sb.Append(b.ToString("x2").ToLower());
             }
-
-
             return sb.ToString();
 
         }
 
         /// <summary>
-        /// Method to write file onto the disk
+        /// Method to write file onto disk
         /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        private async Task<string> WriteFile(IFormFile file)
+        private string WriteFile(IFormFile file)
         {
-            string fileName;
-            try
+            string fileName = GetImageHash(file);
+            Console.Write(fileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", fileName);
+            Console.Write(path);
+            using (var bits = new FileStream(path, FileMode.Create))
             {
-                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
-                fileName = getHash(file) + extension; //Create a new Name 
-                Console.Write(fileName);
-                //for the file due to security reasons.
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", fileName);
-                Console.Write(path);
-                using (var bits = new FileStream(path, FileMode.Create))
-                {
-                    await file.CopyToAsync(bits);
-                }
+                file.CopyToAsync(bits);
             }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-
             return fileName;
         }
     }

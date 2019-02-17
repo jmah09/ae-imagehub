@@ -7,5 +7,13 @@ namespace AEImageHub.Models
 {
     public class User
     {
+        public User()
+        {
+            Image = new HashSet<Image>();
+        }
+
+        public string UserId { get; set; }
+
+        public ICollection<Image> Image { get; set; }
     }
 }

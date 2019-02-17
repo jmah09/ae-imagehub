@@ -27,14 +27,22 @@ export class Upload extends Component {
         const fd = new FormData();
         if (this.state.selectedFile && this.state.selectedFile.name) {
             fd.append('image', this.state.selectedFile, this.state.selectedFile.name);
-            axios.post("/api/image/", fd)
-                .then(res => {
-                    let uri = "/api/image/" + res.data;
-                    this.state.images.push(uri);
-                    this.setState({
-                        images: this.state.images
-                    });
-                })
+
+            axios({
+                url: '/api/image/',
+                method: 'POST',
+                data: fd,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(res => {
+                console.log(res.data)
+                let uri = "/api/image/" + res.data["iId"];
+                this.state.images.push(uri);
+                this.setState({
+                    images: this.state.images
+                });
+            })
         }
     };
 

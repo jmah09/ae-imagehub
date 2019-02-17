@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AEImageHub.Repository.Image
+namespace AEImageHub.Repository
 {
     public class WriterHelper
     {
@@ -21,11 +21,10 @@ namespace AEImageHub.Repository.Image
         {
             var bmp = Encoding.ASCII.GetBytes("BM");     // BMP
             var gif = Encoding.ASCII.GetBytes("GIF");    // GIF
-            var png = new byte[] { 137, 80, 78, 71 };              // PNG
-            var tiff = new byte[] { 73, 73, 42 };                  // TIFF
-            var tiff2 = new byte[] { 77, 77, 42 };                 // TIFF
-            var jpeg = new byte[] { 255, 216, 255, 224 };          // jpeg
-            var jpeg2 = new byte[] { 255, 216, 255, 225 };         // jpeg canon
+            var png = new byte[] { 137, 80, 78, 71 };    // PNG
+            var tiff = new byte[] { 73, 73, 42 };        // TIFF
+            var tiff2 = new byte[] { 77, 77, 42 };       // TIFF
+            var jpeg = new byte[] { 255, 216};           // jpeg
 
             if (bmp.SequenceEqual(bytes.Take(bmp.Length)))
                 return ImageFormat.bmp;
@@ -43,9 +42,6 @@ namespace AEImageHub.Repository.Image
                 return ImageFormat.tiff;
 
             if (jpeg.SequenceEqual(bytes.Take(jpeg.Length)))
-                return ImageFormat.jpeg;
-
-            if (jpeg2.SequenceEqual(bytes.Take(jpeg2.Length)))
                 return ImageFormat.jpeg;
 
             return ImageFormat.unknown;

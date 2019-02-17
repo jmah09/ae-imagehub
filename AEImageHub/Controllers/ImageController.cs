@@ -1,43 +1,88 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using AEImageHub.Repository.Image;
-using Microsoft.AspNetCore.Cors;
+using AEImageHub.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using AEImageHub.Models;
 
 namespace ImageServer.Controllers
 {
     [Route("api/image")]
     public class ImageController : Controller
     {
-        private readonly IImage _repo;
+        private readonly ImageContext _context;
+        private readonly IImageRepository _repo;
 
-        public ImageController(IImage repo)
+
+        public ImageController(ImageContext context, IImageRepository repo)
         {
+            _context = context;
             _repo = repo;
         }
 
         /// <summary>
-        /// Uploads an image to the server.
+        /// Endpoint handling image upload requests
         /// </summary>
-        /// <param name="image"></param>
-        /// <returns></returns>
-        [DisableCors]
-        public async Task<IActionResult> UploadImage(IFormFile image)
+        public IActionResult UploadImage([FromForm]IFormFile image)
         {
-            Debug.Write(HttpContext.Request.Body.ToString());
-            return await _repo.UploadImage(image);
+            // check if image is passed in and also if it's valid image type
+            if(image == null)
+            {
+                return BadRequest("no image passed in");
+            } else if (!_repo.IsImageFileType(image))
+            {
+                return BadRequest("invalid file extension");
+            }
+
+            // check if image exists
+            Image img = GetImageModel(image);
+            if (ImageExists(img.iId))
+            {
+                return Conflict("image already exists");
+            }
+
+            // add image meta data into database
+            try
+            {
+                _context.Add(img);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Debug.Write("SQL exception" + e.Message);
+                return BadRequest("malform request");
+            }
+
+            // store image onto disk
+            string uri = _repo.StoreImageToDisk(image);
+            img.iId = uri; // change database iId type
+            return Created(uri, img);
         }
 
+        private Image GetImageModel(IFormFile image)
+        {
+            string fn = Path.GetFileNameWithoutExtension(image.FileName);
+            Image img = new Image()
+            {
+                iId = ImageWriter.GetImageHash(image).Substring(0,19),
+                uId = "userA", // todo decode token and get username
+                image_name = fn.Length < 19 ? fn : fn.Substring(0,19),
+                size = (Int32)image.Length,
+                uploaded_date = DateTime.Now,
+                type = _repo.GetFileExtension(image),
+                trashed = false,
+                submitted = false
+            };
+            return img;
+        }
 
+        /// <summary>
+        /// Endpoint handling image get requests
+        /// </summary>
         [HttpGet("{filename}")]
-        [DisableCors]
-        public async Task<IActionResult> Get(string filename)
+        public IActionResult GetImage(string filename)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", filename);
             Debug.Write(path);
@@ -49,26 +94,27 @@ namespace ImageServer.Controllers
             return File(image, "image/jpeg");
         }
 
-
-        [Route("api/images")]
-        public IEnumerable<string> GetFiles()
+        /// <summary>
+        /// Endpoint handling image delete requests
+        /// </summary>
+        [HttpDelete(("{uri}"))]
+        public IActionResult DeleteImage(string uri)
         {
-            Debug.Write("===============================================================================");
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources");
-            Debug.Write(path);
-            Debug.Write(path);
-            Debug.Write("===============================================================================");
-            var image = System.IO.File.OpenRead(path);
-            List<string> l = new List<string>();
-
-            DirectoryInfo d = new DirectoryInfo(path);//Assuming Test is your Folder
-            FileInfo[] Files = d.GetFiles("*.png"); //Getting Text files
-            foreach (FileInfo file in Files)
+            Image image =  _context.Image.Find(uri.Substring(0,19));
+            if (image == null)
             {
-                l.Add(file.Name);
+                return NotFound();
             }
+            _context.Image.Remove(image);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", uri);
+            _context.SaveChanges();
+            System.IO.File.Delete(path);
+            return Accepted();
+        }
 
-            return l;
+        private bool ImageExists(string id)
+        {
+            return _context.Image.Any(e => e.iId.Equals(id));
         }
     }
 }
