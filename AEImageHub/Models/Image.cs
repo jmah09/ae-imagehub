@@ -11,15 +11,15 @@ namespace AEImageHub.Models
 
     public partial class Image
     {
-        public string iId { get; set; }
-        public string uId { get; set; }
-        public string image_name { get; set; }
-        public Int32 size { get; set; }
-        public DateTime uploaded_date { get; set; }
-        public string type { get; set; }
-        public bool trashed { get; set; }
-        public DateTime? trashed_date { get; set; }
-        public bool submitted { get; set; }
+        public string IId { get; set; }
+        public string UId { get; set; }
+        public string ImageName { get; set; }
+        public Int32 Size { get; set; }
+        public DateTime UploadedDate { get; set; }
+        public string Type { get; set; }
+        public bool Trashed { get; set; }
+        public DateTime? TrashedDate { get; set; }
+        public bool Submitted { get; set; }
 
         public User User { get; set; }
     }
