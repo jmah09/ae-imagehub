@@ -47,10 +47,11 @@ export class Upload extends Component {
     };
 
     fileLoadHandler = () => {
-        axios.get("/api/files")
+        axios.get("/api/user/todo/images")
             .then(res => {
                 let a = [];
-                res.data.forEach((uri) => { a.push("/api/image/" + uri) })
+                console.log(res.data)
+                res.data.forEach((image) => { a.push("/api/image/" + image.iId) })
                 this.setState({
                     images: a
                 });

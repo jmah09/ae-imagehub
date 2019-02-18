@@ -66,9 +66,9 @@ namespace ImageServer.Controllers
             string fn = Path.GetFileNameWithoutExtension(image.FileName);
             Image img = new Image()
             {
-                IId = ImageWriter.GetImageHash(image).Substring(0,19),
+                IId = ImageWriter.GetImageHash(image),
                 UId = "todo", // todo decode token and get username
-                ImageName = fn.Length < 19 ? fn : fn.Substring(0,19),
+                ImageName = fn,
                 Size = (Int32)image.Length,
                 UploadedDate = DateTime.Now,
                 Type = _repo.GetFileExtension(image),
@@ -86,12 +86,15 @@ namespace ImageServer.Controllers
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", filename);
             Debug.Write(path);
-            var image = System.IO.File.OpenRead(path);
-
-            if (image == null)
+            bool exists = System.IO.File.Exists(path);
+            if (exists)
+            {
+                var image = System.IO.File.OpenRead(path);
+                return File(image, "image/jpeg");
+            }
+            else{
                 return NotFound();
-
-            return File(image, "image/jpeg");
+            }
         }
 
         /// <summary>
@@ -100,7 +103,7 @@ namespace ImageServer.Controllers
         [HttpDelete(("{uri}"))]
         public IActionResult DeleteImage(string uri)
         {
-            Image image =  _context.Image.Find(uri.Substring(0,19));
+            Image image =  _context.Image.Find(uri);
             if (image == null)
             {
                 return NotFound();

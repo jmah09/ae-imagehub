@@ -70,7 +70,15 @@ namespace AEImageHub.Repository
         {
             string fileName = GetImageHash(file);
             Console.Write(fileName);
+
+            var dir = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources");
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", fileName);
+            bool exists = System.IO.Directory.Exists(dir);
+            if (!exists)
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
             Console.Write(path);
             using (var bits = new FileStream(path, FileMode.Create))
             {
