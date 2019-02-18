@@ -1,9 +1,7 @@
-﻿/*
-using System;
+﻿
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AEImageHub.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AEImageHub.Controllers
@@ -12,13 +10,25 @@ namespace AEImageHub.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // GET: api/User
-        [HttpGet]
-        public IEnumerable<string> Get()
+
+        private readonly ImageContext _context;
+
+
+        public UserController(ImageContext context)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
         }
 
+
+        // GET: api/User/:userid/images
+        [HttpGet("{userid}/images")]
+        public IEnumerable<Image> Get(string userid)
+        {
+            var images = _context.Image.Where(i => i.uId == userid);
+            return images.ToList();
+        }
+
+        /*
         // GET: api/User/5
         [HttpGet("{id}", Name = "Get")]
         public string Get(int id)
@@ -43,6 +53,7 @@ namespace AEImageHub.Controllers
         public void Delete(int id)
         {
         }
+        */
     }
 }
-*/
+

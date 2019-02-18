@@ -67,7 +67,7 @@ namespace ImageServer.Controllers
             Image img = new Image()
             {
                 iId = ImageWriter.GetImageHash(image).Substring(0,19),
-                uId = "userA", // todo decode token and get username
+                uId = "todo", // todo decode token and get username
                 image_name = fn.Length < 19 ? fn : fn.Substring(0,19),
                 size = (Int32)image.Length,
                 uploaded_date = DateTime.Now,
