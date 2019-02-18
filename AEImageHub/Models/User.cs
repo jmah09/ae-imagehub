@@ -12,7 +12,7 @@ namespace AEImageHub.Models
             Image = new HashSet<Image>();
         }
 
-        public string UserId { get; set; }
+        public string user_name { get; set; }
 
         public ICollection<Image> Image { get; set; }
     }

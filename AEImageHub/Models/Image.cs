@@ -20,5 +20,7 @@ namespace AEImageHub.Models
         public bool trashed { get; set; }
         public DateTime? trashed_date { get; set; }
         public bool submitted { get; set; }
+
+        public User User { get; set; }
     }
 }
