@@ -24,7 +24,7 @@ namespace AEImageHub.Controllers
         [HttpGet("{userid}/images")]
         public IEnumerable<Image> Get(string userid)
         {
-            var images = _context.Image.Where(i => i.uId == userid);
+            var images = _context.Image.Where(i => i.UId == userid);
             return images.ToList();
         }
 

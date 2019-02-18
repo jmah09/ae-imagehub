@@ -25,7 +25,7 @@ namespace AEImageHub.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Image>()
-                .HasKey(i => i.iId);
+                .HasKey(i => i.IId);
 
             modelBuilder.Entity<User>()
                 .HasKey(i => i.user_name);
@@ -34,7 +34,7 @@ namespace AEImageHub.Models
             {
                 entity.HasOne(i => i.User)
                     .WithMany(u => u.Image)
-                    .HasForeignKey(u => u.uId);
+                    .HasForeignKey(u => u.UId);
             });
         }
     }

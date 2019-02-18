@@ -38,7 +38,7 @@ namespace ImageServer.Controllers
 
             // check if image exists
             Image img = GetImageModel(image);
-            if (ImageExists(img.iId))
+            if (ImageExists(img.IId))
             {
                 return Conflict("image already exists");
             }
@@ -57,7 +57,7 @@ namespace ImageServer.Controllers
 
             // store image onto disk
             string uri = _repo.StoreImageToDisk(image);
-            img.iId = uri; // change database iId type
+            img.IId = uri; // change database iId type
             return Created(uri, img);
         }
 
@@ -66,14 +66,14 @@ namespace ImageServer.Controllers
             string fn = Path.GetFileNameWithoutExtension(image.FileName);
             Image img = new Image()
             {
-                iId = ImageWriter.GetImageHash(image).Substring(0,19),
-                uId = "todo", // todo decode token and get username
-                image_name = fn.Length < 19 ? fn : fn.Substring(0,19),
-                size = (Int32)image.Length,
-                uploaded_date = DateTime.Now,
-                type = _repo.GetFileExtension(image),
-                trashed = false,
-                submitted = false
+                IId = ImageWriter.GetImageHash(image).Substring(0,19),
+                UId = "todo", // todo decode token and get username
+                ImageName = fn.Length < 19 ? fn : fn.Substring(0,19),
+                Size = (Int32)image.Length,
+                UploadedDate = DateTime.Now,
+                Type = _repo.GetFileExtension(image),
+                Trashed = false,
+                Submitted = false
             };
             return img;
         }
@@ -114,7 +114,7 @@ namespace ImageServer.Controllers
 
         private bool ImageExists(string id)
         {
-            return _context.Image.Any(e => e.iId.Equals(id));
+            return _context.Image.Any(e => e.IId.Equals(id));
         }
     }
 }
