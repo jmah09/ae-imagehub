@@ -1,4 +1,4 @@
-## Integration Tests
+## AE Image Hub Integration Testing
 
 How to run tests
 ```
