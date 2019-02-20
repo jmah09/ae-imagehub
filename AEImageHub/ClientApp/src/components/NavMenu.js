@@ -1,41 +1,38 @@
-﻿import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Glyphicon, Nav, Navbar, NavItem } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import './NavMenu.css';
+import './Main.css';
 
 export class NavMenu extends Component {
-  displayName = NavMenu.name
+    displayName = NavMenu.name
 
-  render() {
-    return (
-      <Navbar inverse fixedTop fluid collapseOnSelect>
-        <Navbar.Header>
-          <Navbar.Brand>
-            <Link to={'/'}>AEImageHub</Link>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
-        <Navbar.Collapse>
-          <Nav>
-            <LinkContainer to={'/'} exact>
-              <NavItem>
-                <Glyphicon glyph='home' /> Home
-              </NavItem>
-            </LinkContainer>
-            <LinkContainer to={'/counter'}>
-              <NavItem>
-                <Glyphicon glyph='education' /> Counter
-              </NavItem>
-            </LinkContainer>
-            <LinkContainer to={'/fetchdata'}>
-              <NavItem>
-                <Glyphicon glyph='th-list' /> Fetch data
-              </NavItem>
-            </LinkContainer>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-    );
-  }
+    render() {
+        return (
+            <Navbar fluid>
+                <Nav>
+                    <LinkContainer to={'/search'}>
+                        <NavItem>search</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/palette'}>
+                        <NavItem>user palette</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/log'}>
+                        <NavItem>log</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/trash'}>
+                        <NavItem>trash</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/project'}>
+                        <NavItem>project</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/metadata'}>
+                        <NavItem>metadata</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={'/user'}>
+                        <NavItem>user</NavItem>
+                    </LinkContainer>
+                </Nav>
+            </Navbar>
+        );
+    }
 }
