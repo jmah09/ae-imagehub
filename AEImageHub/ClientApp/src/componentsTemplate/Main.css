@@ -141,3 +141,18 @@ h2 {
     float: left;
 
 }
+
+.toggleButton button {
+    background-color: #1B53AD;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    margin: 3px 0px 0px 5px;
+    padding: 2px 10px;
+    font-size: 15px;
+    color: #FFF;
+}
+
+.toggleButton button:hover {
+    background-color: #287AFF;
+}

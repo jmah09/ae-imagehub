@@ -31,7 +31,7 @@ const SelectedImage = ({ index, onClick, photo, margin, direction, top, left}) =
       <Checkmark selected={photo.selected ? true : false}/>
       <img alt=" " style={photo.selected ? {...imgStyle, ...selectedImgStyle} : {...imgStyle}} {...photo} onClick={(e) => onClick(e, {index, photo})} />
       <style>
-      {`.not-selected:hover{outline:2px solid #06befa}`}
+      {`.not-selected:hover{outline:2px solid #287AFF}`}
       </style>
     </div>
   )

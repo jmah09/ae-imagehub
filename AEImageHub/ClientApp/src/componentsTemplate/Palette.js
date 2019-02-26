@@ -105,15 +105,15 @@ export class Palette extends Component {
     // TODO
     renderContent() {
         return (
-            <div>
+            <div class="toggleButton">
             <p>
-              <button className="toggle-select" onClick={this.toggleSelect}>
-                toggle select all
+              <button onClick={this.toggleSelect}>
+                Select All
               </button>
             </p>
             <Gallery
               photos={this.state.photos}
-              columns = {4}
+              columns = {5}
               onClick={this.selectPhoto}
               ImageComponent={SelectedImage}
               direction={"row"}
