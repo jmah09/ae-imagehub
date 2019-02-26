@@ -4,56 +4,58 @@ import Gallery from 'react-photo-gallery';
 import SelectedImage from './SelectedImage';
 import hooverdam from './img/hooverdam.jpg';
 import clevelanddam from './img/clevelanddam.jpg';
-// import enguridam from './img/enguridam.jpg';
-// import threegorgesdam from './img/threegorgesdam.jpg'
-// import './Palette.css';
+import enguridam from './img/enguridam.jpg';
+import threegorgesdam from './img/threegorgesdam.jpg'
 
 var photos = [
     {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: clevelanddam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      },
-      {
-        src: hooverdam,
-        width: 1,
-        height: 1
-      }
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: clevelanddam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: hooverdam, width: 1, height: 1
+    },
+    {
+        src: enguridam, width: 1, height: 1
+    },
+    {
+        src: threegorgesdam, width: 1, height: 1
+    },
+    {
+        src: enguridam, width: 1, height: 1
+    },
+    {
+        src: enguridam, width: 1, height: 1
+    },
+    {
+        src: enguridam, width: 1, height: 1
+    },
+    {
+        src: enguridam, width: 1, height: 1
+    },
+    {
+        src: threegorgesdam, width: 1, height: 1
+    }
 ]
 export class Palette extends Component {
     constructor(props) {

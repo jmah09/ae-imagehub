@@ -135,12 +135,12 @@ h2 {
     background-color: #287AFF;
 }
 
-#palcontent {
+/* #palcontent {
     overflow: hidden;
     height: 100%;
     float: left;
 
-}
+} */
 
 .toggleButton button {
     background-color: #1B53AD;
