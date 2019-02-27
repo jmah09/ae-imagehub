@@ -32,6 +32,10 @@ export class Project extends Component {
             textAlign: 'center',
             margin: "0px 0px 0px 65px"
         }
+        
+        const statusStyle = {
+            margin: "0px 0px 0px 70px"
+        }
         const data = [
             {
                 name: 'Bridge Project',
@@ -63,7 +67,7 @@ export class Project extends Component {
             },
             {
                 Header: 'Status',
-                Cell: () => <span><input type="checkbox" name="null"></input></span>
+                Cell: () => <span><input type="checkbox" style={statusStyle}></input></span>
             },
             {
                 Header: 'Date Created',
