@@ -30,11 +30,11 @@ export class Project extends Component {
             color: 'white',
             backgroundColor: '#1B53AD',
             textAlign: 'center',
-            margin: "0px 0px 0px 65px"
+            margin: '0px 0px 0px 65px'
         }
         
         const statusStyle = {
-            margin: "0px 0px 0px 70px"
+            margin: '0px 0px 0px 70px'
         }
         const data = [
             {
