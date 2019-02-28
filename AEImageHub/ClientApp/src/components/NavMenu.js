@@ -23,9 +23,34 @@ export class NavMenu extends Component {
                 <Glyphicon glyph='home' /> Home
               </NavItem>
             </LinkContainer>
-            <LinkContainer to={'/upload'}>
+            <LinkContainer to={'/backend_test/Upload'}>
               <NavItem>
                 <Glyphicon glyph='th-list' /> Upload
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/backend_test/User'}>
+              <NavItem>
+                <Glyphicon glyph='th-list' /> User
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/backend_test/Image'}>
+              <NavItem>
+                <Glyphicon glyph='th-list' /> Image
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/backend_test/Project'}>
+              <NavItem>
+                <Glyphicon glyph='th-list' /> Project
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/backend_test/Log'}>
+              <NavItem>
+                <Glyphicon glyph='th-list' /> Log
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/backend_test/Tag'}>
+              <NavItem>
+                <Glyphicon glyph='th-list' /> Tag
               </NavItem>
             </LinkContainer>
           </Nav>
