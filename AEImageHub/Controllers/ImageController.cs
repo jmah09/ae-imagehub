@@ -12,11 +12,11 @@ namespace ImageServer.Controllers
     [Route("api/image")]
     public class ImageController : Controller
     {
-        private readonly ImageContext _context;
+        private readonly ihubDBContext _context;
         private readonly IImageRepository _repo;
 
 
-        public ImageController(ImageContext context, IImageRepository repo)
+        public ImageController(ihubDBContext context, IImageRepository repo)
         {
             _context = context;
             _repo = repo;
