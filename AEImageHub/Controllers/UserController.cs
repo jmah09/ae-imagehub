@@ -7,31 +7,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace AEImageHub.Controllers
 {
     
-        [Route("api/user")]
-        [ApiController]
-        public class UserController : ControllerBase
+    [Route("api/user")]
+    [ApiController]
+    public class UserController : ControllerBase
+    {
+
+        private readonly ihubDBContext _context;
+
+        public UserController(ihubDBContext context)
         {
+            _context = context;
+        }
 
-            private readonly ihubDBContext _context;
+        /* GET
+        API Endpoint: api/user/:user_id/images
+        Description: Retrieves the list of images that belongs to the user
+        Request Requirements:
+        1. User JWT in header field
 
-            public UserController(ihubDBContext context)
-            {
-                _context = context;
-            }
+        Server response and status code:
+        200 - User image retrieve was successful server should return a list of image links
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to view user images
+        */
 
-            /* GET
-            API Endpoint: api/user/:user_id/images
-            Description: Retrieves the list of images that belongs to the user
-            Request Requirements:
-            1. User JWT in header field
-
-            Server response and status code:
-            200 - User image retrieve was successful server should return a list of image links
-            401 - the JWT attached to the header is invalid or expired(should redirect to login)
-            403 - user not authorized to view user images
-            */
-
-    [HttpGet("{userid}/images")]
+        [HttpGet("{userid}/images")]
         public IEnumerable<Image> GetImage(string userid)
         {
             var images = _context.Image.Where(i => i.UId == userid);
@@ -97,7 +97,7 @@ namespace AEImageHub.Controllers
         [HttpPut("{userid}/profile")]
         public void PutProfile(string userid)
         {
-            User user = (User) _context.User.Where(i => i.UId == userid); ;
+            User user = (User) _context.User.Where(i => i.UId == userid);
             user.UserName = "Steve";
             _context.SaveChanges();
         }
