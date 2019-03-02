@@ -33,11 +33,6 @@ export class NavMenu extends Component {
                 <Glyphicon glyph='th-list' /> User
               </NavItem>
             </LinkContainer>
-            <LinkContainer to={'/backend_test/Image'}>
-              <NavItem>
-                <Glyphicon glyph='th-list' /> Image
-              </NavItem>
-            </LinkContainer>
             <LinkContainer to={'/backend_test/Project'}>
               <NavItem>
                 <Glyphicon glyph='th-list' /> Project

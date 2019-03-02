@@ -1,8 +1,11 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
@@ -51,14 +54,31 @@ namespace AEImageHub.Controllers
         */
 
         [HttpGet("{userid}")]
-        public User GetUserProfile(string userid)
+        public Object GetUser(string userid)
         {
-            User user = (User) _context.User.Where(i => i.UId == userid);
-            return user; //user's profile
+            return JsonConvert.SerializeObject(_context.User.Where(i => i.UId == userid).First());
+        }
+
+        /*
+        GET
+        API Endpoint: api/user/
+        Description: Retrieves the list of all user profile
+        Request Requirements:
+        1. User JWT in header field
+        2. Admin credentials
+        Server response and status code:
+        200 - User profile retrieve was successful server should return a list of user profile
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to view users’ profiles
+        */
+        [HttpGet("")]
+        public Object GetUsers()
+        {
+            return JsonConvert.SerializeObject(_context.User);
         }
 
         /* POST
-        API Endpoint: api/user/:user_id
+        API Endpoint: api/user/
         Description: Creates user profile(Admin only)
         Request Requirements:
         1. User JWT in header field
@@ -70,19 +90,23 @@ namespace AEImageHub.Controllers
         403 - user not authorized to create user profile
         */
 
-        [HttpPost("{userid}")]
-        public void PostProfile([FromBody] string value)
+        [HttpPost("")]
+        public void PostUser([FromBody] JObject payload)
         {
             User user = new User()
             {
+                UId = (string)payload["UId"],
+                UserName = (string)payload["UserName"],
+                Role = (string)payload["Role"],
+                Admin = (bool)payload["Admin"],
+                Active = (bool)payload["Active"],
             };
-
             _context.User.Add(user);
             _context.SaveChanges();
         }
 
         /* PUT
-        API Endpoint: api/user/:user_id/profile
+        API Endpoint: api/user/:user_id
         Description: Modifies user profile
         Request Requirements:
         1. User JWT in header field
@@ -94,11 +118,15 @@ namespace AEImageHub.Controllers
         403 - user not authorized to modify user's profile
         */
 
-        [HttpPut("{userid}/profile")]
-        public void PutProfile(string userid)
+        [HttpPut("{userid}")]
+        public void PutUser(string userid, [FromBody] JObject payload)
         {
-            User user = (User) _context.User.Where(i => i.UId == userid);
-            user.UserName = "Steve";
+            User user = (User)_context.User.Where(u => u.UId == userid).First();
+            user.UId = (string)payload["UId"];
+            user.UserName = (string)payload["UserName"];
+            user.Role = (string)payload["Role"];
+            user.Admin = (bool)payload["Admin"];
+            user.Active = (bool)payload["Active"];
             _context.SaveChanges();
         }
     }

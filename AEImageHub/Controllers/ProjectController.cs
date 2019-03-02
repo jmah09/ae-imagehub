@@ -23,6 +23,23 @@ namespace AEImageHub.Controllers
 
         /*
         GET
+        API Endpoint: api/project/
+        Description: Retrieves projects
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - Project retrieve was successful server should return project list
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        */
+        [HttpGet("")]
+        public Object GetProjects()
+        {
+            return JsonConvert.SerializeObject(_context.Project);
+        }
+
+        /*
+        GET
         API Endpoint: api/project/:project_id
         Description: Retrieves project
         Request Requirements:
@@ -81,7 +98,7 @@ namespace AEImageHub.Controllers
         [HttpDelete("{projectname}")]
         public void DeleteProject(string projectname)
         {
-            Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname);
+            Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
             _context.Remove(project);
             _context.SaveChanges();
         }
@@ -98,12 +115,14 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to modify project
         */
-        [HttpPut("{projectid}")]
-        public void PutProject(string projectid)
+        [HttpPut("{projectname}")]
+        public void PutProject(string projectname, [FromBody] JObject payload)
         {
-            User user = (User)_context.Project.Where(i => i.ProjectName == projectid);
-            // user.UserName = "Steve";
-            // _context.SaveChanges();
+            Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
+            project.ProjectName = (string)payload["ProjectName"];
+            project.CreatedDate = (DateTime)payload["CreatedDate"];
+            project.Description = (string)payload["Description"];
+            _context.SaveChanges();
         }
     }
 }

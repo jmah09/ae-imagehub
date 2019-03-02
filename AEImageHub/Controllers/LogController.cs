@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
@@ -32,9 +33,9 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
         [HttpGet("")]
-        public IEnumerable<Log> GetLogs()
+        public Object GetLogs()
         {
-            return _context.Log.ToList(); //user's images
+            return JsonConvert.SerializeObject(_context.Log);
         }
 
         /*
@@ -50,7 +51,7 @@ namespace AEImageHub.Controllers
         */
 
         [HttpPost("")]
-        public void PostProfile([FromBody] JObject payload)
+        public void PostLog([FromBody] JObject payload)
         {
             Log log = new Log()
             {

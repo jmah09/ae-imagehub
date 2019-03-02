@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
@@ -31,9 +33,9 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
         [HttpGet("")]
-        public IEnumerable<Tag> GetTags()
+        public Object GetTags()
         {
-            return _context.Tag.ToList(); //user's images
+            return JsonConvert.SerializeObject(_context.Tag);
         }
 
         /*
@@ -49,14 +51,17 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to create tag
         */
-        [HttpPost("{userid}/profile")]
-        public void PostProfile([FromBody] string value)
+        [HttpPost("")]
+        public void PostTag([FromBody] JObject payload)
         {
-            User user = new User()
+            Tag tag = new Tag()
             {
+                TagName = (string)payload["TagName"],
+                Description = (string)payload["Description"],
+                Active = (bool)payload["Active"],
             };
 
-            _context.User.Add(user);
+            _context.Tag.Add(tag);
             _context.SaveChanges();
         }
 
@@ -72,11 +77,13 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to modify tag
         */
-        [HttpPut("{userid}/profile")]
-        public void PutProfile(string userid)
+        [HttpPut("{tagname}")]
+        public void PutTag(string tagname, [FromBody] JObject payload)
         {
-            User user = (User)_context.User.Where(i => i.UId == userid);
-            user.UserName = "Steve";
+            Tag tag = (Tag)_context.Tag.Where(t => t.TagName == tagname).First();
+            tag.TagName = (string)payload["TagName"];
+            tag.Description = (string)payload["Description"];
+            tag.Active = (bool)payload["Active"];
             _context.SaveChanges();
         }
     }

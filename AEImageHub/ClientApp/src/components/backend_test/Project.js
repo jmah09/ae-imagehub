@@ -16,29 +16,60 @@ export class Project extends Component {
             })
     }
 
+    GetProjects() {
+        axios.get("/api/project")
+            .then(res => {
+                return;
+            })
+    };
+
     PostProject() {
         axios.post("/api/project", {
             ProjectName: 'testPro',
             CreatedDate: '2009-05-08 14:40:52',
             Description: 'TESTPRO'
         })
-            .then(function (response) {
+            .then(response => {
                 console.log(response);
             })
-            .catch(function (error) {
+            .catch(error => {
                 console.log(error);
             });
     }
 
+    PutProject() {
+        axios.put("/api/project", {
+            ProjectName: 'testPro',
+            CreatedDate: '2009-05-08 14:40:52',
+            Description: 'TESTPROOOOOOOOOOO'
+        })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    DeleteProject() {
+        axios.delete("/api/project/testPro")
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
     render() {
         return (
             <div>
                 <br/>
-                <button onClick={this.GetProject}>GetProject</button><br/>
+                <button onClick={this.GetProject}>GetProject</button><br />
+                <button onClick={this.GetProjects}>GetProjects</button><br />
                 <button onClick={this.PostProject}>PostProject</button><br/>
-                <button onClick={this.DeleteProject}>DeleteProject</button><br/>
-                <button onClick={this.func}>func_name</button><br/>
+                <button onClick={this.PutProject}>PutProject</button><br />
+                <button onClick={this.DeleteProject}>DeleteProject</button><br />
             </div>
         );
     }
