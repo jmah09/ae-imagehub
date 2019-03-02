@@ -25,10 +25,10 @@ namespace AEImageHub
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            // Add Image db context
+            // Add db context
             services.AddDbContext<ihubDBContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+           
             // Dependency injection
             services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IImageRepository, ImageRepository>();

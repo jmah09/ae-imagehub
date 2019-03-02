@@ -7,6 +7,7 @@ import { Image } from './components/backend_test/Image';
 import { Project } from './components/backend_test/Project';
 import { Tag } from './components/backend_test/Tag';
 import { User } from './components/backend_test/User';
+import { Log } from './components/backend_test/Log';
 
 export default class App extends Component {
   displayName = App.name
@@ -20,6 +21,7 @@ export default class App extends Component {
         <Route path='/backend_test/Project' component={Project} />
         <Route path='/backend_test/Tag' component={Tag} />
         <Route path='/backend_test/User' component={User} />
+        <Route path='/backend_test/Log' component={Log} />
       </Layout>
     );
   }

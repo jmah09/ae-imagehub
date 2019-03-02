@@ -8,11 +8,18 @@ export class Tag extends Component {
         super(props);
     }
 
+    GetTags() {
+        axios.get("/api/tag")
+            .then(res => {
+                return;
+            })
+    }
+
     render() {
         return (
             <div>
                 <br/>
-                <button onClick={this.func}>func_name</button><br/>
+                <button onClick={this.GetTags}>GetTags</button><br/>
                 <button onClick={this.func}>func_name</button><br/>
                 <button onClick={this.func}>func_name</button><br/>
                 <button onClick={this.func}>func_name</button><br/>

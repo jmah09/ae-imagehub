@@ -32,14 +32,14 @@ namespace AEImageHub.Controllers
         */
 
         [HttpGet("{userid}/images")]
-        public IEnumerable<Image> GetImage(string userid)
+        public IEnumerable<Image> GetUserImages(string userid)
         {
             var images = _context.Image.Where(i => i.UId == userid);
             return images.ToList(); //user's images
         }
 
         /* GET
-        API Endpoint: api/user/:user_id/profile
+        API Endpoint: api/user/:user_id
         Description: Retrieves user profile
         Request Requirements:
         1. User JWT in header field
@@ -50,15 +50,15 @@ namespace AEImageHub.Controllers
         403 - user not authorized to view user's profile
         */
 
-        [HttpGet("{userid}/profile")]
-        public User GetProfile(string userid)
+        [HttpGet("{userid}")]
+        public User GetUserProfile(string userid)
         {
             User user = (User) _context.User.Where(i => i.UId == userid);
             return user; //user's profile
         }
 
         /* POST
-        API Endpoint: api/user/:user_id/profile
+        API Endpoint: api/user/:user_id
         Description: Creates user profile(Admin only)
         Request Requirements:
         1. User JWT in header field
@@ -70,7 +70,7 @@ namespace AEImageHub.Controllers
         403 - user not authorized to create user profile
         */
 
-        [HttpPost("{userid}/profile")]
+        [HttpPost("{userid}")]
         public void PostProfile([FromBody] string value)
         {
             User user = new User()
