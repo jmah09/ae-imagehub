@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AEImageHub.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AEImageHub.Models;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AEImageHub
 {
@@ -33,12 +34,6 @@ namespace AEImageHub
             services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IImageRepository, ImageRepository>();
 
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
-            
             // Azure AD authentication
             // todo - configure cookies
             services
@@ -51,6 +46,13 @@ namespace AEImageHub
                     options.Audience = Configuration["AzureAd:ClientId"];
                     options.Authority = $"{Configuration["AzureAd:Instance"]}{Configuration["AzureAd:TenantId"]}";
                 });
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +69,8 @@ namespace AEImageHub
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseAuthentication();
+            
 
             app.UseMvc(routes =>
             {
@@ -74,6 +78,8 @@ namespace AEImageHub
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
+
+
 
             app.UseSpa(spa =>
             {
@@ -84,8 +90,19 @@ namespace AEImageHub
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
-            
-            app.UseAuthentication();
+
+            app.Use(async (context, next) =>
+            {
+                if (!context.User.Identity.IsAuthenticated)
+                {
+                    await context.ChallengeAsync();
+                }
+                else
+                {
+                    await next();
+                }
+            });
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import axios from 'axios'
+import { getToken } from '../../adalConfig';
 
 export class User extends Component {
     displayName = User.name
@@ -9,21 +10,21 @@ export class User extends Component {
     }
 
     GetUserImages() {
-        axios.get("/api/user/userA/images")
+        axios.get("/api/user/userA/images", { headers: { 'Authorization': "bearer " + getToken() } })
         .then(res => {
             return;
         })
     }
 
     GetUser() {
-        axios.get("/api/user/userA")
+        axios.get("/api/user/userA", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 return;
             })
     }
 
     GetUsers() {
-        axios.get("/api/user")
+        axios.get("/api/user", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 return;
             })
@@ -36,7 +37,7 @@ export class User extends Component {
             Role: 'tester',
             Admin: 0,
             Active: 1
-        })
+        }, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response);
             })
@@ -52,7 +53,7 @@ export class User extends Component {
             Role: 'tester',
             Admin: 1,
             Active: 1
-        })
+        }, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response);
             })

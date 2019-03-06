@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import axios from 'axios'
+import { getToken } from '../../adalConfig';
 
 export class Project extends Component {
     displayName = Project.name
@@ -9,7 +10,7 @@ export class Project extends Component {
     }
 
     GetProject() {
-        axios.get("/api/project/bridge%20builder")
+        axios.get("/api/project/bridge%20builder", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response.data);
                 return;
@@ -17,7 +18,7 @@ export class Project extends Component {
     }
 
     GetProjects() {
-        axios.get("/api/project")
+        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 return;
             })
@@ -28,7 +29,7 @@ export class Project extends Component {
             ProjectName: 'testPro',
             CreatedDate: '2009-05-08 14:40:52',
             Description: 'TESTPRO'
-        })
+        }, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response);
             })

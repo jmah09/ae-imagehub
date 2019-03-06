@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using AEImageHub.Models;
+using Newtonsoft.Json.Linq;
 
 namespace ImageServer.Controllers
 {
@@ -116,6 +117,37 @@ namespace ImageServer.Controllers
             else{
                 return NotFound();
             }
+        }
+
+        /*
+        PUT
+        API Endpoint: api/image/:image_id
+        Description: Modify metadata or the image itself.
+        Request Requirements:
+        1. User JWT in header field
+        2. Image file attachment
+        3. Metadata(optional)
+
+        Server response and status code:
+        200 - image put request was successful server should return the modified image_id
+        400 - malformed request
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        404 - image does not exist
+        */
+        [HttpPut("{imageid}")]
+        public void PutProject(string imageid, [FromBody] JObject payload)
+        {
+            Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+            image.IId = (string)payload["IId"];
+            image.UId = (string)payload["UId"];
+            image.ImageName = (string)payload["ImageName"];
+            image.Size = (int)payload["Size"];
+            image.UploadedDate = (DateTime)payload["UploadedDate"];
+            image.Type = (string)payload["Type"];
+            image.Trashed = (bool)payload["Trashed"];
+            image.TrashedDate = (DateTime)payload["TrashedDate"];
+            image.Submitted = (bool)payload["Submitted"];
+            _context.SaveChanges();
         }
 
         /* DELETE
