@@ -10,21 +10,33 @@ using AEImageHub.Models;
 namespace ImageServer.Controllers
 {
     [Route("api/image")]
+    [ApiController]
     public class ImageController : Controller
     {
-        private readonly ImageContext _context;
+        private readonly ihubDBContext _context;
         private readonly IImageRepository _repo;
 
 
-        public ImageController(ImageContext context, IImageRepository repo)
+        public ImageController(ihubDBContext context, IImageRepository repo)
         {
             _context = context;
             _repo = repo;
         }
 
-        /// <summary>
-        /// Endpoint handling image upload requests
-        /// </summary>
+        /* POST
+        API Endpoint: api/image/
+        Description: Uploads image to the server
+        Request Requirements:
+        1. User JWT in header field
+        2. Image file attachment
+        3. Metadata(optional)
+
+        Server response and status code:
+        201 - image upload was successful server should return a link to the image and its metadata
+        400 - malformed request due to unsupported file extension or etc
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        409 - image already exists on the server
+        */
         public IActionResult UploadImage([FromForm]IFormFile image)
         {
             // check if image is passed in and also if it's valid image type
@@ -78,9 +90,18 @@ namespace ImageServer.Controllers
             return img;
         }
 
-        /// <summary>
-        /// Endpoint handling image get requests
-        /// </summary>
+        /* GET
+        API Endpoint: api/image/:image_id
+        Description: Retrieves image from the server as well as its metadata
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - image retrive successful server should return an image
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to view image
+        404 - image does not exist
+        */
         [HttpGet("{filename}")]
         public IActionResult GetImage(string filename)
         {
@@ -97,9 +118,19 @@ namespace ImageServer.Controllers
             }
         }
 
-        /// <summary>
-        /// Endpoint handling image delete requests
-        /// </summary>
+        /* DELETE
+        API Endpoint: api/image/:image_id
+        Description: Deletes image from the server
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - image delete was successful
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to delete image
+        404 - image does not exist
+        */
+
         [HttpDelete(("{uri}"))]
         public IActionResult DeleteImage(string uri)
         {
