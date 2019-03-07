@@ -4,12 +4,12 @@ import { AuthenticationContext, adalFetch, withAdalLogin } from 'react-adal';
 // todo : document this
 const adalConfig = {
     tenant: 'gwangjaehotmail.onmicrosoft.com',
-    clientId: 'd979cf7a-d85d-4ec4-a47c-99631e13953a',
+    clientId: '1463cf51-dc8a-4bb7-b459-edd88f411830',
     endpoints: {
-        api: 'd979cf7a-d85d-4ec4-a47c-99631e13953a'
+        api: '1463cf51-dc8a-4bb7-b459-edd88f411830'
     },
     postLogoutRedirectUri: window.location.origin,
-    redirectUri: 'http://localhost:5000',
+    redirectUri: 'https://jaetest.azurewebsites.net',
     cacheLocation: 'sessionStorage'
 };
 

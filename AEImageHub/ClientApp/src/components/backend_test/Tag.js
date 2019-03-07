@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import axios from 'axios'
+import { getToken } from '../../adalConfig';
 
 export class Tag extends Component {
     displayName = Tag.name
@@ -9,7 +10,7 @@ export class Tag extends Component {
     }
 
     GetTags() {
-        axios.get("/api/tag")
+        axios.get("/api/tag", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 return;
             })
@@ -20,7 +21,7 @@ export class Tag extends Component {
             TagName: 'testTag',
             Description: 'TESTTAG',
             Active: 1
-        })
+        }, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response);
             })
@@ -34,7 +35,7 @@ export class Tag extends Component {
             TagName: 'testTag',
             Description: 'TESTTAG',
             Active: 0
-        })
+        }, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
                 console.log(response);
             })
