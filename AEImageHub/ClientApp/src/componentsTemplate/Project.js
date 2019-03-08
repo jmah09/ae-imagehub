@@ -26,12 +26,6 @@ export class Project extends Component {
 
     // TODO
     renderContent() {
-        const buttonStyle = {
-            color: 'white',
-            backgroundColor: '#1B53AD',
-            textAlign: 'center',
-            margin: '0px 0px 0px 65px'
-        }
         
         const statusStyle = {
             margin: '0px 0px 0px 70px'
@@ -72,10 +66,6 @@ export class Project extends Component {
             {
                 Header: 'Date Created',
                 accessor: 'date'
-            },
-            {
-                Header: 'Add Media',
-                Cell: () => <button class="addMedia" style={buttonStyle}>+</button>
             }
         ]
         return (
