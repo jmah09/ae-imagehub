@@ -11,7 +11,6 @@ using Newtonsoft.Json.Linq;
 namespace AEImageHub.Controllers
 {
     [Route("api/tag")]
-    [ApiController]
     public class TagController : ControllerBase
     {
         private readonly ihubDBContext _context;

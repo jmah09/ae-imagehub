@@ -11,7 +11,6 @@ using Newtonsoft.Json.Linq;
 namespace AEImageHub.Controllers
 {
     [Route("api/project")]
-    [ApiController]
     public class ProjectController : ControllerBase
     {
         private readonly ihubDBContext _context;

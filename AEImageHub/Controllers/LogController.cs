@@ -13,7 +13,6 @@ using Newtonsoft.Json.Linq;
 namespace AEImageHub.Controllers
 {
     [Route("api/log")]
-    [ApiController]
     public class LogController : ControllerBase
     {
         private readonly ihubDBContext _context;
@@ -39,7 +38,7 @@ namespace AEImageHub.Controllers
         {
             return JsonConvert.SerializeObject(_context.Log);
         }
-
+       // [Authorize(Policy = "Admins")]
         [HttpGet("auth")]
         public string GetAuth()
         {
