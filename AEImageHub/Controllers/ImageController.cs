@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using AEImageHub.Models;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 
 namespace ImageServer.Controllers
 {
     [Route("api/image")]
-    [ApiController]
     public class ImageController : Controller
     {
         private readonly ihubDBContext _context;

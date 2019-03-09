@@ -11,7 +11,6 @@ namespace AEImageHub.Controllers
 {
     
     [Route("api/user")]
-    [ApiController]
     public class UserController : ControllerBase
     {
 
