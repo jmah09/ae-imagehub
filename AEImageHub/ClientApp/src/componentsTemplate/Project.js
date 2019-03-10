@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
+import ReactTable from 'react-table';
+import 'react-table/react-table.css';
 
 export class Project extends Component {
 
@@ -17,17 +19,57 @@ export class Project extends Component {
     renderFunction() {
         return (
             <div class="fnbar">
-                Function stub
+                <button>Create Project</button>
             </div>
         )
     }
 
     // TODO
     renderContent() {
+        
+        const statusStyle = {
+            margin: '0px 0px 0px 70px'
+        }
+        const data = [
+            {
+                name: 'Bridge Project',
+                date: '2019/02/26'
+            },
+            {
+                name: 'Hoover Dam Project',
+                date: '2019/02/26'
+            },
+            {
+                name: 'Enguri Dam Project',
+                date: '2019/02/26'
+            },
+            {
+                name: 'Site C (Cancelled)',
+                date: '2019/02/26'
+            },
+            {
+                name: 'Road Project',
+                date: '2019/02/26'
+            },
+    ]
+
+        
+        const columns = [
+            {
+                Header: 'Name',
+                accessor:'name'
+            },
+            {
+                Header: 'Status',
+                Cell: () => <span><input type="checkbox" style={statusStyle}></input></span>
+            },
+            {
+                Header: 'Date Created',
+                accessor: 'date'
+            }
+        ]
         return (
-            <div>
-                Project stub
-            </div>
+            <ReactTable data={data} columns={columns} />
         )
     }
 

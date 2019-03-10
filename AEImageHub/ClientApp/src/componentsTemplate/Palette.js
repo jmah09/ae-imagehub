@@ -9,52 +9,52 @@ import threegorgesdam from './img/threegorgesdam.jpg'
 
 var photos = [
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: clevelanddam, width: 1, height: 1
+        src: clevelanddam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: hooverdam, width: 1, height: 1
+        src: hooverdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: enguridam, width: 1, height: 1
+        src: enguridam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: threegorgesdam, width: 1, height: 1
+        src: threegorgesdam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: enguridam, width: 1, height: 1
+        src: enguridam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: enguridam, width: 1, height: 1
+        src: enguridam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: enguridam, width: 1, height: 1
+        src: enguridam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: enguridam, width: 1, height: 1
+        src: enguridam, width: 1, height: 1, alt: "dam"
     },
     {
-        src: threegorgesdam, width: 1, height: 1
+        src: threegorgesdam, width: 1, height: 1, alt: "dam"
     }
 ]
 export class Palette extends Component {
