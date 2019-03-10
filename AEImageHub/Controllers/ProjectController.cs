@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AEImageHub.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
+    [Authorize]
     [Route("api/project")]
     public class ProjectController : ControllerBase
     {
