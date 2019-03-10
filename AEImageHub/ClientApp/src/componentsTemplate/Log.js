@@ -66,7 +66,7 @@ export class Log extends Component {
             {
                 name: 'log_00000043_20190123_BO',
                 user: 'Barak Obama',
-                date: '2019/01/23'
+                date: '2019/01/23ç'
             }
         ]
         return (

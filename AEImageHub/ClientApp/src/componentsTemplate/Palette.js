@@ -119,7 +119,6 @@ export class Palette extends Component {
               onClick={this.selectPhoto}
               ImageComponent={SelectedImage}
               direction={"row"}
-              margin={10}
             />
           </div>
         );
