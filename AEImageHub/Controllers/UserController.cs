@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
-    
+    [Authorize]
     [Route("api/user")]
     public class UserController : ControllerBase
     {

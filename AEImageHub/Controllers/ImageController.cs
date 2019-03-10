@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ImageServer.Controllers
 {
+    [Authorize]
     [Route("api/image")]
     public class ImageController : Controller
     {

@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
+    [Authorize]
     [Route("api/log")]
     public class LogController : ControllerBase
     {
@@ -56,7 +57,6 @@ namespace AEImageHub.Controllers
         201 - Log creation was successful
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
-
         [HttpPost("")]
         public void PostLog([FromBody] JObject payload)
         {
