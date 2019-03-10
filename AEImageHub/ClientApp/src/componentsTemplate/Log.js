@@ -23,6 +23,10 @@ export class Log extends Component {
             {
                 Header: 'User',
                 accessor: 'user'
+            },
+            {
+                Header: 'Date',
+                accessor: 'date'
             }
 
         ]
@@ -30,32 +34,39 @@ export class Log extends Component {
         const data = [
             {
                 name: 'log_00000032_20190226_PR',
-                user: 'Peter Rosenberg'
+                user: 'Peter Rosenberg',
+                date: '2019/02/26'
             },
             {
                 name: 'log_00000022_20190226_TG',
-                user: 'Thadeus Gamelthorpe'
+                user: 'Thadeus Gamelthorpe',
+                date: '2019/02/26'
             },
             {
                 name: 'log_00000034_20190210_JC',
-                user: 'Jesus Christ'
+                user: 'Jesus Christ',
+                date: '2019/02/10'
             },
             {
                 name: 'log_00000045_20190210_JT',
-                user: 'Justin Timberlake'
+                user: 'Justin Timberlake',
+                date: '2019/02/10'
             },
             {
                 name: 'log_00000069_20190209_RZ',
-                user: 'Robert Zhang'
+                user: 'Robert Zhang',
+                date: '2019/02/09'
             },
             {
                 name: 'log_00000045_20190129_KN',
-                user: 'Kim Nishimura'
+                user: 'Kim Nishimura',
+                date: '2019/01/29'
                 
             },
             {
                 name: 'log_00000043_20190123_BO',
-                user: 'Barak Obama'
+                user: 'Barak Obama',
+                date: '2019/01/23'
             }
         ]
         return (
