@@ -31,9 +31,14 @@ export class Log extends Component {
         );
     }
 
-    // TODO
     renderContent() {
+
+        //JAE
         this.GetLogs();
+        this.GetLog('log1');
+        ////////////////////////
+
+
         const columns = [
             {
                 Header: 'Name',
