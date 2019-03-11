@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AEImageHub.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AEImageHub.Controllers
 {
-    
+    [Authorize]
     [Route("api/user")]
     public class UserController : ControllerBase
     {

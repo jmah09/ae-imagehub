@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ImageServer.Controllers
 {
+    [Authorize]
     [Route("api/image")]
     public class ImageController : Controller
     {
@@ -135,19 +136,14 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
         [HttpPut("{imageid}")]
-        public void PutProject(string imageid, [FromBody] JObject payload)
+        public string PutImage(string imageid, [FromBody] JObject payload)
         {
             Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
-            image.IId = (string)payload["IId"];
-            image.UId = (string)payload["UId"];
-            image.ImageName = (string)payload["ImageName"];
-            image.Size = (int)payload["Size"];
-            image.UploadedDate = (DateTime)payload["UploadedDate"];
-            image.Type = (string)payload["Type"];
-            image.Trashed = (bool)payload["Trashed"];
-            image.TrashedDate = (DateTime)payload["TrashedDate"];
-            image.Submitted = (bool)payload["Submitted"];
+            if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
+            if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
+            if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
             _context.SaveChanges();
+            return imageid;
         }
 
         /* DELETE
