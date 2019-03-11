@@ -1,8 +1,29 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
 import ReactTable from 'react-table'
+import axios from 'axios'
+import { getToken } from '../adalConfig';
 
 export class Log extends Component {
+
+    // Jae's example
+
+    // get all Logs
+    GetLogs() {
+        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                return;
+            })
+    };
+
+    // get a log with logid
+    GetLog(logid) {
+        axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                return;
+            })
+    };
+    ///////////////////////////////////////////////////////////
 
     render() {
         return (
@@ -13,8 +34,14 @@ export class Log extends Component {
         );
     }
 
-    // TODO
     renderContent() {
+
+        //JAE
+        this.GetLogs();
+        this.GetLog('log1');
+        ////////////////////////
+
+
         const columns = [
             {
                 Header: 'Name',

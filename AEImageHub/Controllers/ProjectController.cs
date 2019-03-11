@@ -120,9 +120,9 @@ namespace AEImageHub.Controllers
         public void PutProject(string projectname, [FromBody] JObject payload)
         {
             Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
-            project.ProjectName = (string)payload["ProjectName"];
-            project.CreatedDate = (DateTime)payload["CreatedDate"];
-            project.Description = (string)payload["Description"];
+            if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
+            if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
+            if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
             _context.SaveChanges();
         }
     }

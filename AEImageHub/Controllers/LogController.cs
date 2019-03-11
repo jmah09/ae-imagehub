@@ -39,11 +39,23 @@ namespace AEImageHub.Controllers
         {
             return JsonConvert.SerializeObject(_context.Log);
         }
-       // [Authorize(Policy = "Admins")]
-        [HttpGet("auth")]
-        public string GetAuth()
+
+        /*
+        GET
+        API Endpoint: api/log/:log_id
+        Description: Get the log mode by idl
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - Log retrieve was successful server should return log data
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        */
+
+        [HttpGet("{logid}")]
+        public Object Getlog(string logid)
         {
-            return HttpContext.User.Identity.Name;
+            return JsonConvert.SerializeObject(_context.Log.Where(l => l.LId == logid).First());
         }
 
         /*
