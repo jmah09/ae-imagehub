@@ -39,7 +39,7 @@ export class Project extends Component {
     }
 
     PutProject() {
-        axios.put("/api/project", {
+        axios.put("/api/project/testPro", {
             ProjectName: 'testPro',
             CreatedDate: '2009-05-08 14:40:52',
             Description: 'TESTPROOOOOOOOOOO'

@@ -6,7 +6,9 @@ import { getToken } from '../adalConfig';
 
 export class Log extends Component {
 
-    // Jae
+    // Jae's example
+
+    // get all Logs
     GetLogs() {
         axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
@@ -14,6 +16,7 @@ export class Log extends Component {
             })
     };
 
+    // get a log with logid
     GetLog(logid) {
         axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {

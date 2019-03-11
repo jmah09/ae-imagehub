@@ -16,6 +16,7 @@ export class User extends Component {
         })
     }
 
+
     GetUser() {
         axios.get("/api/user/userA", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {

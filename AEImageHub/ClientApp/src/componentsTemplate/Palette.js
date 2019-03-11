@@ -6,6 +6,8 @@ import hooverdam from './img/hooverdam.jpg';
 import clevelanddam from './img/clevelanddam.jpg';
 import enguridam from './img/enguridam.jpg';
 import threegorgesdam from './img/threegorgesdam.jpg'
+import axios from 'axios'
+import { getToken } from '../adalConfig';
 
 var photos = [
     {
@@ -76,6 +78,28 @@ export class Palette extends Component {
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
       }
 
+    //Jae
+
+    // get Images with the userid
+    GetUserImages(userid) {
+        axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                return;
+            })
+    }
+
+    // put images with imageid
+    PutImage(imageid, payload) {
+        axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    ////////////////////////////////////////////////////////////////////////
+
     render() {
         return (
             <div>
@@ -106,6 +130,20 @@ export class Palette extends Component {
 
     // TODO
     renderContent() {
+
+        // Jae
+
+        // batch images
+        this.GetUserImages('userA');
+        // trash image
+        this.PutImage('hashA', {
+            ImageName: null,
+            Trashed: 1,
+            Submitted: null
+        });
+        // get info
+        this.GetImage()
+        ////////////////////////////////
         return (
             <div class="toggleButton">
             <p>
