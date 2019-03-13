@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
-import Gallery from 'react-photo-gallery';
+import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import hooverdam from './img/hooverdam.jpg';
 import clevelanddam from './img/clevelanddam.jpg';
@@ -62,10 +62,20 @@ var photos = [
 export class Palette extends Component {
     constructor(props) {
         super(props);
-        this.state = { photos: photos, selectAll: false };
         this.selectPhoto = this.selectPhoto.bind(this);
         this.toggleSelect = this.toggleSelect.bind(this);
-      }
+
+        this.state = {
+            photos: [] ,
+            selectAll: false
+        };
+
+        this.GetUserImages = this.GetUserImages.bind(this);
+        this.GetUserImages("todo");
+    }
+
+
+
       selectPhoto(event, obj) {
         let photos = this.state.photos;
         photos[obj.index].selected = !photos[obj.index].selected;
@@ -82,9 +92,17 @@ export class Palette extends Component {
 
     // get Images with the userid
     GetUserImages(userid) {
+        // todo hardcoded for now
+        userid = 'todo';
         axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                var images = [];
+                res.data.map((image, index) => {
+                    images.push({
+                        src: "/api/image/" + image.iId, width: 1, height: 1, alt: image.iId
+                    });
+                })
+                this.setState({photos: images})
             })
     }
 
@@ -130,20 +148,6 @@ export class Palette extends Component {
 
     // TODO
     renderContent() {
-
-        // Jae
-
-        // batch images
-        this.GetUserImages('userA');
-        // trash image
-        this.PutImage('hashA', {
-            ImageName: null,
-            Trashed: 1,
-            Submitted: null
-        });
-        // get info
-        this.GetImage()
-        ////////////////////////////////
         return (
             <div class="toggleButton">
             <p>
