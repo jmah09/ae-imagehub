@@ -174,7 +174,7 @@ namespace ImageServer.Controllers
             System.IO.File.Delete(path);
             return Accepted();
         }
-
+        
         private bool ImageExists(string id)
         {
             return _context.Image.Any(e => e.IId.Equals(id));
