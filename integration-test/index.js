@@ -6,10 +6,35 @@ const request = require('supertest');
 const should = require('should');
 const isPortReachable = require('is-port-reachable');
 
+
+
 describe('user-service', function() {
   const url = `http://localhost:5000`;
   const api = request(url);
  
+  let token = null;
+  let user = { 
+    "grant_type": "password",	
+                 "username": 'userA@gwangjaehotmail.onmicrosoft.com',
+                 "password": 'Tuma23621',
+     "client_id": "a42cbd10-bbd7-414f-b9f8-733274fea3c1",
+     "resource": "a42cbd10-bbd7-414f-b9f8-733274fea3c1",
+     "client_secret":"&Q=r[}]@$^X*;(:^&*/$[%z>.:-.#%}3)]&)W*]Z.@}:/.f=.$R*-:+" 
+     };
+  const urlAuth = "https://login.microsoftonline.com";
+  const api2 = request(urlAuth);
+
+  before(function(done) {
+    
+    api2.post('/80698aee-cfad-4328-9c3a-2c38a08a5ee2/oauth2/token')
+    .field(user)
+    .end(function(err, res) {
+        token = res.body.access_token; // Or something
+        console.log("token: " + JSON.stringify(res.body.access_token) + '\n');
+        done();
+      });
+  });
+
 
   it('add delete image test', (done) => {	  
 	let deleteImage = (err, res) => {
@@ -17,11 +42,13 @@ describe('user-service', function() {
         throw err;
       }
 	  console.log(res.body);
-	  api.del('/api/image/' + res.body.iId)
+    api.del('/api/image/' + res.body.iId)
+    .set('Authorization', 'bearer ' + token)
     .expect(202,done);
     }; 
 	  
     api.post('/api/image/')
+    .set('Authorization', 'Bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image1.jpg')
     .expect(201,deleteImage);
@@ -29,6 +56,7 @@ describe('user-service', function() {
   
   it('null image passed in image', (done) => {
     api.post('/api/image/')
+    .set('Authorization', 'bearer ' + token)
     .expect(400,done);
   });
   
@@ -40,7 +68,8 @@ describe('user-service', function() {
       if (err) {
         throw err;
       }
-	  api.del('/api/image/' + imageId)
+    api.del('/api/image/' + imageId)
+    .set('Authorization', 'bearer ' + token)
     .expect(202,done);
     }; 
 	  
@@ -49,13 +78,15 @@ describe('user-service', function() {
         throw err;
       }
 	  imageId = res.body.iId
-	  api.post('/api/image/')
+    api.post('/api/image/')
+    .set('Authorization', 'bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image1.jpg')
     .expect(409,deleteImage);
     }; 
 	  
     api.post('/api/image/')
+    .set('Authorization', 'bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image1.jpg')
     .expect(201,duplicateImage);
@@ -70,14 +101,16 @@ describe('user-service', function() {
       if (err) {
         throw err;
       }
-	  api.del('/api/image/' + imagemeta3.iId)
+    api.del('/api/image/' + imagemeta3.iId)
+    .set('Authorization', 'bearer ' + token)
     .expect(202,done);
     }; 
 	let deleteImage2 = (err, res) => {
       if (err) {
         throw err;
       }
-	  api.del('/api/image/' + imagemeta2.iId)
+    api.del('/api/image/' + imagemeta2.iId)
+    .set('Authorization', 'bearer ' + token)
     .expect(202,deleteImage3);
     }; 
 	
@@ -92,6 +125,7 @@ describe('user-service', function() {
 	  imagemeta2.should.not.equal(null);
 	  imagemeta3.should.not.equal(null);
 	  api.del('/api/image/' + imagemeta1.iId)
+    .set('Authorization', 'bearer ' + token)
     .expect(202,deleteImage2);
     }; 
 	  
@@ -99,7 +133,8 @@ describe('user-service', function() {
       if (err) {
         throw err;
       }
-	  api.get('/api/user/todo/images')
+    api.get('/api/user/'+ user.username +'/images')
+    .set('Authorization', 'bearer ' + token)
     .expect(200,checkImages);
     }; 
 	
@@ -107,7 +142,8 @@ describe('user-service', function() {
       if (err) {
         throw err;
       }
-	  api.post('/api/image/')
+    api.post('/api/image/')
+    .set('Authorization', 'bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image3.PNG')
     .expect(201,getImages);
@@ -117,13 +153,15 @@ describe('user-service', function() {
       if (err) {
         throw err;
       }
-	  api.post('/api/image/')
+    api.post('/api/image/')
+    .set('Authorization', 'bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image2.PNG')
     .expect(201,uploadimage3);
     };
-	  
+
     api.post('/api/image/')
+    .set('Authorization', 'Bearer ' + token)
     .field('image', 'test-image')
     .attach('image', './data/test-image1.jpg')
     .expect(201,uploadimage2);
