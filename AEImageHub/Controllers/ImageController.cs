@@ -81,7 +81,7 @@ namespace ImageServer.Controllers
             Image img = new Image()
             {
                 IId = ImageWriter.GetImageHash(image),
-                UId = "todo", // todo decode token and get username
+                UId = HttpContext.User.Identity.Name.Split("@")[0],
                 ImageName = fn,
                 Size = (Int32)image.Length,
                 UploadedDate = DateTime.Now,
