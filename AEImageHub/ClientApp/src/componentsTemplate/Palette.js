@@ -9,56 +9,6 @@ import threegorgesdam from './img/threegorgesdam.jpg'
 import axios from 'axios'
 import { getToken } from '../adalConfig';
 
-var photos = [
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: clevelanddam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: hooverdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: enguridam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: threegorgesdam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: enguridam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: enguridam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: enguridam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: enguridam, width: 1, height: 1, alt: "dam"
-    },
-    {
-        src: threegorgesdam, width: 1, height: 1, alt: "dam"
-    }
-]
 export class Palette extends Component {
     constructor(props) {
         super(props);
@@ -87,8 +37,6 @@ export class Palette extends Component {
         });
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
       }
-
-    //Jae
 
     // get Images with the userid
     GetUserImages(userid) {
