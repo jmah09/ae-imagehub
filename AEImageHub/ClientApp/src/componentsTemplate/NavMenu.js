@@ -13,6 +13,9 @@ export class NavMenu extends Component {
                     <LinkContainer to={'/search'}>
                         <NavItem>search</NavItem>
                     </LinkContainer>
+                    <LinkContainer to={'/upload'}>
+                        <NavItem>upload</NavItem>
+                    </LinkContainer>
                     <LinkContainer to={'/palette'}>
                         <NavItem>user palette</NavItem>
                     </LinkContainer>

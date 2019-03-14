@@ -46,14 +46,14 @@ namespace AEImageHub
                     options.Audience = Configuration["AzureAd:ClientId"];
                     options.Authority = $"{Configuration["AzureAd:Instance"]}{Configuration["AzureAd:TenantId"]}";
                 });
-            /*
+            
             // Authorization
             services.AddAuthorization(options => {
                 options.AddPolicy("Admins",
                     policyBuilder => policyBuilder.RequireClaim("groups",
                         "e76d7410-92be-4073-9709-2d8b737f1d44"));
             });
-            */
+            
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

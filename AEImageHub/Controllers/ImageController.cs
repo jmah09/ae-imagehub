@@ -105,6 +105,7 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
         [HttpGet("{filename}")]
+        [AllowAnonymous]
         public IActionResult GetImage(string filename)
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", filename);
@@ -173,7 +174,7 @@ namespace ImageServer.Controllers
             System.IO.File.Delete(path);
             return Accepted();
         }
-
+        
         private bool ImageExists(string id)
         {
             return _context.Image.Any(e => e.IId.Equals(id));
