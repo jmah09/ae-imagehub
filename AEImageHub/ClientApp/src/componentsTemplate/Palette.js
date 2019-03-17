@@ -143,6 +143,8 @@ export class Palette extends Component {
                 <button>Submit</button>
                 <button onClick={this.onImageBtnClick}>Edit Photo</button>
                 <button>Get Info</button>
+                <br />
+                <br />
             </div>
         )
     }

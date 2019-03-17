@@ -61,7 +61,7 @@ export class Project extends Component {
     // TODO
     renderFunction() {
         return (
-            <div class="fnbar">
+            <div className="fnbar">
                 <button>Create Project</button>
             </div>
         )

@@ -116,6 +116,7 @@ h2 {
 
 .fnbar {
     margin: 0px;
+    margin-bottom: 0px;
     padding: 0px 0px;
     font-size: 15px;
     color: #FFF;
