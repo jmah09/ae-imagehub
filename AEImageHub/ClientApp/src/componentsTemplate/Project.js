@@ -75,6 +75,12 @@ export class Project extends Component {
         // batches project
         let obj = this.GetProjects();
         
+        let type = typeof(obj);
+        if (type === "undefined") {
+            console.log("project object is undefined");
+        }
+        console.log(obj);
+        
         
         
 
