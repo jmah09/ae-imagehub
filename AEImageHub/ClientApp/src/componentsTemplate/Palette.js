@@ -86,10 +86,11 @@ export class Palette extends Component {
     renderFunction() {
         return (
             <div class="fnbar">
-                <button>Get Info</button>
-                <button>Edit Photo</button>
-                <button>Submit</button>
+                <button onClick={this.toggleSelect}>Select All</button>
                 <button>Delete</button>
+                <button>Submit</button>
+                <button>Edit Photo</button>
+                <button>Get Info</button>
             </div>
         )
     }
@@ -98,11 +99,6 @@ export class Palette extends Component {
     renderContent() {
         return (
             <div class="toggleButton">
-            <p>
-              <button onClick={this.toggleSelect}>
-                Select All
-              </button>
-            </p>
             <Gallery
               photos={this.state.photos}
               columns = {5}
