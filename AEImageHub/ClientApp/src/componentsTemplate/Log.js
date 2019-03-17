@@ -12,7 +12,7 @@ export class Log extends Component {
     GetLogs() {
         axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res;
             })
     };
 
@@ -20,7 +20,7 @@ export class Log extends Component {
     GetLog(logid) {
         axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res;
             })
     };
     ///////////////////////////////////////////////////////////
@@ -39,6 +39,13 @@ export class Log extends Component {
         //JAE
         this.GetLogs();
         this.GetLog('log1');
+        
+        var logs = this.GetLogs();
+        var type = typeof(logs);
+        if (type === "undefined") {
+            console.log("fudge cakes")
+        }
+        
         ////////////////////////
 
 

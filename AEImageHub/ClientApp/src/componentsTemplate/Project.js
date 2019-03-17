@@ -100,7 +100,8 @@ export class Project extends Component {
 
         const statusStyle = {
             margin: '0px 0px 0px 70px'
-        }
+        };
+        
         const data = [
             {
                 name: 'Bridge Project',
@@ -122,7 +123,7 @@ export class Project extends Component {
                 name: 'Road Project',
                 date: '2019/02/26'
             },
-    ]
+        ];
 
         
         const columns = [
