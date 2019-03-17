@@ -46,6 +46,12 @@ export class Log extends Component {
             console.log("fudge cakes")
         }
         
+        var jsonObj = JSON.stringify(this.GetLogs());
+        
+        if (typeof(jsonObj) === "undefined"){
+            console.log("young metro don't trust you");
+        }
+        
         ////////////////////////
 
 
