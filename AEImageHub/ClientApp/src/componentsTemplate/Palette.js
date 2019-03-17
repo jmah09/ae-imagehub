@@ -136,12 +136,13 @@ export class Palette extends Component {
     // TODO
     renderFunction() {
         return (
-            <div class="fnbar">
+            <div className ="fnbar">
                 {this.renderRedirect()}
-                <button>Get Info</button>
-                <button onClick={this.onImageBtnClick}>Edit Photo</button>
-                <button>Submit</button>
+                <button onClick={this.toggleSelect}>Select All</button>
                 <button onClick={this.TrashSelectedImages}>Delete</button>
+                <button>Submit</button>
+                <button onClick={this.onImageBtnClick}>Edit Photo</button>
+                <button>Get Info</button>
             </div>
         )
     }
@@ -149,20 +150,14 @@ export class Palette extends Component {
     // TODO
     renderContent() {
         return (
-            <div class="toggleButton">
-                <p>
-                    <button onClick={this.toggleSelect}>
-                        Select All
-              </button>
-                </p>
+            <div className="toggleButton">
                 <Gallery
                     photos={this.state.photos}
                     columns={3}
                     onClick={this.selectPhoto}
                     ImageComponent={SelectedImage}
                     margin={4}
-                    direction={"row"}
-                />
+                    direction={"row"} />
             </div>
         );
     }

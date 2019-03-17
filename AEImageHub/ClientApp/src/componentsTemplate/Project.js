@@ -13,7 +13,7 @@ export class Project extends Component {
     GetProjects() {
         axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res;
             })
     };
 
@@ -21,7 +21,7 @@ export class Project extends Component {
     GetProject(projectname) {
         axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res ;
             })
     };
 
@@ -73,10 +73,13 @@ export class Project extends Component {
         //Jae's example
 
         // batches project
-        this.GetProjects();
+        let obj = this.GetProjects();
+        
+        
+        
 
         // get a project info
-        this.GetProject('bridge%20builder');
+        // this.GetProject('bridge%20builder');
 
         /*
         // Post project
@@ -137,7 +140,7 @@ export class Project extends Component {
             }
         ]
         return (
-            <ReactTable data={data} columns={columns} />
+            <div><br /><br /><ReactTable data={data} columns={columns} /></div>
         )
     }
 
