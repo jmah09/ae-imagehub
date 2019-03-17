@@ -152,7 +152,6 @@ export class Palette extends Component {
     // TODO
     renderContent() {
         return (
-<<<<<<< HEAD
             <div className="toggleButton">
                 <Gallery
                     photos={this.state.photos}
@@ -162,17 +161,6 @@ export class Palette extends Component {
                     margin={4}
                     direction={"row"} />
             </div>
-=======
-            <div class="toggleButton">
-            <Gallery
-              photos={this.state.photos}
-              columns = {5}
-              onClick={this.selectPhoto}
-              ImageComponent={SelectedImage}
-              direction={"row"}
-            />
-          </div>
->>>>>>> bc5ebd4e5bb9d753aac6c11d4f7d84fc1e35afd8
         );
     }
 }
