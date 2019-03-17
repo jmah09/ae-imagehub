@@ -122,6 +122,36 @@
         height: 30px;
     }
 
+    .fileContainer .imageUploadSuccess {
+        position: absolute;
+        background-position: 50% 50%;
+        color: #fff;
+        background: #4BB543;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        font-size: 46px;
+        font-weight: bold;
+        line-height: 45px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .fileContainer .imageUploadfail {
+        position: absolute;
+        background-position: 50% 50%;
+        color: #fff;
+        background: #FFCC00;
+        border-radius: 50%;
+        text-align: center;
+        cursor: pointer;
+        font-size: 46px;
+        font-weight: bold;
+        line-height: 45px;
+        width: 50px;
+        height: 50px;
+    }
+
 .flipMove {
 	display: flex;
     align-items: center;
