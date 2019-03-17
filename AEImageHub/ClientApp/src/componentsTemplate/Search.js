@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { SearchForm } from './SearchForm';
 import { Title } from './Title';
 
 export class Search extends Component {
@@ -7,26 +8,17 @@ export class Search extends Component {
         return (
             <div>
                 <Title title='SEARCH' />
-                {this.renderFunction()}
                 {this.renderContent()}
             </div>
         );
     }
+    
 
-    // TODO
-    renderFunction() {
-        return (
-            <div class="fnbar">
-                Function stub
-            </div>
-        )
-    }
-
-    // TODO
+    // request in SearchForm
     renderContent() {
         return (
             <div>
-                Search stub
+                <SearchForm />
             </div>
         )
     }
