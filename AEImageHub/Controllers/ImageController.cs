@@ -54,7 +54,18 @@ namespace ImageServer.Controllers
             Image img = GetImageModel(image);
             if (ImageExists(img.IId))
             {
-                return Conflict("image already exists");
+                Image dbImgRecord = (Image)_context.Image.Where(i => i.IId == img.IId).First();
+                if (dbImgRecord.Trashed)
+                {
+                    dbImgRecord.Trashed = false;
+                    _context.Update(dbImgRecord);
+                    _context.SaveChanges();
+                    return Created(dbImgRecord.IId, img);
+                }
+                else
+                {
+                    return Conflict("image already exists");
+                }
             }
 
             // add image meta data into database
@@ -81,7 +92,7 @@ namespace ImageServer.Controllers
             Image img = new Image()
             {
                 IId = ImageWriter.GetImageHash(image),
-                UId = HttpContext.User.Identity.Name,
+                UId = HttpContext.User.Identity.Name.Split("@")[0],
                 ImageName = fn,
                 Size = (Int32)image.Length,
                 UploadedDate = DateTime.Now,
@@ -140,9 +151,10 @@ namespace ImageServer.Controllers
         public string PutImage(string imageid, [FromBody] JObject payload)
         {
             Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
-            if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
-            if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
-            if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
+            if (payload["ImageName"] != null) { image.ImageName = (string)payload["ImageName"]; };
+            if (payload["Trashed"] != null) { image.Trashed = (bool)payload["Trashed"]; };
+            if (payload["Submitted"] != null) { image.Submitted = (bool)payload["Submitted"]; };
+            _context.Update(image);
             _context.SaveChanges();
             return imageid;
         }
