@@ -11,7 +11,6 @@ export class Upload extends Component {
     }
 
     onDrop(picture) {
-        console.log(picture);
         this.setState({
             pictures: this.state.pictures.concat(picture),
         });

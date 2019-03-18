@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
+﻿import React, { Component } from 'react';
 import { Title } from './Title';
+import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
-import hooverdam from './img/hooverdam.jpg';
-import clevelanddam from './img/clevelanddam.jpg';
-import enguridam from './img/enguridam.jpg';
-import threegorgesdam from './img/threegorgesdam.jpg'
 import axios from 'axios'
-import { getToken } from '../adalConfig';
+import { getCredentials, getToken } from '../adalConfig';
+import { Redirect } from 'react-router-dom'
 
 export class Palette extends Component {
     constructor(props) {
@@ -17,20 +15,25 @@ export class Palette extends Component {
 
         this.state = {
             photos: [] ,
-            selectAll: false
+            selectAll: false,
+            showInfo: false,
+            redirect: false,
         };
 
         this.GetUserImages = this.GetUserImages.bind(this);
-        this.GetUserImages("todo");
+        this.TrashSelectedImages = this.TrashSelectedImages.bind(this);
+
+
+        this.GetUserImages();
     }
 
-
-
-      selectPhoto(event, obj) {
+    selectPhoto(event, obj) {
+        console.log(obj);
         let photos = this.state.photos;
         photos[obj.index].selected = !photos[obj.index].selected;
         this.setState({ photos: photos });
-      }
+    }
+
       toggleSelect() {
         let photos = this.state.photos.map((photo, index) => {
           return { ...photo, selected: !this.state.selectAll };
@@ -39,32 +42,45 @@ export class Palette extends Component {
       }
 
     // get Images with the userid
-    GetUserImages(userid) {
+    GetUserImages() {
         // todo hardcoded for now
-        userid = 'todo';
+        let userid = getCredentials().name;
         axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 var images = [];
                 res.data.map((image, index) => {
                     images.push({
-                        src: "/api/image/" + image.iId, width: 1, height: 1, alt: image.iId
+                        src: "/api/image/" + image.iId, width: 5, height: 4, alt: image.iId , meta : image
                     });
                 })
+                console.log(res.data);
                 this.setState({photos: images})
             })
     }
 
-    // put images with imageid
-    PutImage(imageid, payload) {
-        axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    TrashSelectedImages() {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        })
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        })
+
+        selected.map((image, index) => {
+            image.meta.Trashed = true;
+            axios.put("/api/image/" + image.meta.iId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
+                .then(response => {
+                    console.log(response);
+                    this.setState({
+                        photos: notSelected
+                    })
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        })
     }
-    ////////////////////////////////////////////////////////////////////////
 
     render() {
         return (
@@ -82,14 +98,38 @@ export class Palette extends Component {
         );
     }
 
+    renderRedirect = () => {
+        let redirectLink = 'edit?src=' + this.state.editImageLink;
+        if (this.state.redirect) {
+            return <Redirect to={redirectLink} />
+        }
+    }
+
+
+    onImageBtnClick = () => {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        })
+
+        if (selected.length != 1) {
+            alert("select exactly one image");
+        } else {
+            this.state.editImageLink = selected[0].meta.iId;
+            this.setState({
+                redirect: true
+            })
+        }
+    }
+
     // TODO
     renderFunction() {
         return (
             <div class="fnbar">
+                {this.renderRedirect()}
                 <button>Get Info</button>
-                <button>Edit Photo</button>
+                <button onClick={this.onImageBtnClick}>Edit Photo</button>
                 <button>Submit</button>
-                <button>Delete</button>
+                <button onClick={this.TrashSelectedImages}>Delete</button>
             </div>
         )
     }
@@ -98,19 +138,20 @@ export class Palette extends Component {
     renderContent() {
         return (
             <div class="toggleButton">
-            <p>
-              <button onClick={this.toggleSelect}>
-                Select All
+                <p>
+                    <button onClick={this.toggleSelect}>
+                        Select All
               </button>
-            </p>
-            <Gallery
-              photos={this.state.photos}
-              columns = {5}
-              onClick={this.selectPhoto}
-              ImageComponent={SelectedImage}
-              direction={"row"}
-            />
-          </div>
+                </p>
+                <Gallery
+                    photos={this.state.photos}
+                    columns={3}
+                    onClick={this.selectPhoto}
+                    ImageComponent={SelectedImage}
+                    margin={4}
+                    direction={"row"}
+                />
+            </div>
         );
     }
 }

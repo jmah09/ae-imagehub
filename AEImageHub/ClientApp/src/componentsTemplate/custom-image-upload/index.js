@@ -1,10 +1,12 @@
-import React from 'react';
+﻿import React from 'react';
 import PropTypes from 'prop-types';
 import './index.css';
 import FlipMove from 'react-flip-move';
 import UploadIcon from './UploadIcon.svg';
 import axios from 'axios';
 import { getToken } from '../../adalConfig';
+import Popup from 'reactjs-popup';
+
 
 const styles = {
   display: "flex",
@@ -86,7 +88,7 @@ class ReactImageUploadComponent extends React.Component {
       const files = this.state.files.slice();
 
       newFilesData.forEach(newFileData => {
-        dataURLs.push(newFileData.dataURL);
+          dataURLs.push({ "value" : newFileData.dataURL });
         files.push(newFileData.file);
       });
 
@@ -186,16 +188,28 @@ class ReactImageUploadComponent extends React.Component {
     );
   }
 
-  renderPreviewPictures() {
-    return this.state.pictures.map((picture, index) => {
-      return (
-        <div key={index} className="uploadPictureContainer">
-          <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
-          <img src={picture} className="uploadPicture" alt="preview"/>
-        </div>
-      );
-    });
-  }
+    renderPreviewPictures() {
+        return this.state.pictures.map((picture, index) => {
+            let uploadstatus;
+            let deleteButton;
+            if (picture.status != null) {
+                deleteButton = null
+                let success = <Popup trigger={<div className="imageUploadSuccess" onClick={() => this.removeImage(picture)}>✓</div>} position="top center" on="hover">Image successfully uploaded</Popup> ;
+                let fail = <Popup trigger={<div className="imageUploadfail" onClick={() => this.removeImage(picture)}>!</div>} position="top center" on="hover">Image exists in the system</Popup> 
+                uploadstatus = picture.status ? success : fail; 
+            } else {
+                deleteButton = <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>;
+                uploadstatus = null;
+            }
+            return (
+                <div key={index} className="uploadPictureContainer">
+                    {deleteButton}
+                    {uploadstatus}
+                    <img src={picture.value} className="uploadPicture" alt="preview" />
+                </div>
+            );
+        });
+    }
 
   /*
    On button click, trigger input file to open
@@ -221,7 +235,13 @@ class ReactImageUploadComponent extends React.Component {
                     'Authorization': "bearer " + getToken()
                 }
             }).then(res => {
-                console.log(res.data)
+                delete this.state.files[index]
+                this.state.pictures[index].status = true;
+                this.props.onChange(this.state.files, this.state.pictures);
+                }).catch(err => {
+                    delete this.state.files[index]
+                    this.state.pictures[index].status = false;
+                    this.props.onChange(this.state.files, this.state.pictures);
             })
         })
     }
@@ -237,21 +257,21 @@ class ReactImageUploadComponent extends React.Component {
                     </div>
 
                     <div className="buttonContainer">
-                    <button
-                        type={this.props.buttonType}
-                        className={"chooseImageButton " + this.props.chooseImageButtonClassName}
-                        style={this.props.buttonStyles}
-                        onClick={this.triggerFileUpload}
-                    >
-                        {this.props.chooseImageButtonText}
-                    </button>
-                    <button
-                        type={this.props.buttonType}
-                        className={"uploadImagesButton " + this.props.uploadButtonClassName}
-                        style={this.props.buttonStyles}
+                        <button
+                            type={this.props.buttonType}
+                            className={"chooseImageButton " + this.props.chooseImageButtonClassName}
+                            style={this.props.buttonStyles}
+                            onClick={this.triggerFileUpload}
+                        >
+                            {this.props.chooseImageButtonText}
+                        </button>
+                        <button
+                            type={this.props.buttonType}
+                            className={"uploadImagesButton " + this.props.uploadButtonClassName}
+                            style={this.props.buttonStyles}
                             onClick={this.uploadImagesToServer}
-                    >
-                        {this.props.uploadToServerButtonText}
+                        >
+                            {this.props.uploadToServerButtonText}
                         </button>
                     </div>
 
