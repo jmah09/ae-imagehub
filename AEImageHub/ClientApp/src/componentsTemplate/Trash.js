@@ -1,11 +1,84 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
-import axios from "axios";
-import {getToken} from "../adalConfig";
-import Gallery from "./custom-photo-gallery";
-import SelectedImage from "./SelectedImage";
+import '../index.css';
+import Gallery from './custom-photo-gallery';
+import SelectedImage from './SelectedImage';
+import axios from 'axios'
+import { getCredentials, getToken } from '../adalConfig';
 
 export class Trash extends Component {
+    constructor(props) {
+        super(props);
+        this.selectPhoto = this.selectPhoto.bind(this);
+        this.toggleSelect = this.toggleSelect.bind(this);
+
+        this.state = {
+            photos: [],
+            selectAll: false,
+            showInfo: false,
+            redirect: false,
+        };
+
+        this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
+        this.RecoverSelectedImages = this.RecoverSelectedImages.bind(this);
+
+
+        this.GetUserTrashedImages();
+    }
+
+    selectPhoto(event, obj) {
+        console.log(obj);
+        let photos = this.state.photos;
+        photos[obj.index].selected = !photos[obj.index].selected;
+        this.setState({ photos: photos });
+    }
+
+    toggleSelect() {
+        let photos = this.state.photos.map((photo, index) => {
+            return { ...photo, selected: !this.state.selectAll };
+        });
+        this.setState({ photos: photos, selectAll: !this.state.selectAll });
+    }
+
+    // get Images with the userid
+    GetUserTrashedImages() {
+        let userid = getCredentials().name;
+        axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                var images = [];
+                res.data.map((image, index) => {
+                    images.push({
+                        src: "/api/image/" + image.iId, width: 5, height: 4, alt: image.iId, meta: image
+                    });
+                })
+                console.log(res.data);
+                this.setState({ photos: images })
+            })
+    }
+
+    RecoverSelectedImages() {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        })
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        })
+
+        selected.map((image, index) => {
+            image.meta.Trashed = false;
+            axios.put("/api/image/" + image.meta.iId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
+                .then(response => {
+                    console.log(response);
+                    this.setState({
+                        photos: notSelected
+                    })
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        })
+    }
 
     constructor(props) {
         super(props);
@@ -53,7 +126,7 @@ export class Trash extends Component {
                 this.setState({photos: images})
             })
     }
-    
+
     // put images with imageid
     PutImage(imageid, payload) {
         axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
@@ -65,7 +138,7 @@ export class Trash extends Component {
                 console.log(error);
             });
     }
-    
+
     DeleteImagePermanently(imageid) {
         // TODO: Complete trash, once the isTrashed detadata is available
         // Check if isTrash (if not, 40X code), and then delete image by uri
@@ -99,8 +172,8 @@ export class Trash extends Component {
     renderFunction() {
         return (
             <div class="fnbar">
-                <button>Restore</button>
-                <button>Delete</button>
+                <button>Get Info</button>
+                <button onClick={this.RecoverSelectedImages}>Recover</button>
             </div>
         )
     }
@@ -112,13 +185,14 @@ export class Trash extends Component {
                 <p>
                     <button onClick={this.toggleSelect}>
                         Select All
-                    </button>
+              </button>
                 </p>
                 <Gallery
                     photos={this.state.photos}
-                    columns = {5}
+                    columns={3}
                     onClick={this.selectPhoto}
                     ImageComponent={SelectedImage}
+                    margin={4}
                     direction={"row"}
                 />
             </div>
