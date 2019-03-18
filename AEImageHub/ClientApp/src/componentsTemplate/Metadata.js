@@ -3,10 +3,6 @@ import { Title } from './Title';
 import ReactTable from 'react-table'
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
-import hooverdam from './img/hooverdam.jpg';
-import clevelanddam from './img/clevelanddam.jpg';
-import enguridam from './img/enguridam.jpg';
-import threegorgesdam from './img/threegorgesdam.jpg'
 import axios from 'axios'
 import { getToken } from '../adalConfig';
 
@@ -31,12 +27,30 @@ export class Metadata extends Component {
             </div>
         );
     }
-
+    
+    GetTags() {
+        axios.get("/api/tag", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                console.log("successfully grabbed tag!");
+                console.log(res);
+            })
+            .catch(res => {
+                console.log("caught error for getting tag!");
+                console.log(res);
+            })
+    };
+    
+    /*
+    AddMedia(string uri) {
+        // TODO
+    }
+    */
+    
     // TODO
     renderFunction() {
         return (
             <div class="fnbar">
-                <button>Make Admin</button>
+                <button>Create Project</button>
             </div>
         )
     }
@@ -74,8 +88,26 @@ export class Metadata extends Component {
                 Cell: () => <span><input type="checkbox" style={statusStyle}></input></span>
             },
         ];
+
+        const sub_columns = columns.slice(0);
+        sub_columns.push({
+            id: 'button',
+            accessor: 'name',
+            Cell: ({value}) => (<div class="fnbar">
+                <button onClick={()=>{
+                    // alert('Updating ADD MEDIA.'); // TODO
+                    this.AddMedia(value);
+                }}>ADD MEDIA
+                </button>
+            </div>)
+        })
+        
         return (
-            <ReactTable data={data} columns={columns} />
+            <div>
+                <br />
+                <br />
+                <ReactTable data={data} columns={columns} />
+            </div>
         )
     }
 

@@ -38,6 +38,7 @@ export class Trash extends Component {
     // get Images with the userid
     GetUserImages(userid) {
         // todo hardcoded for now
+        // Make sure to load only images that are flagged with "Trashed = true;"
         userid = 'todo';
         axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
@@ -47,19 +48,34 @@ export class Trash extends Component {
                         src: "/api/image/" + image.iId, width: 1, height: 1, alt: image.iId
                     });
                 })
+                console.log("Obtained user images!");
+                console.log(res);
                 this.setState({photos: images})
             })
     }
-
+    
     // put images with imageid
     PutImage(imageid, payload) {
         axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
+            // Trashed = (bool)false; <- place it in here somehow
             .then(response => {
                 console.log(response);
             })
             .catch(error => {
                 console.log(error);
             });
+    }
+    
+    DeleteImagePermanently(imageid) {
+        // TODO: Complete trash, once the isTrashed detadata is available
+        // Check if isTrash (if not, 40X code), and then delete image by uri
+        axios.delete("/api/image/" + imageid, { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                console.log(res);
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
     ////////////////////////////////////////////////////////////////////////
 
@@ -83,9 +99,7 @@ export class Trash extends Component {
     renderFunction() {
         return (
             <div class="fnbar">
-                <button>Get Info</button>
-                <button>Edit Photo</button>
-                <button>Submit</button>
+                <button>Restore</button>
                 <button>Delete</button>
             </div>
         )

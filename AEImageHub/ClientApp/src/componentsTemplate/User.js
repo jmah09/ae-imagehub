@@ -9,96 +9,49 @@ export class User extends Component {
 
     constructor(props) {
         super(props);
-        this.selectPhoto = this.selectPhoto.bind(this);
-        this.toggleSelect = this.toggleSelect.bind(this);
-
-        this.state = {
-            photos: [] ,
-            selectAll: false
-        };
-
-        this.GetUserImages = this.GetUserImages.bind(this);
-        this.GetUserImages("todo");
+        this.getUsers = this.getUsers.bind(this);
+        this.getUsers();
     }
-
-
-
-    selectPhoto(event, obj) {
-        let photos = this.state.photos;
-        photos[obj.index].selected = !photos[obj.index].selected;
-        this.setState({ photos: photos });
+    
+    makeAdmin(userPrincipalName) {
+        userPrincipalName= 'todo';
+        axios.post("/api/graph" + userPrincipalName, null, { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res=> {
+                console.log(res);
+                alert("User " + userPrincipalName + " has been made Admin.");
+            })
     }
-    toggleSelect() {
-        let photos = this.state.photos.map((photo, index) => {
-            return { ...photo, selected: !this.state.selectAll };
-        });
-        this.setState({ photos: photos, selectAll: !this.state.selectAll });
-    }
-
-    // get Images with the userid
-    GetUserImages(userid) {
-        // todo hardcoded for now
-        userid = 'todo';
-        axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + getToken() } })
+    
+    
+    
+    getUsers() {
+        axios.post("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                var images = [];
-                res.data.map((image, index) => {
-                    images.push({
-                        src: "/api/image/" + image.iId, width: 1, height: 1, alt: image.iId
-                    });
+                var users = [];
+                res.data.map((user, index) => {
+                    users.push({
+                        name: user.name, email: user.unique_name
+                    })
                 })
-                this.setState({photos: images})
+                console.log("users: " + res);
             })
     }
-
-    // put images with imageid
-    PutImage(imageid, payload) {
-        axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-    ////////////////////////////////////////////////////////////////////////
-
+    
     render() {
         return (
             <div>
                 <div>
                     <div>
                         <Title title='MANAGEMENT: USER' />
-                        <div>{this.renderFunction()}</div>
                     </div>
                 </div>
                 <div id="palcontent">
                     {this.renderContent()}
                 </div>
-                <div id="palcontent">
-                    {this.renderConfirmation()}
-                </div>
             </div>
         );
     }
-
-    // TODO
-    renderFunction() {
-        return (
-            <div class="fnbar">
-                <button>Make Admin</button>
-                <button>Confirm</button>
-            </div>
-        )
-    }
-
-    renderConfirmation() {
-        return (
-            <div className="fnbar">
-                <button>Confirm</button>
-            </div>
-        )
-    };
+    
     
     // TODO
     renderContent() {
@@ -107,12 +60,12 @@ export class User extends Component {
         };
         const data = [
             {
-                name: 'Bridge Project',
-                email: 'abcd'
+                name: 'John Smith',
+                email: 'john@gmail.com'
             },
             {
-                name: 'Hoover Dam Project',
-                email: 'efgh'
+                name: 'Adam Smith',
+                email: 'coin@gmail.com',
             },
         ];
 
@@ -126,18 +79,39 @@ export class User extends Component {
                 Header: 'Email',
                 accessor: 'email'
             },
-            {
-                Header: ' ',
-                accessor: null
-            },
         ];
+
+        const sub_columns = columns.slice(0)
+        sub_columns.push({
+            id: 'button',
+            accessor: 'name',
+            Cell: ({value}) => (<div class="fnbar">
+                <button onClick={()=>{
+                    alert('Updating MAKE ADMIN.'); // TODO
+                    this.makeAdmin(value);
+                }}>MAKE ADMIN
+                </button>
+            </div>)
+        })
+        
+        sub_columns.push({
+            id: 'button2',
+            accessor: 'email',
+            Cell: ({value}) => (<div className="fnbar">
+                <button onClick={() => {
+                    alert('Updating VIEW PALETTE')
+                    // TODO
+                }}>VIEW PALETTE
+                </button>
+            </div>)
+        })
         
         
         return (
             <div>
                 <br />
                 <br />
-                <ReactTable data={data} columns={columns} />
+                <ReactTable data={data} columns={sub_columns} />
             </div>
         )
     }
