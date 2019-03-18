@@ -58,17 +58,6 @@ export class Palette extends Component {
             })
     }
 
-    // put images with imageid
-    PutImage(imageid, payload) {
-        axios.put("/api/image/" + imageid, payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
     TrashSelectedImages() {
         const selected = this.state.photos.filter((value, index, array) => {
             return value.selected;
@@ -83,14 +72,13 @@ export class Palette extends Component {
             axios.put("/api/image/" + image.meta.iId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
                 .then(response => {
                     console.log(response);
+                    this.setState({
+                        photos: notSelected
+                    })
                 })
                 .catch(error => {
                     console.log(error);
                 });
-        })
-
-        this.setState({
-            photos: notSelected
         })
     }
 

@@ -100,33 +100,23 @@ export class ImageEditor extends Component {
     }
 
     render() {
-        let cropRes = this.state.cropResult ? <img style={{ width: '70%' }} src={this.state.cropResult} alt="cropped image" /> : null
-
         return (
             <div>
                 {this.renderRedirect()}
                 <br />
                 <div style={{ width: '100%' }}>
                     <Cropper
-                        style={{ height: 400, width: '100%' }}
+                        style={{ height: 650, width: '100%' }}
                         guides={false}
                         src={this.state.src}
                         ref={cropper => { this.cropper = cropper; }}
                     />
                 </div>
                 <br />
-                <button onClick={this.cropImage} style={{ float: 'right' }}>Crop Image</button>
+                <button onClick={this.submitImage} style={{ float: 'right' }}>Submit</button>
                 <button onClick={this.rotateCW} style={{ float: 'right' }}>Rotate clockwise</button>
                 <button onClick={this.rotateCounterCW} style={{ float: 'right' }}>Rotate counter clockwise</button>
 
-                <br />
-                <br />
-                <h3> Crop Preview </h3>
-                <button onClick={this.submitImage} style={{ float: 'right' }}>Upload Image</button>
-                <div>
-                    {cropRes}
-
-                </div>
                 <br />
                 <br />
                 <br />
