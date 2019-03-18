@@ -18,10 +18,15 @@ export class Palette extends Component {
             selectAll: false,
             showInfo: false,
             redirect: false,
+
+            toSubmit: []
         };
 
         this.GetUserImages = this.GetUserImages.bind(this);
         this.TrashSelectedImages = this.TrashSelectedImages.bind(this);
+
+        this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleGetInfoSubmit = this.handleGetInfoSubmit.bind(this);
 
         this.GetUserImages();
     }
@@ -98,6 +103,7 @@ export class Palette extends Component {
             <div>
             <div>
                 <div>
+                    <div>{this.renderGetInfo()}</div>
                     <Title title='PALETTE' />
                     <div>{this.renderFunction()}</div>
                 </div>
@@ -150,9 +156,48 @@ export class Palette extends Component {
         }
     }
 
-    // TODO
+    // TODO : double check on projectLink and why it's an array
+    handleProjectChange(e) {
+        let selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const unselected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        selected.forEach((img) => { img.projectLink = [e.target.value] });
+
+        selected.concat(unselected);
+
+        this.setState({ toSubmit: selected });
+    }
+
+    handleClassificationChange(e) {
+        let selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const unselected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        let tag = e.target.value;
+
+        selected.forEach((img) => {
+            if (!img.tagLink.includes(tag)) {
+                img.tagLink.push(tag)
+            }
+        });
+
+        selected.concat(unselected);
+
+        this.setState({ toSubmit: selected });
+    }
+
     handleGetInfoSubmit() {
-        //
+        this.setState({ photos: this.state.toSubmit });
+        this.setState({ toSubmit: [] });
         
         this.setState({ showInfo: false });
     }
@@ -167,12 +212,10 @@ export class Palette extends Component {
 
     // TODO
     // 1. implement way to check whether there is anything in common
-    // 3. get list of projects in database
-    // 4. get list of classifications in database
+    // 3. get full list of projects in database
+    // 4. get full list of classifications in database
     renderGetInfo() {
         if (this.state.showInfo) {
-            let values;
-
             // TODO 1
             const selected = this.state.photos.filter((value, index, array) => {
                 return value.selected;
@@ -188,7 +231,7 @@ export class Palette extends Component {
 
                     <div id="getInfo-right">
                         <p>TITLE : <br />
-                            <form type="text" id="name">{selected.length > 1 ? 'Various' : selected.imageName}</form>
+                            {selected.length > 1 ? 'Various' : selected.imageName}
                         </p>
                         <p>DATE : <br />
                             {selected.length > 1 ? 'Various' : selected.uploadedDate}
@@ -198,24 +241,24 @@ export class Palette extends Component {
                         </p>
                         <p>PROJECT : <br />
                             {selected.length > 1 ? 'Various' : this.listItems(selected.projectLink)}
-                            <select>
-                                <option name="projecta">Project A</option>
-                                <option name="projectb">Project B</option>
-                                <option name="projectc">Project C</option>
-                                <option name="projectd">Project D</option>
+                            <select onChange={this.handleProjectChange}>
+                                <option name="Project A">Project A</option>
+                                <option name="Project B">Project B</option>
+                                <option name="Project C">Project C</option>
+                                <option name="Project D">Project D</option>
                             </select>
                         </p>
                         <p>CLASSIFICATION : <br />
                             {selected.length > 1 ? 'Various' : this.listItems(selected.tagLink)}
-                            <select>
-                                <option name="bridge">Bridge</option>
-                                <option name="dam">Dam</option>
-                                <option name="river">River</option>
-                                <option name="road">Road</option>
+                            <select onChange={this.handleClassificationChange}>
+                                <option name="Bridge">Bridge</option>
+                                <option name="Dam">Dam</option>
+                                <option name="River">River</option>
+                                <option name="Road">Road</option>
                             </select>
                         </p>
                         <br /><br />
-                        <button onSubmit={this.handleGetInfoSubmit}>Submit</button>
+                        <button onSubmit={this.handleGetInfoSubmit}>Save</button>
                         <br /><br />
                         <button onClick={this.onGetInfo}>Cancel</button>
                     </div>
