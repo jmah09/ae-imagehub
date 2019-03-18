@@ -11,32 +11,34 @@ export class User extends Component {
         super(props);
         this.getUsers = this.getUsers.bind(this);
         this.getUsers();
+
+        this.state = {
+            users: []
+        };
     }
 
-    makeAdmin(userPrincipalName) {
-        userPrincipalName= 'todo';
-        axios.post("/api/graph" + userPrincipalName, null, { headers: { 'Authorization': "bearer " + getToken() } })
+    makeAdmin(userId) {
+        console.log(userId);
+        axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res=> {
                 console.log(res);
-                alert("User " + userPrincipalName + " has been made Admin.");
+                alert("The selected User has been made an admin.");
             })
     }
 
-
-
     getUsers() {
-        axios.post("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
+        axios.get("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
                 var users = [];
                 res.data.map((user, index) => {
                     users.push({
-                        name: user.name, email: user.unique_name
+                        name: user.displayName, email: user.mail, uid: user.id
                     })
-                })
-                console.log("users: " + res);
+                });
+                this.setState({ users: users });
             })
     }
-
+    
     render() {
         return (
             <div>
@@ -58,33 +60,27 @@ export class User extends Component {
         const statusStyle = {
             margin: '0px 0px 0px 70px'
         };
-        const data = [
-            {
-                name: 'John Smith',
-                email: 'john@gmail.com'
-            },
-            {
-                name: 'Adam Smith',
-                email: 'coin@gmail.com',
-            },
-        ];
-
 
         const columns = [
             {
                 Header: 'Name',
-                accessor:'name'
+                accessor:'name',
             },
             {
                 Header: 'Email',
-                accessor: 'email'
+                accessor: 'email',
+            },
+            {
+                Header: 'Uid',
+                accessor: 'uid',
+                show: false
             },
         ];
 
-        const sub_columns = columns.slice(0)
+        const sub_columns = columns.slice(0);
         sub_columns.push({
             id: 'button',
-            accessor: 'name',
+            accessor: 'uid',
             Cell: ({value}) => (<div class="fnbar">
                 <button onClick={()=>{
                     alert('Updating MAKE ADMIN.'); // TODO
@@ -92,8 +88,9 @@ export class User extends Component {
                 }}>MAKE ADMIN
                 </button>
             </div>)
-        })
+        });
 
+        // TODO
         sub_columns.push({
             id: 'button2',
             accessor: 'email',
@@ -104,14 +101,14 @@ export class User extends Component {
                 }}>VIEW PALETTE
                 </button>
             </div>)
-        })
+        });
 
 
         return (
             <div>
                 <br />
                 <br />
-                <ReactTable data={data} columns={sub_columns} />
+                <ReactTable data={this.state.users} columns={sub_columns} />
             </div>
         )
     }
