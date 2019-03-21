@@ -3,8 +3,7 @@ import { Title } from './Title';
 import ReactTable from 'react-table'
 import axios from 'axios'
 import { getToken } from '../adalConfig';
-import 'core-js/es6/number';
-import 'core-js/es6/array'; 
+import 'core-js';
 
 export class Log extends Component {
     
