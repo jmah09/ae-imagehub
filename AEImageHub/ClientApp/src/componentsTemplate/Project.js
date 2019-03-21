@@ -6,6 +6,13 @@ import axios from 'axios'
 import { getToken } from '../adalConfig';
 
 export class Project extends Component {
+    
+    constructor (props){
+        super(props);
+        this.state  = {
+            projects: {}
+        }
+    }
 
     // Jae
 
@@ -48,6 +55,16 @@ export class Project extends Component {
     }
     ///////////////////////////////////////////////////////////
 
+    componentDidMount() {
+        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                this.setState({projects: res.data})
+            }).catch (err => {
+            console.log(err);
+        })
+    }
+    
+    
     render() {
         return (
             <div>
@@ -73,13 +90,7 @@ export class Project extends Component {
         //Jae's example
 
         // batches project
-        let obj = this.GetProjects();
         
-        let type = typeof(obj);
-        if (type === "undefined") {
-            console.log("project object is undefined");
-        }
-        console.log(obj);
         
         // get a project info
         // this.GetProject('bridge%20builder');
@@ -100,34 +111,21 @@ export class Project extends Component {
         })
         */
         //////////////////////////////////////////
+        
+        const {projects} = this.state;
+        const tableData = [];
+        
+        for (let i = 0; i < projects.length; i++){
+            let project = {};
+            project.name = projects[i].ProjectName;
+            project.date = projects[i].CreatedDate;
+            project.description = projects[i].Description;
+            tableData.push(project);
+        }
 
         const statusStyle = {
             margin: '0px 0px 0px 70px'
         };
-        
-        const data = [
-            {
-                name: 'Bridge Project',
-                date: '2019/02/26'
-            },
-            {
-                name: 'Hoover Dam Project',
-                date: '2019/02/26'
-            },
-            {
-                name: 'Enguri Dam Project',
-                date: '2019/02/26'
-            },
-            {
-                name: 'Site C (Cancelled)',
-                date: '2019/02/26'
-            },
-            {
-                name: 'Road Project',
-                date: '2019/02/26'
-            },
-        ];
-
         
         const columns = [
             {
@@ -141,10 +139,14 @@ export class Project extends Component {
             {
                 Header: 'Date Created',
                 accessor: 'date'
+            },
+            {
+                Header: 'Description',
+                accessor: 'description'
             }
         ]
         return (
-            <div><br /><br /><ReactTable data={data} columns={columns} /></div>
+            <div><br /><br /><ReactTable data={tableData} columns={columns} /></div>
         )
     }
 

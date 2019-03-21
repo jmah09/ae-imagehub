@@ -20,7 +20,6 @@ export class Log extends Component {
     static GetLogs() {
         axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                console.log(res.data);
                 return res;
             })
     };
@@ -33,6 +32,14 @@ export class Log extends Component {
             })
     };
     ///////////////////////////////////////////////////////////
+    
+    //componentDidMount() will give is the response.data from server response
+    componentDidMount() {
+        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                this.setState({logs: res.data});
+            })
+    }
 
     render() {
         return (
@@ -43,14 +50,6 @@ export class Log extends Component {
         );
     }
     
-    //componentDidMount() will give is the response.data from server response
-    componentDidMount() {
-        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                this.setState({logs: res.data});
-            })
-    }
-
     renderContent() {
         
         //inside renderContent() we can store the response.data (an array of log objs) 
