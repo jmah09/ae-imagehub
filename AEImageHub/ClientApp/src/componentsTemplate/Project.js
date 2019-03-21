@@ -81,9 +81,6 @@ export class Project extends Component {
         }
         console.log(obj);
         
-        
-        
-
         // get a project info
         // this.GetProject('bridge%20builder');
 
