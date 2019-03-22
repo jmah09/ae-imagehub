@@ -41,6 +41,13 @@ namespace AEImageHub.Controllers
             return images.ToList(); //user's images
         }
 
+        [HttpGet("{userid}/images/trashed")]
+        public IEnumerable<Image> GetUserTrashedImages(string userid)
+        {
+            var images = _context.Image.Where(i => i.UId == userid && i.Trashed);
+            return images.ToList(); //user's images
+        }
+
         /* GET
         API Endpoint: api/user/:user_id
         Description: Retrieves user profile

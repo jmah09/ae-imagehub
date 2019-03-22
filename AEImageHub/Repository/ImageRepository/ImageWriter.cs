@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
-using AEImageHub.Repository;
 
 namespace AEImageHub.Repository
 {
@@ -69,7 +66,6 @@ namespace AEImageHub.Repository
         private string WriteFile(IFormFile file)
         {
             string fileName = GetImageHash(file);
-            Console.Write(fileName);
 
             var dir = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources");
             var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", fileName);
@@ -79,7 +75,6 @@ namespace AEImageHub.Repository
                 Directory.CreateDirectory(dir);
             }
 
-            Console.Write(path);
             using (var bits = new FileStream(path, FileMode.Create))
             {
                 file.CopyTo(bits);
