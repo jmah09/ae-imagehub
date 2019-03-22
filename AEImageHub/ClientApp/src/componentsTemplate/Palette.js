@@ -34,12 +34,12 @@ export class Palette extends Component {
         this.setState({ photos: photos });
     }
 
-      toggleSelect() {
+    toggleSelect() {
         let photos = this.state.photos.map((photo, index) => {
-          return { ...photo, selected: !this.state.selectAll };
+            return { ...photo, selected: !this.state.selectAll };
         });
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
-      }
+    }
 
     // get Images with the userid
     GetUserImages() {
@@ -85,15 +85,15 @@ export class Palette extends Component {
     render() {
         return (
             <div>
-            <div>
                 <div>
-                    <Title title='PALETTE' />
-                    <div>{this.renderFunction()}</div>
+                    <div>
+                        <Title title='PALETTE' />
+                        <div>{this.renderFunction()}</div>
+                    </div>
                 </div>
-            </div>
-            <div id="palcontent">
-            {this.renderContent()}
-            </div>
+                <div id="palcontent">
+                    {this.renderContent()}
+                </div>
             </div>
         );
     }
@@ -141,7 +141,7 @@ export class Palette extends Component {
                 <p>
                     <button onClick={this.toggleSelect}>
                         Select All
-              </button>
+                    </button>
                 </p>
                 <Gallery
                     photos={this.state.photos}
