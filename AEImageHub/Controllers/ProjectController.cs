@@ -77,7 +77,8 @@ namespace AEImageHub.Controllers
             {
                 ProjectName = (string)payload["ProjectName"],
                 CreatedDate = (DateTime)payload["CreatedDate"],
-                Description = (string)payload["Description"]
+                Description = (string)payload["Description"],
+                Active = (bool)payload["Active"]
             };
 
             _context.Project.Add(project);
@@ -123,6 +124,7 @@ namespace AEImageHub.Controllers
             if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
             if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
             if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
+            if (payload["Active"].Type != JTokenType.Null) { project.Description = (string)payload["Active"]; };
             _context.SaveChanges();
         }
     }
