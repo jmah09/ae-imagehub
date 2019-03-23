@@ -13,6 +13,7 @@ namespace AEImageHub.Models
         public string ProjectName { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Description { get; set; }
+        public bool Active { get; set; }
 
         public ICollection<ProjectLink> ProjectLink { get; set; }
     }
