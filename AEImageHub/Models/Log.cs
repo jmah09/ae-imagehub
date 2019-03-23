@@ -5,8 +5,8 @@ namespace AEImageHub.Models
 {
     public partial class Log
     {
-        public string Lid { get; set; }
-        public string Uid { get; set; }
+        public string LId { get; set; }
+        public string UId { get; set; }
         public DateTime CreatedDate { get; set; }
         public string LogFile { get; set; }
 
