@@ -77,7 +77,7 @@ namespace AEImageHub.Controllers
                 LId = (string)payload["LId"],
                 UId = (string)payload["UId"],
                 CreatedDate = (DateTime)payload["CreatedDate"],
-                Log1 = (string)payload["Log1"]
+                LogFile = (string)payload["LogFile"]
             };
 
             _context.Log.Add(log);
