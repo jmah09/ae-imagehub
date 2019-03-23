@@ -105,7 +105,6 @@ namespace AEImageHub.Controllers
                 UId = (string)payload["UId"],
                 UserName = (string)payload["UserName"],
                 Role = (string)payload["Role"],
-                Admin = (bool)payload["Admin"],
                 Active = (bool)payload["Active"],
             };
             _context.User.Add(user);
@@ -132,7 +131,6 @@ namespace AEImageHub.Controllers
             user.UId = (string)payload["UId"];
             user.UserName = (string)payload["UserName"];
             user.Role = (string)payload["Role"];
-            user.Admin = (bool)payload["Admin"];
             user.Active = (bool)payload["Active"];
             _context.SaveChanges();
         }
