@@ -167,13 +167,16 @@ export class Palette extends Component {
         });
 
         let tag = e.target.value;
+        console.log("this is the tag: " + tag);
+        
+        console.log(selected);
 
         selected.forEach((img) => {
-            if (!img.tagLink.includes(tag)) {
-                img.tagLink.push(tag)
+            if (!img.meta.tagLink.includes(tag)) {
+                img.meta.tagLink.push(tag)
             }
         });
-
+        
         selected.concat(unselected);
 
         this.setState({ toSubmit: selected });
