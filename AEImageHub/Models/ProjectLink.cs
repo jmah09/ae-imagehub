@@ -7,7 +7,7 @@ namespace AEImageHub.Models
     {
         public int PlinkId { get; set; }
         public string ProjectName { get; set; }
-        public string IId { get; set; }
+        public string Iid { get; set; }
 
         public Image I { get; set; }
         public Project ProjectNameNavigation { get; set; }

@@ -7,7 +7,7 @@ namespace AEImageHub.Models
     {
         public int TlinkId { get; set; }
         public string TagName { get; set; }
-        public string IId { get; set; }
+        public string Iid { get; set; }
 
         public Image I { get; set; }
         public Tag TagNameNavigation { get; set; }

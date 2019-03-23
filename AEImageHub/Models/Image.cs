@@ -11,8 +11,8 @@ namespace AEImageHub.Models
             TagLink = new HashSet<TagLink>();
         }
 
-        public string IId { get; set; }
-        public string UId { get; set; }
+        public string Iid { get; set; }
+        public string Uid { get; set; }
         public string ImageName { get; set; }
         public int Size { get; set; }
         public DateTime UploadedDate { get; set; }
