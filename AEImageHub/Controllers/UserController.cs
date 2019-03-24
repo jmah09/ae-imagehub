@@ -35,10 +35,18 @@ namespace AEImageHub.Controllers
         */
 
         [HttpGet("{userid}/images")]
-        public IEnumerable<Image> GetUserImages(string userid)
+        public Object GetUserImages(string userid)
         {
-            var images = _context.Image.Where(i => i.UId == userid && !i.Trashed);
-            return images.ToList(); //user's images
+            //TODO: currently the other users can access others palette 
+            try
+            {
+                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted);
+                return images.ToList(); //user's images
+            }
+            catch(Exception e)
+            {
+                return e;
+            }
         }
 
         [HttpGet("{userid}/images/trashed")]

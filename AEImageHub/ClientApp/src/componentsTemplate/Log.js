@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
 import ReactTable from 'react-table'
-import axios from 'axios'
+import axios from 'axios';
 import { getToken } from '../adalConfig';
+import 'core-js';
 
 export class Log extends Component {
 
@@ -20,7 +21,7 @@ export class Log extends Component {
     GetLog(logid) {
         axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                console.log(res);
             })
     };
     ///////////////////////////////////////////////////////////

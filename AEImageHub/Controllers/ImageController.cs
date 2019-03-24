@@ -148,15 +148,21 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
         [HttpPut("{imageid}")]
-        public string PutImage(string imageid, [FromBody] JObject payload)
+        public Object PutImage(string imageid, [FromBody] JObject payload)
         {
-            Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
-            if (payload["ImageName"] != null) { image.ImageName = (string)payload["ImageName"]; };
-            if (payload["Trashed"] != null) { image.Trashed = (bool)payload["Trashed"]; };
-            if (payload["Submitted"] != null) { image.Submitted = (bool)payload["Submitted"]; };
-            _context.Update(image);
-            _context.SaveChanges();
-            return imageid;
+            try
+            { 
+                Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
+                if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
+                if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
+                _context.SaveChanges();
+                return imageid;
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
 
         /* DELETE
