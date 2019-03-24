@@ -6,6 +6,7 @@ using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -63,9 +64,13 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                return JsonConvert.SerializeObject(_context.Project.Where(p => p.ProjectName == projectname).First());
+                var project = _context.Project
+                    .Where(p => p.ProjectName == projectname)
+                    .Include(p => p.ProjectLink)
+                    .First();
+                return JsonConvert.SerializeObject(project);
             }
-            catch (Exception e)
+            catch (Exception e) 
             {
                 return e;
             }
