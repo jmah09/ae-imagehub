@@ -37,7 +37,14 @@ namespace AEImageHub.Controllers
         [HttpGet("")]
         public Object GetLogs()
         {
-            return JsonConvert.SerializeObject(_context.Log);
+            try
+            {
+                return JsonConvert.SerializeObject(_context.Log);
+            }
+            catch(Exception e)
+            {
+                return e;
+            }
         }
 
         /*
@@ -55,7 +62,14 @@ namespace AEImageHub.Controllers
         [HttpGet("{logid}")]
         public Object Getlog(string logid)
         {
-            return JsonConvert.SerializeObject(_context.Log.Where(l => l.LId == logid).First());
+            try
+            {
+                return JsonConvert.SerializeObject(_context.Log.Where(l => l.LId == logid).First());
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
 
         /*
@@ -70,18 +84,25 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
         [HttpPost("")]
-        public void PostLog([FromBody] JObject payload)
+        public Object PostLog([FromBody] JObject payload)
         {
-            Log log = new Log()
+            try
+            { 
+                Log log = new Log()
+                {
+                    LId = (string)payload["LId"],
+                    UId = (string)payload["UId"],
+                    CreatedDate = (DateTime)payload["CreatedDate"],
+                    LogFile = (string)payload["LogFile"]
+                };
+                _context.Log.Add(log);
+                _context.SaveChanges();
+                return "success";
+            }
+            catch (Exception e)
             {
-                LId = (string)payload["LId"],
-                UId = (string)payload["UId"],
-                CreatedDate = (DateTime)payload["CreatedDate"],
-                LogFile = (string)payload["LogFile"]
-            };
-
-            _context.Log.Add(log);
-            _context.SaveChanges();
+                return e;
+            }
         }
     }
 }
