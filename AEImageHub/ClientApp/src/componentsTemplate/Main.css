@@ -116,6 +116,7 @@ h2 {
 
 .fnbar {
     margin: 0px;
+    margin-bottom: 0px;
     padding: 0px 0px;
     font-size: 15px;
     color: #FFF;
@@ -134,13 +135,6 @@ h2 {
 .fnbar button:hover {
     background-color: #287AFF;
 }
-
-/* #palcontent {
-    overflow: hidden;
-    height: 100%;
-    float: left;
-
-} */
 
 .toggleButton button {
     background-color: #1B53AD;

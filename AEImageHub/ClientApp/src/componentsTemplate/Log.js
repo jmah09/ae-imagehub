@@ -3,27 +3,43 @@ import { Title } from './Title';
 import ReactTable from 'react-table'
 import axios from 'axios'
 import { getToken } from '../adalConfig';
+import 'core-js';
 
 export class Log extends Component {
+    
+    constructor(props){
+        super(props);
+        this.state = {
+            logs: {},
+        }
+    }
 
     // Jae's example
 
     // get all Logs
-    GetLogs() {
+    static GetLogs() {
         axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res;
             })
     };
 
     // get a log with logid
-    GetLog(logid) {
+    static GetLog(logid) {
         axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                return res;
             })
     };
     ///////////////////////////////////////////////////////////
+    
+    //componentDidMount() will give is the response.data from server response
+    componentDidMount() {
+        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                this.setState({logs: res.data});
+            })
+    }
 
     render() {
         return (
@@ -33,14 +49,26 @@ export class Log extends Component {
             </div>
         );
     }
-
+    
     renderContent() {
-
-        //JAE
-        this.GetLogs();
-        this.GetLog('log1');
-        ////////////////////////
-
+        
+        //inside renderContent() we can store the response.data (an array of log objs) 
+        //inside a var an object called logs by calling this.state
+        const {logs} = this.state;
+        const tableData = [];
+        
+        //building log obj for each log obj returned from server
+        for (let i = 0; i < logs.length; i++){
+            let log = {};
+            log.name = logs[i].LId;
+            log.user = logs[i].UId;
+            log.date = logs[i].CreatedDate;
+            tableData.push(log);
+        }
+        
+        //printing out the contents of tableData which contains log column data 
+        console.log(tableData);
+        
 
         const columns = [
             {
@@ -49,55 +77,16 @@ export class Log extends Component {
             },
             {
                 Header: 'User',
-                accessor: 'user'
+                accessor: 'user',
             },
             {
-                Header: 'Date',
+                Header: 'Date Created',
                 accessor: 'date'
             }
-
-        ]
-
-        const data = [
-            {
-                name: 'log_00000032_20190226_PR',
-                user: 'Peter Rosenberg',
-                date: '2019/02/26'
-            },
-            {
-                name: 'log_00000022_20190226_TG',
-                user: 'Thadeus Gamelthorpe',
-                date: '2019/02/26'
-            },
-            {
-                name: 'log_00000034_20190210_JC',
-                user: 'Jesus Christ',
-                date: '2019/02/10'
-            },
-            {
-                name: 'log_00000045_20190210_JT',
-                user: 'Justin Timberlake',
-                date: '2019/02/10'
-            },
-            {
-                name: 'log_00000069_20190209_RZ',
-                user: 'Robert Zhang',
-                date: '2019/02/09'
-            },
-            {
-                name: 'log_00000045_20190129_KN',
-                user: 'Kim Nishimura',
-                date: '2019/01/29'
-                
-            },
-            {
-                name: 'log_00000043_20190123_BO',
-                user: 'Barak Obama',
-                date: '2019/01/23ç'
-            }
-        ]
+        ];
+        
         return (
-            <ReactTable data={data} columns={columns} />
+            <ReactTable data={tableData} columns={columns} />
         )
     }
 
