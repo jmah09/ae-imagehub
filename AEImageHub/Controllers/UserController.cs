@@ -53,10 +53,10 @@ namespace AEImageHub.Controllers
         }
 
         [HttpGet("{userid}/images/trashed")]
-        public IEnumerable<Image> GetUserTrashedImages(string userid)
+        public Object GetUserTrashedImages(string userid)
         {
             var images = _context.Image.Where(i => i.UId == userid && i.Trashed);
-            return images.ToList(); //user's images
+            return JsonConvert.SerializeObject(images); //user's images
         }
 
         /* GET
