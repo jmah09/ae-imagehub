@@ -194,19 +194,19 @@ export class Palette extends Component {
         let str = 'TEST';
 
         if (item === 'classification') {
-            str = photo.tagLink[0] || '';
+            str = photo.TagLink[0] || '';
 
-            for (let i = 1; i < photo.tagLink.length; i++) {
-                str += photo.tagLink[i];
+            for (let i = 1; i < photo.TagLink.length; i++) {
+                str += photo.TagLink[i];
 
             }
         } 
         
         else if (item === 'project') {
-            str = photo.projectLink[0] || '';
+            str = photo.ProjectLink[0] || '';
 
-            for (let i = 1; i < photo.projectLink.length; i++) {
-                str += photo.projectLink[i];
+            for (let i = 1; i < photo.ProjectLink.length; i++) {
+                str += photo.ProjectLink[i];
 
             }
         }
