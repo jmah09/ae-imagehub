@@ -5,6 +5,7 @@ using System.Linq;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,8 +41,10 @@ namespace AEImageHub.Controllers
             //TODO: currently the other users can access others palette 
             try
             {
-                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted);
-                return images.ToList(); //user's images
+                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted)
+                                           .Include(i => i.ProjectLink)
+                                           .Include(i => i.TagLink);
+                return JsonConvert.SerializeObject(images); //user's images
             }
             catch(Exception e)
             {
