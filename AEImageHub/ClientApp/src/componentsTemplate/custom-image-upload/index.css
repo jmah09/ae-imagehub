@@ -3,10 +3,7 @@
 }
 
 .fileContainer {
-	background: #fff;
-	box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.05);
 	position: relative;
-	border-radius: 10px;
 	padding: 20px 0;
 	display: flex;
 	align-items: center;
@@ -27,53 +24,31 @@
 	margin: 8px 0 4px;
 }
 
-    .fileContainer .errorsContainer {
-        max-width: 300px;
-        font-size: 12px;
-        color: red;
-        text-align: left;
-    }
+.fileContainer .errorsContainer {
+    max-width: 300px;
+    font-size: 12px;
+    color: red;
+    text-align: left;
+}
 
-    .fileContainer .chooseImageButton {
-        padding: 6px 23px;
-        background: #3f4257;
-        border-radius: 30px;
-        color: white;
-        font-weight: 300;
-        font-size: 14px;
-        margin: 10px 0;
-        transition: all 0.2s ease-in;
-        cursor: pointer;
-        outline: none;
-        border: none;
-    }
+.fileContainer .chooseImageButton,
+.fileContainer .uploadImagesButton {
+    background: #1B53AD;
+    border: none;
+    color: #FFF;
+    font-size: 15px;
+    margin: 20px 20px;
+    padding: 2px 10px;
+}
 
-        .fileContainer .chooseImageButton:hover {
-            background: #545972;
-        }
+.fileContainer .chooseImageButton:hover,
+.fileContainer .uploadImagesButton:hover {
+    background: #287AFF;
+}
 
-    .fileContainer .uploadImagesButton {
-        padding: 6px 23px;
-        background: #3f4257;
-        border-radius: 30px;
-        color: white;
-        font-weight: 300;
-        font-size: 14px;
-        margin: 10px 0;
-        margin-left: 10px;
-        transition: all 0.2s ease-in;
-        cursor: pointer;
-        outline: none;
-        border: none;
-    }
-
-        .fileContainer .uploadImagesButton:hover {
-            background: #545972;
-        }
-
-    .fileContainer .buttonContainer {
-        display: inline-block;
-    }
+.fileContainer .buttonContainer {
+    display: inline-block;
+}
 
 
 .fileContainer .uploadIcon {
@@ -106,51 +81,51 @@
 	width: 100%;
 }
 
-    .fileContainer .deleteImage {
-        position: absolute;
-        top: -9px;
-        right: -9px;
-        color: #fff;
-        background: #1B53AD;
-        border-radius: 50%;
-        text-align: center;
-        cursor: pointer;
-        font-size: 26px;
-        font-weight: bold;
-        line-height: 30px;
-        width: 30px;
-        height: 30px;
-    }
+.fileContainer .deleteImage {
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    color: #fff;
+    background: #1B53AD;
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+}
 
-    .fileContainer .imageUploadSuccess {
-        position: absolute;
-        background-position: 50% 50%;
-        color: #fff;
-        background: #4BB543;
-        border-radius: 50%;
-        text-align: center;
-        cursor: pointer;
-        font-size: 46px;
-        font-weight: bold;
-        line-height: 45px;
-        width: 50px;
-        height: 50px;
-    }
+.fileContainer .imageUploadSuccess {
+    position: absolute;
+    background-position: 50% 50%;
+    color: #fff;
+    background: #4BB543;
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    font-size: 46px;
+    font-weight: bold;
+    line-height: 45px;
+    width: 50px;
+    height: 50px;
+}
 
-    .fileContainer .imageUploadfail {
-        position: absolute;
-        background-position: 50% 50%;
-        color: #fff;
-        background: #FFCC00;
-        border-radius: 50%;
-        text-align: center;
-        cursor: pointer;
-        font-size: 46px;
-        font-weight: bold;
-        line-height: 45px;
-        width: 50px;
-        height: 50px;
-    }
+.fileContainer .imageUploadfail {
+    position: absolute;
+    background-position: 50% 50%;
+    color: #fff;
+    background: #FFCC00;
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    font-size: 46px;
+    font-weight: bold;
+    line-height: 45px;
+    width: 50px;
+    height: 50px;
+}
 
 .flipMove {
 	display: flex;
