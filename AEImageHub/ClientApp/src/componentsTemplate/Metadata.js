@@ -3,7 +3,17 @@ import { Title } from './Title';
 
 export class Metadata extends Component {
 
+    // get all projects
+    GetMetadata() {
+        axios.get("/api/metadata", { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                return res;
+            })
+    };
+
     render() {
+
+        GetMetadata();
         return (
             <div>
                 <Title title='MANAGEMENT : METADATA' />
