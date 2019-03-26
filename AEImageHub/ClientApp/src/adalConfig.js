@@ -20,14 +20,19 @@ export const getToken = () => {
 };
 
 
-export const getCredentials = () => {
-    var token = getToken();
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace('-', '+').replace('_', '/');
+export const getCredentials = (token) => {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace('-', '+').replace('_', '/');
     return JSON.parse(window.atob(base64));
 };
 
+export const isAdmin = (token) => {
+    let decoded_token = getCredentials(token);
+    const adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
+    return decoded_token["groups"].includes(adminGroup);
+};
+
 export const adalApiFetch = (fetch, url, options) =>
-    adalFetch(authContext, adalConfig.endpoints.api, fetch, url, options);
+adalFetch(authContext, adalConfig.endpoints.api, fetch, url, options);
 
 export const withAdalLoginApi = withAdalLogin(authContext, adalConfig.endpoints.api);
