@@ -34,6 +34,7 @@ export class Palette extends Component {
 
     componentDidMount() {
         let param = this.props.location.search;
+        this.state.validId = param.includes("?"); // todo : temp fix
         this.state.userId = param.substring(1, param.indexOf("@"));
         this.state.admin = isAdmin(getToken());
         console.log(this.state.admin);
@@ -58,7 +59,7 @@ export class Palette extends Component {
         // todo hardcoded for now
         let token = getToken();
         let userid = getCredentials(token).name;
-        if (this.state.admin) { // todo add check for validId
+        if (this.state.admin && this.state.validId) { // todo add check for validId
             console.log("ok");
             userid = this.state.userId
         }
