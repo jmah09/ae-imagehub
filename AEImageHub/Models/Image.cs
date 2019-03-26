@@ -7,6 +7,7 @@ namespace AEImageHub.Models
     {
         public Image()
         {
+            LogLink = new HashSet<LogLink>();
             ProjectLink = new HashSet<ProjectLink>();
             TagLink = new HashSet<TagLink>();
         }
@@ -22,6 +23,7 @@ namespace AEImageHub.Models
         public bool Submitted { get; set; }
 
         public User U { get; set; }
+        public ICollection<LogLink> LogLink { get; set; }
         public ICollection<ProjectLink> ProjectLink { get; set; }
         public ICollection<TagLink> TagLink { get; set; }
     }
