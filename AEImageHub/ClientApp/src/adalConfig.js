@@ -9,7 +9,7 @@ const adalConfig = {
         api: 'a42cbd10-bbd7-414f-b9f8-733274fea3c1'
     },
     postLogoutRedirectUri: window.location.origin,
-    redirectUri: 'http://localhost:5000/',
+    redirectUri: 'http://localhost:5000/palette',
     cacheLocation: 'sessionStorage'
 };
 
@@ -21,7 +21,7 @@ export const getToken = () => {
 
 
 export const getCredentials = () => {
-    var token  = getToken();
+    var token = getToken();
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace('-', '+').replace('_', '/');
     return JSON.parse(window.atob(base64));

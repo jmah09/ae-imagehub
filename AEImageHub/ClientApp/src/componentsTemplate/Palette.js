@@ -50,7 +50,7 @@ export class Palette extends Component {
                 var images = [];
                 res.data.map((image, index) => {
                     images.push({
-                        src: "/api/image/" + image.iId, width: 5, height: 4, alt: image.iId , meta : image
+                        src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
                     });
                 })
                 console.log(res.data);
@@ -69,7 +69,7 @@ export class Palette extends Component {
 
         selected.map((image, index) => {
             image.meta.Trashed = true;
-            axios.put("/api/image/" + image.meta.iId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
+            axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
                 .then(response => {
                     console.log(response);
                     this.setState({
@@ -114,7 +114,7 @@ export class Palette extends Component {
         if (selected.length != 1) {
             alert("select exactly one image");
         } else {
-            this.state.editImageLink = selected[0].meta.iId;
+            this.state.editImageLink = selected[0].meta.IId;
             this.setState({
                 redirect: true
             })

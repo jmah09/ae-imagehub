@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -88,9 +88,8 @@ namespace AEImageHub.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Log1)
+                entity.Property(e => e.LogFile)
                     .IsRequired()
-                    .HasColumnName("Log")
                     .HasMaxLength(1000);
 
                 entity.Property(e => e.UId)
@@ -126,9 +125,7 @@ namespace AEImageHub.Models
 
                 entity.HasIndex(e => new { e.IId, e.ProjectName });
 
-                entity.Property(e => e.PlinkId)
-                    .HasColumnName("PLinkId")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.PlinkId).HasColumnName("PLinkId");
 
                 entity.Property(e => e.IId)
                     .IsRequired()
@@ -169,9 +166,7 @@ namespace AEImageHub.Models
 
                 entity.HasIndex(e => new { e.IId, e.TagName });
 
-                entity.Property(e => e.TlinkId)
-                    .HasColumnName("TLinkId")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.TlinkId).HasColumnName("TLinkId");
 
                 entity.Property(e => e.IId)
                     .IsRequired()

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace AEImageHub.Models
@@ -9,7 +8,7 @@ namespace AEImageHub.Models
         public string LId { get; set; }
         public string UId { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string Log1 { get; set; }
+        public string LogFile { get; set; }
 
         public User U { get; set; }
     }

@@ -6,6 +6,7 @@ using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -36,7 +37,14 @@ namespace AEImageHub.Controllers
         [HttpGet("")]
         public Object GetProjects()
         {
-            return JsonConvert.SerializeObject(_context.Project);
+            try
+            {
+                return JsonConvert.SerializeObject(_context.Project);
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
 
         /*
@@ -54,7 +62,18 @@ namespace AEImageHub.Controllers
         [HttpGet("{projectname}")]
         public Object GetProject(string projectname)
         {
-            return JsonConvert.SerializeObject(_context.Project.Where(p => p.ProjectName == projectname).First());
+            try
+            {
+                var project = _context.Project
+                    .Where(p => p.ProjectName == projectname)
+                    .Include(p => p.ProjectLink)
+                    .First();
+                return JsonConvert.SerializeObject(project);
+            }
+            catch (Exception e) 
+            {
+                return e;
+            }
         }
 
         /*
@@ -70,38 +89,28 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to create project
         */
+        [Authorize(Policy = "Admins")]
         [HttpPost("")]
-        public void PostProject([FromBody] JObject payload)
+        public Object PostProject([FromBody] JObject payload)
         {
-            Project project = new Project()
+            try
             {
-                ProjectName = (string)payload["ProjectName"],
-                CreatedDate = (DateTime)payload["CreatedDate"],
-                Description = (string)payload["Description"]
-            };
+                Project project = new Project()
+                {
+                    ProjectName = (string)payload["ProjectName"],
+                    CreatedDate = (DateTime)payload["CreatedDate"],
+                    Description = (string)payload["Description"],
+                    Active = (bool)payload["Active"]
+                };
 
-            _context.Project.Add(project);
-            _context.SaveChanges();
-        }
-
-        /*
-        DELETE
-        API Endpoint: api/project/:project_id
-        Description: Deletes project
-        Request Requirements:
-        1. User JWT in header field
-
-        Server response and status code:
-        200 - Project deletion was successful 
-        401 - the JWT attached to the header is invalid or expired(should redirect to login)
-        403 - user not authorized to delete project
-        */
-        [HttpDelete("{projectname}")]
-        public void DeleteProject(string projectname)
-        {
-            Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
-            _context.Remove(project);
-            _context.SaveChanges();
+                _context.Project.Add(project);
+                _context.SaveChanges();
+                return "success";
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
 
         /*
@@ -116,14 +125,24 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to modify project
         */
+        [Authorize(Policy = "Admins")]
         [HttpPut("{projectname}")]
-        public void PutProject(string projectname, [FromBody] JObject payload)
+        public Object PutProject(string projectname, [FromBody] JObject payload)
         {
-            Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
-            if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
-            if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
-            if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
-            _context.SaveChanges();
+            try
+            {
+                Project project = (Project)_context.Project.Where(p => p.ProjectName == projectname).First();
+                if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
+                if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
+                if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
+                if (payload["Active"].Type != JTokenType.Null) { project.Description = (string)payload["Active"]; };
+                _context.SaveChanges();
+                return "success";
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
         }
     }
 }

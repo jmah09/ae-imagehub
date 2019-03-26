@@ -5,6 +5,7 @@ using System.Linq;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -35,10 +36,20 @@ namespace AEImageHub.Controllers
         */
 
         [HttpGet("{userid}/images")]
-        public IEnumerable<Image> GetUserImages(string userid)
+        public Object GetUserImages(string userid)
         {
-            var images = _context.Image.Where(i => i.UId == userid && !i.Trashed);
-            return images.ToList(); //user's images
+            //TODO: currently the other users can access others palette 
+            try
+            {
+                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted)
+                                           .Include(i => i.ProjectLink)
+                                           .Include(i => i.TagLink);
+                return JsonConvert.SerializeObject(images); //user's images
+            }
+            catch(Exception e)
+            {
+                return e;
+            }
         }
 
         [HttpGet("{userid}/images/trashed")]
@@ -105,7 +116,6 @@ namespace AEImageHub.Controllers
                 UId = (string)payload["UId"],
                 UserName = (string)payload["UserName"],
                 Role = (string)payload["Role"],
-                Admin = (bool)payload["Admin"],
                 Active = (bool)payload["Active"],
             };
             _context.User.Add(user);
@@ -132,7 +142,6 @@ namespace AEImageHub.Controllers
             user.UId = (string)payload["UId"];
             user.UserName = (string)payload["UserName"];
             user.Role = (string)payload["Role"];
-            user.Admin = (bool)payload["Admin"];
             user.Active = (bool)payload["Active"];
             _context.SaveChanges();
         }

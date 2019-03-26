@@ -106,6 +106,7 @@ export class ImageEditor extends Component {
                 <br />
                 <div style={{ width: '100%' }}>
                     <Cropper
+
                         style={{ height: 650, width: '100%' }}
                         guides={false}
                         src={this.state.src}
@@ -113,6 +114,7 @@ export class ImageEditor extends Component {
                     />
                 </div>
                 <br />
+
                 <button onClick={this.submitImage} style={{ float: 'right' }}>Submit</button>
                 <button onClick={this.rotateCW} style={{ float: 'right' }}>Rotate clockwise</button>
                 <button onClick={this.rotateCounterCW} style={{ float: 'right' }}>Rotate counter clockwise</button>
