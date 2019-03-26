@@ -49,7 +49,7 @@ export class Trash extends Component {
             var images = [];
         res.data.map((image, index) => {
             images.push({
-                src: "/api/image/" + image.iId, width: 5, height: 4, alt: image.iId, meta: image
+                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
             });
     })
         console.log(res.data);
@@ -68,7 +68,7 @@ export class Trash extends Component {
 
         selected.map((image, index) => {
             image.meta.Trashed = false;
-        axios.put("/api/image/" + image.meta.iId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
+        axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(response => {
             console.log(response);
         this.setState({
