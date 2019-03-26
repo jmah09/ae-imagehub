@@ -21,7 +21,7 @@ export class Project extends Component {
     GetProject(projectname) {
         axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
-                return;
+                console.log("project: " + JSON.stringify(res));
             })
     };
 
@@ -76,7 +76,7 @@ export class Project extends Component {
         this.GetProjects();
 
         // get a project info
-        this.GetProject('bridge%20builder');
+        this.GetProject('Capilano Bridge');
 
         /*
         // Post project
