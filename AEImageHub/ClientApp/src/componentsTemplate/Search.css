@@ -1,0 +1,43 @@
+#search-form {
+    margin: 15px 0px 0px 15px;
+}
+
+#search-form button {
+    background-color: #1B53AD;
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    margin: 3px 0px 0px 5px;
+    padding: 2px 10px;
+    font-size: 15px;
+    color: #FFF;
+}
+
+#search-form button:hover {
+    background-color: #287AFF;
+}
+
+#search-form select {
+    margin: 0px 5px 0px 0px;
+    height: 25px;
+    border: 1px solid;
+    text-align: justify ;
+}
+
+#search-form option:checked {
+    background-color: #87c34b;
+    color: #FFF;
+    
+}
+
+#search-form input {
+    margin: 0px 5px 0px 0px;
+    padding: 0px 0px 0px 5px;
+    width: 140px;
+    height: 25px;
+    border: 1px solid;
+}
+
+#search-content {
+    margin: 15px 0px 0px 15px;
+}
