@@ -17,7 +17,7 @@ export class Header extends Component {
                     </Link>
                     <div id="hdrname">
                         <span>NAME PLACEHOLDER</span>
-                        <button>SIGN IN</button>
+                        <button>SIGN OUT</button>
                     </div>
                 </div>
             </div>
