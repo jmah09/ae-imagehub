@@ -3,7 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import Cropper from 'react-cropper';
 import axios from 'axios';
 import { getToken } from '../../adalConfig';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
 
 export class ImageEditor extends Component {
     constructor(props) {
@@ -97,8 +97,14 @@ export class ImageEditor extends Component {
         if (this.state.redirect) {
             return <Redirect to={redirectLink} />
         }
-    }
+    };
 
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    };
+    
     render() {
         return (
             <div>
@@ -114,7 +120,7 @@ export class ImageEditor extends Component {
                     />
                 </div>
                 <br />
-
+                <button onClick={this.setRedirect} style={{ float: 'right' }}>Cancel</button>
                 <button onClick={this.submitImage} style={{ float: 'right' }}>Submit</button>
                 <button onClick={this.rotateCW} style={{ float: 'right' }}>Rotate clockwise</button>
                 <button onClick={this.rotateCounterCW} style={{ float: 'right' }}>Rotate counter clockwise</button>
