@@ -116,7 +116,7 @@ export class Search extends Component {
         
         let curQuery = this.buildQuery();
 
-        if (curQuery.input_1 === null) {
+        if (!curQuery.input_1) {
             return;
         }
 
@@ -155,7 +155,7 @@ export class Search extends Component {
 
         let curQuery = this.buildQuery();
 
-        if (curQuery.input_1 === null) {
+        if (!curQuery.input_1) {
             return;
         }
 
