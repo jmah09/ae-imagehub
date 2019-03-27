@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
+import { Dropdown } from './sub-components/form-dropdown';
+import { TextInput } from './sub-components/form-text-input';
 import axios from 'axios';
 import { getCredentials, getToken } from '../adalConfig';
 import Gallery from './custom-photo-gallery';
@@ -23,12 +25,33 @@ export class Search extends Component {
 
             showDateInput: false,
             showInfo: false,
-            showResult: false,
+            showResults: false,
 
             photos: [],
             selectAll: false
         };
 
+        
+        this.dropdown_options = {
+            '': 'Select Option',
+            'n': 'Name',
+            'c': 'Classification',
+            'p': 'Project',
+            //'m': 'Metadata',
+            'u':'User',
+            'd': 'Date'
+        }
+
+        this.text_options = {
+            '': 'Search..',
+            'n': 'img_sample_name',
+            'c': 'Bridge',
+            'p': 'Project A',
+            //'m': 'Bridge',
+            'u':'John Smith',
+            'd': 'yyyymmdd'
+        }
+        
     }
 
     //
@@ -49,7 +72,10 @@ export class Search extends Component {
         }
         else
         {
-            this.setState({ showDateInput: false });
+            this.setState({
+                input_2: null,
+                showDateInput: false
+            });
         }
     }
 
@@ -60,8 +86,8 @@ export class Search extends Component {
 
     buildQuery = (e) =>
     {
-        let input_1 = this.state.input_1;
-        let input_2 = this.state.input_2;
+        let input_1 = this.state.input_1 !== '' ? this.state.input_1 : null;
+        let input_2 = this.state.input_1 !== '' ? this.state.input_2 : null;
 
         if (this.state.option === 'd')
         {
@@ -90,6 +116,10 @@ export class Search extends Component {
         
         let curQuery = this.buildQuery();
 
+        if (curQuery.input_1 === null) {
+            return;
+        }
+
         if (this.state.option === 'd' && (!curQuery.input_1 || !curQuery.input_2))
         {
             alert('Please search with the correct date format: yyyymmdd');
@@ -104,7 +134,7 @@ export class Search extends Component {
             input_1: '',
             input_2: '',
             
-            showResult: true
+            showResults: true
         });
 
         // AXIOS POST REQUEST
@@ -124,6 +154,10 @@ export class Search extends Component {
         e.preventDefault();
 
         let curQuery = this.buildQuery();
+
+        if (curQuery.input_1 === null) {
+            return;
+        }
 
         if (this.state.option === 'd' && (!curQuery.input_1 || !curQuery.input_2))
         {
@@ -161,7 +195,7 @@ export class Search extends Component {
         return (
             <div>
                 <Title title='SEARCH' />
-                {this.renderSearch()}
+                {this.renderSearchBar()}
                 {this.renderFunction()}
                 {this.renderContent()}
             </div>
@@ -170,7 +204,7 @@ export class Search extends Component {
 
     renderFunction()
     {
-        if (this.state.showResult)
+        if (this.state.showResults && this.state.photos.length > 0)
         {
             return (
                 <div className="fnbar">
@@ -183,33 +217,58 @@ export class Search extends Component {
     }
 
 
-    renderSearch = () => 
+    renderSearchBar = () => 
     {
         return (
             <div id="search-form">
-                <SearchDropdown onChange={this.handleListChange} />
-                <SearchTextform id="input_1" option={this.state.option} value={this.state.input_1} onChange={this.handleTextChange} />
-                {this.state.showDateInput ? <SearchTextform id="input_2" option={this.state.option} value={this.state.input_2} onChange={this.handleTextChange} /> : null}
-                {this.state.showResult ? null : <SearchButton name="Search" onClick={this.onSearch} />}
-                {this.state.showResult ? <SearchButton name="Add Filter" onClick={this.onAddFilter} /> : null}
+                <Dropdown
+                    id="search-dropdown"
+                    options={this.dropdown_options}
+                    onChange={this.handleListChange} />
+                <TextInput 
+                    id="input_1" 
+                    option={this.state.option}
+                    options={this.text_options}
+                    value={this.state.input_1} 
+                    onChange={this.handleTextChange} />
+                {this.state.showDateInput 
+                    ? <TextInput 
+                        id="input_2" 
+                        option={this.state.option}
+                        options={this.text_options}
+                        value={this.state.input_2} 
+                        onChange={this.handleTextChange} />
+                    : null}
+                {this.state.showResults 
+                    ? null
+                    : <SearchButton 
+                        name="Search" 
+                        onClick={this.onSearch} />}
+                {this.state.showResults 
+                    ? <SearchButton 
+                        name="Add Filter" 
+                        onClick={this.onAddFilter} />
+                    : null}
             </div>
         )
     }
 
     renderContent() 
     {
-        if (this.state.onSearch)
+        if (this.state.showResults)
         {
             return (
                 <div id="search-content">
-                    <Gallery
-                        photos={this.state.photos}
-                        columns={3}
-                        onClick={this.selectPhoto}
-                        ImageComponent={SelectedImage}
-                        margin={4}
-                        direction={"row"}
-                    />
+                    <p>Found {this.state.photos.length} results.</p>
+                    {this.state.photos.length > 0
+                        ? <Gallery
+                            photos={this.state.photos}
+                            columns={3}
+                            onClick={this.selectPhoto}
+                            ImageComponent={SelectedImage}
+                            margin={4}
+                            direction={"row"} />
+                        : null}
                 </div>
             )
         }
@@ -220,79 +279,7 @@ export class Search extends Component {
     }
 }
 
-class SearchDropdown extends React.Component {
-
-    constructor(props)
-    {   
-        super(props);
-    }
-
-    render()
-    {
-        return (
-            <select id="search-dropdown" onChange={this.props.onChange}>
-                <option style={{ display: 'none' }}>Select Option</option>
-                <option value="n">Name</option>
-                <option value="c">Classification</option>
-                <option value="p">Project</option>
-                
-                <option value="u">User</option>
-                <option value="d">Date</option>
-            </select>
-        )
-    }
-
-}
-
-class SearchTextform extends React.Component {
-
-    constructor(props)
-    {
-        super(props);
-
-        this.placeholder = '';
-    }
-
-    // predefined search categories
-    setPlaceholder = () =>
-    {
-        switch(this.props.option) {
-            case 'n':
-                this.placeholder = 'img_sample_name';
-                break;
-            case 'c':
-                this.placeholder = 'Bridge';
-                break;
-            case 'p':
-                this.placeholder = 'Project A';
-                break;
-            /* case 'm':
-                this.placeholder = 'Bridge';
-                break; */
-            case 'u':
-                this.placeholder = 'John Smith';
-                break;
-            case 'd':
-                this.placeholder = 'yyyymmdd';
-                break;
-            default:
-                this.placeholder = 'Search..';
-        }
-    }
-
-
-    render()
-    {
-        this.setPlaceholder();
-
-        return (
-            <input type="text" id={this.props.id} placeholder={this.placeholder} value={this.props.value} onChange={this.props.onChange} />
-        )
-    }
-
-}
-
-class SearchButton extends React.Component {
+export class SearchButton extends Component {
 
     constructor(props)
     {
