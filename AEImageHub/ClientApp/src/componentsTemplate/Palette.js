@@ -32,8 +32,6 @@ export class Palette extends Component {
             this.state.photos = props.location.state.photos;
         }
 
-        console.log('BEFORE : ' + JSON.stringify(this.state.photos, null, 4));
-
         this.componentDidMount();
 
         this.selectPhoto = this.selectPhoto.bind(this);
@@ -97,8 +95,6 @@ export class Palette extends Component {
                     }
                 }
 
-                console.log('BEFORE : ' + JSON.stringify(images, null, 4));
-
                 this.setState({photos: images})
             })
     }
@@ -132,10 +128,6 @@ export class Palette extends Component {
         photos[obj.index].selected = !photos[obj.index].selected;
 
         this.setState({ photos: photos });
-
-        // TEST
-        console.log('Selected image name : '+photos[obj.index].meta.ImageName);
-        console.log('Selected image iid  : '+photos[obj.index].meta.IId);
     }
 
     toggleSelect() 
