@@ -63,7 +63,7 @@ export class Palette extends Component {
     {
         // TODO -- hardcoded for now
         let token = getToken();
-        let userid = getCredentials(token).name;
+        let userid = getCredentials(token).oid;
 
         // TODO -- add check for validId
         if (this.state.admin && this.state.validId)
