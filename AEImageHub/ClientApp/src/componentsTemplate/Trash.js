@@ -43,7 +43,7 @@ export class Trash extends Component {
     // get Images with the userid
     GetUserTrashedImages() {
         let token = getToken();
-        let userid = getCredentials(token).name;
+        let userid = getCredentials(token).oid;
         axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
             .then(res => {
             var images = [];
