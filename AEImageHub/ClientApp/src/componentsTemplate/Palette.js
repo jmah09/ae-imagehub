@@ -27,6 +27,13 @@ export class Palette extends Component {
             redirectOption: 0
         };
 
+        if (props.location.state && Array.isArray(props.location.state.photos))
+        {
+            this.state.photos = props.location.state.photos;
+        }
+
+        console.log('BEFORE : ' + JSON.stringify(this.state.photos, null, 4));
+
         this.componentDidMount();
 
         this.selectPhoto = this.selectPhoto.bind(this);
@@ -37,18 +44,6 @@ export class Palette extends Component {
         this.renderRedirect = this.renderRedirect.bind(this);
 
         this.GetUserImages();
-
-        // TEST
-        // update getinfo changes
-        if (props.location.state && Array.isArray(props.location.state.photos))
-        {
-            console.log('BEFORE : FOUND CHANGES : ' + JSON.stringify(props.location.state.photos,null,2));
-            this.state.photos = Object.assign(this.state.photos, props.location.state.photos);
-            
-            //this.setState({ photos: Object.assign(this.state.photos, props.location.state.photos)});
-            console.log('AFTER : OBJECT ASSIGN : ' + JSON.stringify(this.state, null, 4));
-
-        }
 
     }
 
@@ -82,11 +77,28 @@ export class Palette extends Component {
         axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token } })
             .then(res => {
                 var images = [];
+
                 res.data.map((image, index) => {
                     images.push({
                         src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
                     });
                 });
+
+                // TODO -- question efficiency
+                for (let i = 0; i < this.state.photos.length; i++)
+                {
+                    for (let j = 0; j < images.length; j++)
+                    {
+                        if (images[j].src === this.state.photos[i].src)
+                        {
+                            Object.assign(images[j].meta, this.state.photos[i].meta);
+                            break;
+                        }
+                    }
+                }
+
+                console.log('BEFORE : ' + JSON.stringify(images, null, 4));
+
                 this.setState({photos: images})
             })
     }
