@@ -16,7 +16,7 @@ export class Palette extends Component {
         super(props);
 
         this.state = {
-            photos: [] ,
+            photos: [],
             selectAll: false,
             showInfo: false,
             redirect: false,
@@ -38,8 +38,23 @@ export class Palette extends Component {
 
         this.GetUserImages();
 
+        // TEST
+        // update getinfo changes
+        if (props.location.state && Array.isArray(props.location.state.photos))
+        {
+            console.log('BEFORE : FOUND CHANGES : ' + JSON.stringify(props.location.state.photos,null,2));
+            this.state.photos = Object.assign(this.state.photos, props.location.state.photos);
+            
+            //this.setState({ photos: Object.assign(this.state.photos, props.location.state.photos)});
+            console.log('AFTER : OBJECT ASSIGN : ' + JSON.stringify(this.state, null, 4));
+
+        }
+
     }
 
+    //
+    // axios request
+    //
     componentDidMount()
     {
         let param = this.props.location.search;
@@ -105,6 +120,10 @@ export class Palette extends Component {
         photos[obj.index].selected = !photos[obj.index].selected;
 
         this.setState({ photos: photos });
+
+        // TEST
+        console.log('Selected image name : '+photos[obj.index].meta.ImageName);
+        console.log('Selected image iid  : '+photos[obj.index].meta.IId);
     }
 
     toggleSelect() 
@@ -200,8 +219,10 @@ export class Palette extends Component {
                     });
                     return <Redirect to={{
                         pathname: redirectLink,
-                        state: { photos: selected }
-                    }} />;
+                        state: {
+                            photos: selected,
+                            redirectLink: 'palette'
+                        }}} />;
                 }
                 break;
             case 2: // edit image
@@ -244,8 +265,7 @@ export class Palette extends Component {
                     onClick={this.selectPhoto}
                     ImageComponent={SelectedImage}
                     margin={4}
-                    direction={"row"}
-                />
+                    direction={"row"} />
             </div>
         );
     }

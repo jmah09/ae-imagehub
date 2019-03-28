@@ -4,219 +4,231 @@ import { TextInput } from './form-text-input';
 import { Dropdown } from './form-dropdown';
 import { Redirect } from 'react-router-dom';
 
+import { getToken } from '../../adalConfig';
+import axios from 'axios';
+
 import './get-info.css';
 
 export class GetInfo extends Component {
 
-    constructor(props)
-    {
+  constructor(props)
+  {
 
-        super(props);
+    super(props);
 
-        this.state = {
-            photos: props.location.state.photos,
+    this.state = {
+      classification: {},
+      photos: props.location.state.photos,
 
-            redirect: false
-        }
-
+      redirectLink: props.location.state.redirectLink,
+      redirectOption: false,
+      redirect: false
     }
 
-    //
-    // helper
-    //
+    this.getClassification();
 
-    // TODO
-    listItems(photo, item) 
-    {
+  }
 
-        let str = 'TEST';
-    
-        if (item === 'classification') {
-            str = photo.TagLink[0] || '';
-    
-            for (let i = 1; i < photo.TagLink.length; i++) {
-                str += photo.TagLink[i];
-    
-            }
-        }
-    
-        else if (item === 'project') {
-            str = photo.ProjectLink[0] || '';
-    
-            for (let i = 1; i < photo.ProjectLink.length; i++) {
-                str += photo.ProjectLink[i];
-    
-            }
-        }
-    
-        return str;
-    }
+  //
+  // axios request
+  //
+  getClassification = () =>
+  {
+    let token = getToken();
 
-    // TODO
-    handleProjectChange = (e) =>
-    {
-        let selected = this.state.photos.filter((value, index, array) => {
-            return value.selected;
+    axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + token }})
+      .then((res) => {
+        let obj = {};
+        obj[''] = '';
+
+        res.data.forEach((item) => {
+          let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
+          obj[name] = name;
         });
 
-        const unselected = this.state.photos.filter((value, index, array) => {
-            return !value.selected;
-        });
+        this.setState({ classification: obj });
+      })
+      .catch((err) => { console.log(err); });
+  }
 
-        selected.forEach((img) => { img.ProjectLink = [e.target.value] });
+  //
+  // helper
+  //
+  listItems(photo, item) 
+  {
+    let str = '';
 
-        selected.concat(unselected);
-
-        this.setState({ toSubmit: selected });
-    }
-
-    // TODO
-    handleClassificationChange = (e) =>
+    if (item === 'classification')
     {
-        let selected = this.state.photos.filter((value, index, array) => {
-            return value.selected;
-        });
+      str = photo.TagLink[0] || '';
 
-        const unselected = this.state.photos.filter((value, index, array) => {
-            return !value.selected;
-        });
-
-        let tag = e.target.value;
-
-        selected.forEach((img) => {
-            if (!img.meta.TagLink.includes(tag)) {
-                img.meta.TagLink.push(tag)
-            }
-        });
-
-        selected.concat(unselected);
-
-        this.setState({ toSubmit: selected });
+      for (let i = 1; i < photo.TagLink.length; i++)
+      {
+        str += photo.TagLink[i];
+      }
     }
-
-    onCancel = () =>
+    else if (item === 'project')
     {
-        this.setState({ redirect: true });
+      str = photo.ProjectLink[0] || '';
+
+      for (let i = 1; i < photo.ProjectLink.length; i++)
+      {
+        str += photo.ProjectLink[i];
+      }
     }
 
-    // TODO
-    onSave = () =>
+    return str;
+  }
+
+  handleChange = (e) =>
+  {
+    let photos = this.state.photos;
+
+    if (e.target.id === 'getinfo_name')
     {
-        // MAKE EDITS HERE AND SEND CHANGED INFO BACK
-        this.setState({ redirect: true });
+      photos.forEach((img) => { img.meta.ImageName = e.target.value });
     }
-    
-    //
-    // redirect
-    //
-    renderRedirect = () =>
+    else if (e.target.id === 'getinfo_class')
     {
-        let redirectLink = 'palette';
-
-        if (this.state.redirect)
-        {
-            return <Redirect to={redirectLink} />;
-        }
-    };
-
-    //
-    // render
-    //
-    render() {
-        return (
-            <div>
-                <Title title='GET INFO' />
-                {this.renderRedirect()}
-                {this.renderFunction()}
-                {this.renderGetInfo()}
-            </div>
-        );
+      photos.forEach((img) => { img.meta.TagLink = [e.target.value] });
     }
-    
-    renderFunction()
+
+    this.setState({ photos: photos });
+  }
+
+  onCancel = () =>
+  {
+    this.setState({
+      redirectOption: false,
+      redirect: true
+    });
+  }
+
+  // TODO
+  onSave = () =>
+  {
+    this.setState({
+      redirectOption: true,
+      redirect: true
+    });
+  }
+  
+  //
+  // redirect
+  //
+  renderRedirect = () =>
+  {
+    if (this.state.redirect)
     {
-        return (
-            <div className="fnbar">
-                <button onClick={this.onCancel}>Cancel</button>
-                <button onClick={this.onSave}>Save</button>
-            </div>
-        );
-    
+      if (this.state.redirectOption)
+      {
+        return <Redirect to={{
+          pathname: this.state.redirectLink,
+          state: { photos: this.state.photos }
+        }}/>
+      }
+      else
+      {
+        return <Redirect to={this.state.redirectLink} />;
+      }
     }
+  };
 
-    renderGetInfo()
+  //
+  // render
+  //
+  render() {
+    return (
+      <div>
+        <Title title='GET INFO' />
+        {this.renderRedirect()}
+        {this.renderFunction()}
+        {this.renderGetInfo()}
+      </div>
+    );
+  }
+  
+  renderFunction()
+  {
+    return (
+      <div className="fnbar">
+        <button onClick={this.onCancel}>Cancel</button>
+        <button onClick={this.onSave}>Save</button>
+      </div>
+    );
+  
+  }
+
+  renderGetInfo()
+  {
+    let selected = this.state.photos;
+
+    let placeholder = selected.length > 1 ? 'Various' : this.listItems(selected[0].meta, 'classification');
+
+    const class_options = this.state.classification;
+    class_options[''] = placeholder;
+
+    return (
+      <div id="getinfo">
+          <div className="float-left">
+            {this.renderImages()}
+          </div>
+
+          <div className="float-right">
+            <h2>TITLE :</h2>
+            <p>
+              <TextInput 
+                disabled={selected.length > 1 ? true : false}
+                id='getinfo_name'
+                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ImageName}
+                onChange={this.handleChange} />
+              <br />
+            </p>
+            <h2>DATE :</h2>
+            <p>
+              <TextInput 
+                disabled={true}
+                id='getinfo_date'
+                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.UploadedDate}
+                onChange={null} />
+              <br />
+            </p>
+            <h2>USER :</h2>
+            <p>
+              <TextInput 
+                disabled={true}
+                id='getinfo_user'
+                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.UId}
+                onChange={null} />
+              <br />
+            </p>
+            <h2>CLASSIFICATION :</h2>
+            <p>
+              <Dropdown
+                id="getinfo_class"
+                options={class_options}
+                onChange={this.handleChange} />
+            </p>
+          </div>
+      </div>
+    );
+  }
+
+  renderImages = () =>
+  {
+    let render = [];
+
+    for (let i = 0; i < this.state.photos.length; i++)
     {
-        let selected = this.state.photos;
-
-        let placeholder = selected.length > 1 ? 'Various' : this.listItems(selected[0].meta, 'classification');
-
-        const class_options = {
-            '': placeholder,
-            'b': 'Bridge',
-            'd': 'Dam',
-            'ri': 'river',
-            'ro': 'road'
-        }
-
-        return (
-            <div id="getinfo">
-                <div className="float-left">
-                {this.renderImages()}
-                </div>
-
-                <div className="float-right">
-                    <h2>TITLE :</h2>
-                    <p>
-                        <TextInput 
-                            disabled={false}
-                            id='getinfo_title'
-                            placeholder={selected.length > 1 ? 'Various' : selected[0].meta.imageName}
-                            onChange={null} />
-                        <br />
-                    </p>
-                    <h2>DATE :</h2>
-                    <p>
-                        <TextInput 
-                            disabled={false}
-                            id='getinfo_date'
-                            placeholder={selected.length > 1 ? 'Various' : selected[0].meta.uploadedDate}
-                            onChange={null} />
-                        <br />
-                    </p>
-                    <h2>USER :</h2>
-                    <p>
-                        <TextInput 
-                            disabled={false}
-                            id='getinfo_user'
-                            placeholder={selected.length > 1 ? 'Various' : selected[0].meta.uId}
-                            onChange={null} />
-                        <br />
-                    </p>
-                    <h2>CLASSIFICATION :</h2>
-                    <p>
-                        <Dropdown
-                            id="getinfo-class"
-                            options={class_options}
-                            onChange={null} />
-                    </p>
-                </div>
-            </div>
-        );
+      render.push(
+        <div key={i}>
+        <img key={i} src={this.state.photos[i].src} />
+        <p style={{textAlign: 'center'}}>{this.state.photos[i].meta.ImageName}</p>
+        </div>
+      );
     }
 
-    renderImages = () =>
-    {
-        let render = [];
-
-        for (let i = 0; i < this.state.photos.length; i++)
-        {
-            render.push(
-                <img key={'img_'+i} src={this.state.photos[i].src} />
-            );
-        }
-
-        return render;
-    }
-
+    return render;
+  }
 
 }
