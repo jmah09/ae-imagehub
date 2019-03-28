@@ -36,11 +36,9 @@ export class Upload extends Component {
             <ImageUploader
                 withIcon = {true}
                 withPreview = {true}
-                buttonText = 'Choose images'
                 onChange = {this.onDrop}
                 imgExtension = {['.jpg', '.gif', '.png', '.gif', '.PNG']}
-                maxFileSize = {5242880}
-            />
+                maxFileSize = {5242880} />
         )
     }
 
