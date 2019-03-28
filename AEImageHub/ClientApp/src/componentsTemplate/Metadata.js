@@ -217,7 +217,7 @@ export class Metadata extends Component {
                     Header: 'Active',
                     accessor: 'Active',
                     Cell: (props) => <span><input type="checkbox" checked={props.original.Active} onChange={(e) => {
-                        alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Active + ".");
+                        alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Active + " for Active.");
                         if(this.state.metadata[props.original.id].Active) {
                             this.state.metadata[props.original.id].Mandatory = false;
                         }
@@ -230,10 +230,15 @@ export class Metadata extends Component {
                     Header: 'Mandatory',
                     accessor: 'Mandatory',
                     Cell: (props) => <span><input type="checkbox" checked={props.original.Mandatory} onChange={(e) => {
-                        alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Mandatory + ".");
-                        this.state.metadata[props.original.id].Mandatory = !this.state.metadata[props.original.id].Mandatory;
-                        this.setState({metadata: this.state.metadata});
-                        this.changeMetaTag(props.original.MetaName, props.original.Active, !props.original.Mandatory);
+                        if(this.state.metadata[props.original.id].Active) {
+                            alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Mandatory + " for Mandatory.");
+                            this.state.metadata[props.original.id].Mandatory = !this.state.metadata[props.original.id].Mandatory;
+                            this.setState({metadata: this.state.metadata});
+                            this.changeMetaTag(props.original.MetaName, props.original.Active, !props.original.Mandatory);
+                        }
+                        else {
+                            alert("Metadata: " + props.original.MetaName + " is inactive.");
+                        }
                     }} style={statusStyle} /></span>
                 },
             ];
