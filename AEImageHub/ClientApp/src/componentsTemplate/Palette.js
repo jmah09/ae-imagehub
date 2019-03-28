@@ -240,9 +240,9 @@ export class Palette extends Component {
             case 2: // edit image
                 redirectLink = 'edit?src=' + this.state.redirectLink;
                 break;
-            case 3: // submit
+            /* case 3: // submit
                 redirectLink = 'submit';
-                break;
+                break; */
             default:
                 redirectLink = '';
         }
