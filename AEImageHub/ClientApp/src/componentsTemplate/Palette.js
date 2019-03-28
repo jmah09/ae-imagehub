@@ -1,324 +1,294 @@
 ﻿import React, { Component } from 'react';
 import { Title } from './Title';
-import '../index.css';
-import './palette.css';
+import axios from 'axios';
+import { getCredentials, getToken, isAdmin } from '../adalConfig';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
-import axios from 'axios'
-import {getCredentials, getToken, isAdmin} from '../adalConfig';
-import { Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom';
+
+import '../index.css';
 
 export class Palette extends Component {
-    constructor(props) {
+
+    constructor(props)
+    {
+
         super(props);
-        this.selectPhoto = this.selectPhoto.bind(this);
-        this.toggleSelect = this.toggleSelect.bind(this);
 
         this.state = {
-            photos: [] ,
+            photos: [],
             selectAll: false,
             showInfo: false,
             redirect: false,
             admin: false,
             validId: false,
-            userId: ""
+            userId: '',
+            redirectLink: '',
+            redirectOption: 0
         };
 
+        if (props.location.state && Array.isArray(props.location.state.photos))
+        {
+            this.state.photos = props.location.state.photos;
+        }
+
+        console.log('BEFORE : ' + JSON.stringify(this.state.photos, null, 4));
+
         this.componentDidMount();
+
+        this.selectPhoto = this.selectPhoto.bind(this);
+        this.toggleSelect = this.toggleSelect.bind(this);
         this.GetUserImages = this.GetUserImages.bind(this);
         this.TrashSelectedImages = this.TrashSelectedImages.bind(this);
 
+        this.renderRedirect = this.renderRedirect.bind(this);
 
         this.GetUserImages();
+
     }
 
-    componentDidMount() {
+    //
+    // axios request
+    //
+    componentDidMount()
+    {
         let param = this.props.location.search;
         this.state.validId = param.includes("?"); // todo : temp fix
         this.state.userId = param.substring(1, param.indexOf("@"));
         this.state.admin = isAdmin(getToken());
-        console.log(this.state.admin);
+        console.log("isAdmin ? " + this.state.admin);
         // todo valid id logic [have to change db]
     }
 
-    selectPhoto(event, obj) {
-        let photos = this.state.photos;
-        photos[obj.index].selected = !photos[obj.index].selected;
-        this.setState({ photos: photos });
-    }
-
-    toggleSelect() {
-        let photos = this.state.photos.map((photo, index) => {
-            return { ...photo, selected: !this.state.selectAll };
-    });
-        this.setState({ photos: photos, selectAll: !this.state.selectAll });
-    }
-
     // get Images with the userid
-    GetUserImages() {
-        // todo hardcoded for now
+    GetUserImages()
+    {
+        // TODO -- hardcoded for now
         let token = getToken();
         let userid = getCredentials(token).name;
-        if (this.state.admin && this.state.validId) { // todo add check for validId
+
+        // TODO -- add check for validId
+        if (this.state.admin && this.state.validId)
+        { 
             console.log("ok");
-            userid = this.state.userId
+            userid = this.state.userId;
         }
+
         axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token } })
             .then(res => {
-            var images = [];
-        res.data.map((image, index) => {
-            images.push({
-                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-            });
-    })
-        this.setState({photos: images})
-    })
+                var images = [];
+
+                res.data.map((image, index) => {
+                    images.push({
+                        src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
+                    });
+                });
+
+                // TODO -- question efficiency
+                for (let i = 0; i < this.state.photos.length; i++)
+                {
+                    for (let j = 0; j < images.length; j++)
+                    {
+                        if (images[j].src === this.state.photos[i].src)
+                        {
+                            Object.assign(images[j].meta, this.state.photos[i].meta);
+                            break;
+                        }
+                    }
+                }
+
+                console.log('BEFORE : ' + JSON.stringify(images, null, 4));
+
+                this.setState({photos: images})
+            })
     }
 
-    TrashSelectedImages() {
-        const selected = this.state.photos.filter((value, index, array) => {
-            return value.selected;
-    })
-
-        const notSelected = this.state.photos.filter((value, index, array) => {
-            return !value.selected;
-    })
+    TrashSelectedImages()
+    {
+        const selected = this.state.photos.filter((value) => { return value.selected; });
+        const notSelected = this.state.photos.filter((value) => { return !value.selected; });
 
         selected.map((image, index) => {
             image.meta.Trashed = true;
-        axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-            console.log(response);
-        this.setState({
-            photos: notSelected
-        })
-    })
-    .catch(error => {
-            console.log(error);
-    });
-    })
-    }
-
-    render() {
-        return (
-            <div>
-            <div>
-            {this.renderGetInfo()}
-            </div>
-
-            <div>
-            <div>
-            <Title title='PALETTE' />
-            <div>{this.renderFunction()}</div>
-            </div>
-            </div>
-            <div style={{padding:50}}>
-        {this.renderContent()}
-    </div>
-        </div>
-    );
-    }
-
-    renderRedirect = () => {
-    let redirectLink = 'edit?src=' + this.state.editImageLink;
-    if (this.state.redirect) {
-    return <Redirect to={redirectLink} />
-}
-}
-
-
-onImageBtnClick = () => {
-    const selected = this.state.photos.filter((value, index, array) => {
-        return value.selected;
-})
-
-    if (selected.length != 1) {
-        alert("select exactly one image");
-    } else {
-        this.state.editImageLink = selected[0].meta.IId;
-        this.setState({
-            redirect: true
+            axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
+                .then(response => {
+                    console.log(response);
+                    this.setState({
+                        photos: notSelected
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         })
     }
-}
 
-// TODO
-// GET INFO
-onGetInfo = () => {
-    if (this.state.showInfo) {
-        this.setState({ showInfo: false });
-        return;
+    //
+    // image
+    //
+    selectPhoto(event, obj)
+    {
+        let photos = this.state.photos;
+        photos[obj.index].selected = !photos[obj.index].selected;
+
+        this.setState({ photos: photos });
+
+        // TEST
+        console.log('Selected image name : '+photos[obj.index].meta.ImageName);
+        console.log('Selected image iid  : '+photos[obj.index].meta.IId);
     }
 
-    const selected = this.state.photos.filter((value, index, array) => {
-        return value.selected;
-});
+    toggleSelect() 
+    {
+        let photos = this.state.photos.map((photo, index) => {
+            return { ...photo, selected: !this.state.selectAll };
+        });
 
-    if (selected.length > 0 && !this.state.showInfo) {
-        this.setState({ showInfo: true });
+        this.setState({
+            photos: photos,
+            selectAll: !this.state.selectAll
+        });
     }
-}
 
-handleProjectChange = (e) => {
-    let selected = this.state.photos.filter((value, index, array) => {
-        return value.selected;
-});
+    //
+    // get info
+    //
+    onGetInfo = () =>
+    {
+        const selected = this.state.photos.filter((value) => { return value.selected; });
 
-    const unselected = this.state.photos.filter((value, index, array) => {
-        return !value.selected;
-});
-
-    selected.forEach((img) => { img.projectLink = [e.target.value] });
-
-    selected.concat(unselected);
-
-    this.setState({ toSubmit: selected });
-}
-
-handleClassificationChange = (e) => {
-    let selected = this.state.photos.filter((value, index, array) => {
-        return value.selected;
-});
-
-    const unselected = this.state.photos.filter((value, index, array) => {
-        return !value.selected;
-});
-
-    let tag = e.target.value;
-    console.log("this is the tag: " + tag);
-
-    console.log(selected);
-
-    selected.forEach((img) => {
-        if (!img.meta.tagLink.includes(tag)) {
-        img.meta.tagLink.push(tag)
-    }
-});
-
-    selected.concat(unselected);
-
-    this.setState({ toSubmit: selected });
-}
-
-handleGetInfoSubmit = () => {
-    this.setState({ photos: this.state.toSubmit });
-    this.setState({ toSubmit: [] });
-
-    this.setState({ showInfo: false });
-}
-
-listItems(photo, item) {
-
-    let str = 'TEST';
-
-    if (item === 'classification') {
-        str = photo.TagLink[0] || '';
-
-        for (let i = 1; i < photo.TagLink.length; i++) {
-            str += photo.TagLink[i];
-
+        if (selected.length > 0 && !this.state.showInfo)
+        {
+            this.setState({
+                redirectLink: '',
+                redirectOption: 1,
+                redirect: true
+            });
+            return;
         }
+
+        alert("Please select image(s).");
     }
 
-    else if (item === 'project') {
-        str = photo.ProjectLink[0] || '';
-
-        for (let i = 1; i < photo.ProjectLink.length; i++) {
-            str += photo.ProjectLink[i];
-
-        }
-    }
-
-    return str;
-}
-
-// TODO
-// 1. implement way to check whether there is anything in common
-// 2. list function not working
-// 3. get full list of projects in database
-// 4. get full list of classifications in database
-renderGetInfo() {
-    if (this.state.showInfo) {
+    //
+    // edit image
+    //
+    onEditImage = () =>
+    {
         const selected = this.state.photos.filter((value, index, array) => {
             return value.selected;
-    });
+        });
+    
+        if (selected.length === 1)
+        {
+            this.setState({ 
+                redirectLink: selected[0].meta.IId,
+                redirectOption: 2,
+                redirect: true
+            });
+            return;
+        }
 
-        return (
-            <div id="getInfo-container">
-            <div id="getInfo-left">
-            {selected.length > 1
-                    ? <img src="http://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png" />
-    : <img src={selected[0].src} />}
-        </div>
-
-        <div id="getInfo-right">
-            <p>TITLE : <br />
-        {selected.length > 1 ? 'Various' : selected[0].meta.imageName}
-        </p>
-        <p>DATE : <br />
-        {selected.length > 1 ? 'Various' : selected[0].meta.uploadedDate}
-        </p>
-        <p>USER : <br />
-        {selected.length > 1 ? 'Various' : selected[0].meta.uId}
-        </p>
-        <p>PROJECT : <br />
-        {selected.length > 1 ? 'Various' : this.listItems(selected[0].meta, 'project')}
-        <br />
-        <select onChange={this.handleProjectChange}>
-            <option name="Project A">Project A</option>
-        <option name="Project B">Project B</option>
-        <option name="Project C">Project C</option>
-        <option name="Project D">Project D</option>
-        </select>
-        </p>
-        <p>CLASSIFICATION : <br />
-        {selected.length > 1 ? 'Various' : this.listItems(selected[0].meta, 'classification')}
-        <select onChange={this.handleClassificationChange}>
-            <option name="Bridge">Bridge</option>
-            <option name="Dam">Dam</option>
-            <option name="River">River</option>
-            <option name="Road">Road</option>
-            </select>
-            </p>
-            <br /><br />
-            <button onSubmit={this.handleGetInfoSubmit}>Save</button>
-            <br /><br />
-            <button onClick={this.onGetInfo}>Cancel</button>
-            </div>
-            </div>
-    );
+        alert("Please select one image.");
     }
 
-    return null;
-}
+    //
+    // submit
+    //
+    // TODO
+    onSubmit = () =>
+    {
+        // TODO
+        return null;
+    }
 
-// TODO
-renderFunction() {
-    return (
-        <div class="fnbar">
-        {this.renderRedirect()}
-        <button>Submit</button>
-        <button onClick={this.onImageBtnClick}>Edit Photo</button>
-    <button onClick={this.onGetInfo}>Get Info</button>
-    <button onClick={this.TrashSelectedImages}>Delete</button>
-        <button onClick={this.toggleSelect}>Select All</button>
-    </div>
-)
-}
+    //
+    // render
+    //
+    render()
+    {
+        return (
+            <div>
+                <Title title='PALETTE' />
+                {this.renderFunction()}
+                {this.renderContent()}
+            </div>
+        );
+    }
 
-// TODO
-renderContent() {
-    return (
-        <div class="toggleButton">
-        <Gallery
-    photos={this.state.photos}
-    columns={3}
-    onClick={this.selectPhoto}
-    ImageComponent={SelectedImage}
-    margin={4}
-    direction={"row"}
-    />
-    </div>
-);
-}
+    renderRedirect()
+    {
+        let redirectLink;
+
+        switch (this.state.redirectOption)
+        {
+            case 1: // get info
+                redirectLink = 'getinfo';
+                if (this.state.redirect)
+                {
+                    const selected = this.state.photos.filter((value, index, array) => {
+                        return value.selected;
+                    });
+                    return <Redirect to={{
+                        pathname: redirectLink,
+                        state: {
+                            photos: selected,
+                            redirectLink: 'palette'
+                        }}} />;
+                }
+                break;
+            case 2: // edit image
+                redirectLink = 'edit?src=' + this.state.redirectLink;
+                break;
+            /* case 3: // submit
+                redirectLink = 'submit';
+                break; */
+            default:
+                redirectLink = '';
+        }
+
+        if (this.state.redirect)
+        {
+            return <Redirect to={redirectLink} />;
+        }
+    }
+
+    renderFunction()
+    {
+        return (
+            <div className="fnbar">
+                {this.renderRedirect()}
+                <button>Submit</button>
+                <button onClick={this.onEditImage}>Edit Image</button>
+                <button onClick={this.onGetInfo}>Get Info</button>
+                <button onClick={this.TrashSelectedImages}>Delete</button>
+                <button onClick={this.toggleSelect}>Select All</button>
+            </div>
+        );
+    }
+
+    renderContent()
+    {
+        return (
+            <div className="toggleButton">
+                <Gallery
+                    photos={this.state.photos}
+                    columns={4}
+                    onClick={this.selectPhoto}
+                    ImageComponent={SelectedImage}
+                    margin={4}
+                    direction={"row"} />
+            </div>
+        );
+    }
+
+    handleGetInfoSubmit = () =>
+    {
+        this.setState({
+            photos: this.state.toSubmit,
+            toSubmit: [],
+            showInfo: false
+        });
+    }
+
 }
