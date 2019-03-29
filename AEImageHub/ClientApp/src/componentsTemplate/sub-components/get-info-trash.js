@@ -89,6 +89,7 @@ export class GetInfoTrash extends Component {
         return str;
     }
 
+
     
     onCancel = () =>
     {
@@ -166,7 +167,7 @@ export class GetInfoTrash extends Component {
                     <h2>IMAGE NAME :</h2>
                     <p>
                         <TextInput
-                            disabled={selected.length > 1 ? true : false}
+                            disabled={true}
                             id='getinfo_name'
                             value={selected.length > 1 ? 'Various' : null}
                             placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ImageName}
@@ -193,10 +194,11 @@ export class GetInfoTrash extends Component {
                     </p>
                     <h2>CLASSIFICATION :</h2>
                     <p>
-                        <Dropdown
+                       { <TextInput //todo value
+                            disabled={true}
                             id="getinfo_class"
-                            options={class_options}
-                            onChange={this.handleClassificationChange} />
+                            value = {[]}
+                            onChange={null} />}
                     </p>
                     <h2>PROJECT :</h2>
                     <p>
