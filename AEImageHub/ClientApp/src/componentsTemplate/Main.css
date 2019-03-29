@@ -163,6 +163,15 @@ h2 {
     background-color: #287AFF;
 }
 
+.addMedia form submit {
+  background-color: #1B53AD;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  margin: -3px 0px 0px 20px;
+  padding: 2px 10px;
+}
+
 .submit-container{
     margin-left: 70px;
     margin-top: 40px;

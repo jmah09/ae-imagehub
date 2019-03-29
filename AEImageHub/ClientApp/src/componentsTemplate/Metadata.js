@@ -166,7 +166,7 @@ export class Metadata extends Component {
         return (
             <div >
                 <br />
-                <form onSubmit={this.handleSubmit} className="addTag">
+                <form onSubmit={this.handleSubmit} className="addMedia">
                     ADD NEW CLASSIFICATION
                     <br />
                     New Classification Name:
