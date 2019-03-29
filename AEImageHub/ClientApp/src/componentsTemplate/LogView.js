@@ -12,11 +12,11 @@ const dropdownStyle = {
     marginRight: '20px'
 };
 
-
-export class Submit extends Component {
+export class LogView extends Component {
     constructor(props) {
         super(props);
         let params = new URLSearchParams(window.location.search);
+        console.log(JSON.parse(params.get('src')));
         this.state = {
             images: JSON.parse(params.get('src')),
             redirect: false,
@@ -29,10 +29,9 @@ export class Submit extends Component {
         
         this.getProjectOptions = this.getProjectOptions.bind(this);
         this.onCancel = this.onCancel.bind(this);
-        this.onDropdownChange = this.onDropdownChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        
         this.componentDidMount();
-
         this.getProjectOptions();
     }
 
@@ -40,6 +39,7 @@ export class Submit extends Component {
         let param = this.props.location.search;
         this.state.userId = param.substring(1, param.indexOf("@"));
         this.state.admin = isAdmin(getToken());
+        console.log(this.state.admin);
         // todo valid id logic [have to change db]
     }
     
@@ -86,51 +86,12 @@ export class Submit extends Component {
         })
     }
     
-    onSubmit(){
-        if(!this.state.project){
-            alert("please select a project");
-            return;
-        }
-        
-        let images = [];
-        for(let i = 0 ; i < this.state.images.length ; i++){
-            images.push(this.state.images[i].meta.IId);
-        }
-        axios({
-            url: '/api/submit',
-            method: 'POST',
-            data: { images: images, project: this.state.project},
-            headers: {
-                'Authorization': "bearer " + getToken()
-            }
-        }).then(res => {
-            console.log(res.data);
-            this.setState({
-                redirect: true
-            })
-        })
-    }
-    
-    onDropdownChange(event, data){
-        this.setState({project:data.value});
-    }
-    
     renderFunction() {
         return (
             <div class="fnbar">
             {this.renderRedirect()}
                 <div className="submit-container">
-                    <div style={dropdownStyle}>
-                        <Dropdown
-                            placeholder='Select Project'
-                            fluid
-                            search
-                            selection
-                            onChange={this.onDropdownChange}
-                            options={this.state.projectOptions}
-                        /></div>
-                    <Button onClick={this.onSubmit} primary>Submit</Button>
-                    <Button onClick={this.onCancel} primary>Cancel</Button>
+                    <Button onClick={this.onCancel} primary>Back</Button>
                 </div>
             
             </div>
@@ -138,13 +99,11 @@ export class Submit extends Component {
     }
     
     renderContent() {
-        console.log(this.state.images);
         const listItems = this.state.images.map((i) =>
             <li><p><b>Name: </b>{i.meta.ImageName}</p><img src={i.src} alt="" className="img-responsive" width="800px" height="800px"/><br/></li>
         );
-
         return (
-            <div class="toggleButton">
+            <div>
                 <ul>{listItems}</ul>
             </div>
         );
