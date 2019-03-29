@@ -110,14 +110,14 @@ namespace AEImageHub.Controllers
         */
 
         [HttpPost("")]
-        public void PostUser([FromBody] JObject payload)
+        public void PostUser()
         {
             User user = new User()
             {
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
-                UserName = (string)payload["UserName"], //todo 'name or username
-                Role = (string)payload["Role"],
-                Active = (bool)payload["Active"],
+                UserName = HttpContext.User.FindFirstValue("name"), //todo 'name or username
+                Role = "todo",
+                Active = true,
             };
             _context.User.Add(user);
             _context.SaveChanges();
