@@ -14,9 +14,13 @@ export class GetInfo extends Component {
   constructor(props)
   {
 
+    const token = getToken();
+
     super(props);
 
     this.state = {
+      token: token,
+
       classification: {},
       photos: props.location.state.photos,
 
@@ -26,7 +30,6 @@ export class GetInfo extends Component {
     }
 
     this.getClassification();
-
   }
 
   //
@@ -34,21 +37,27 @@ export class GetInfo extends Component {
   //
   getClassification = () =>
   {
-    let token = getToken();
-
-    axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + token }})
+    axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + this.state.token }})
       .then((res) => {
         let obj = {};
         obj[''] = '';
 
         res.data.forEach((item) => {
           let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
-          obj[name] = name;
+          obj[name] = {
+            name: name,
+            selected: false
+          };
         });
 
         this.setState({ classification: obj });
       })
       .catch((err) => { console.log(err); });
+  }
+
+  getProject = () =>
+  {
+    // STUB
   }
 
   //
@@ -64,7 +73,7 @@ export class GetInfo extends Component {
 
       for (let i = 1; i < photo.TagLink.length; i++)
       {
-        str += photo.TagLink[i];
+        str = str + ', ' + photo.TagLink[i];
       }
     }
     else if (item === 'project')
@@ -73,25 +82,29 @@ export class GetInfo extends Component {
 
       for (let i = 1; i < photo.ProjectLink.length; i++)
       {
-        str += photo.ProjectLink[i];
+        str = str + ', ' + photo.ProjectLink[i];
       }
     }
 
     return str;
   }
 
-  handleChange = (e) =>
+  handleNameChange = (e) =>
   {
     let photos = this.state.photos;
 
-    if (e.target.id === 'getinfo_name')
-    {
-      photos.forEach((img) => { img.meta.ImageName = e.target.value });
-    }
-    else if (e.target.id === 'getinfo_class')
-    {
-      photos.forEach((img) => { img.meta.TagLink = [e.target.value] });
-    }
+    photos.forEach((img) => { img.meta.ImageName = e.target.value });
+
+    this.setState({ photos: photos });
+  }
+
+  // TODO
+  handleClassificationChange = (e) =>
+  {
+    let photos = this.state.photos;
+
+    
+    //photos.forEach((img) => { img.meta.TagLink = [e.target.value] });
 
     this.setState({ photos: photos });
   }
@@ -104,7 +117,8 @@ export class GetInfo extends Component {
     });
   }
 
-  // TODO
+  // TODO -- SAVE METADATA TO DATABASE INSTEAD
+  // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
   onSave = () =>
   {
     this.setState({
@@ -175,30 +189,31 @@ export class GetInfo extends Component {
           </div>
 
           <div className="float-right">
-            <h2>TITLE :</h2>
+            <h2>IMAGE NAME :</h2>
             <p>
               <TextInput 
                 disabled={selected.length > 1 ? true : false}
                 id='getinfo_name'
+                value={selected.length > 1 ? 'Various' : null}
                 placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ImageName}
-                onChange={this.handleChange} />
+                onChange={this.handleNameChange} />
               <br />
             </p>
-            <h2>DATE :</h2>
+            <h2>UPLOADED DATE :</h2>
             <p>
               <TextInput 
                 disabled={true}
                 id='getinfo_date'
-                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.UploadedDate}
+                value={selected.length > 1 ? 'Various' : selected[0].meta.UploadedDate}
                 onChange={null} />
               <br />
             </p>
-            <h2>USER :</h2>
+            <h2>UPLOADED BY :</h2>
             <p>
               <TextInput 
                 disabled={true}
                 id='getinfo_user'
-                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.UId}
+                value={selected.length > 1 ? 'Various' : selected[0].meta.UId} // TODO -- GET USERNAME
                 onChange={null} />
               <br />
             </p>
@@ -207,7 +222,15 @@ export class GetInfo extends Component {
               <Dropdown
                 id="getinfo_class"
                 options={class_options}
-                onChange={this.handleChange} />
+                onChange={this.handleClassificationChange} />
+            </p>
+            <h2>PROJECT :</h2>
+            <p>
+              <TextInput 
+                disabled={true}
+                id='getinfo_proj'
+                placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ProjectLink[0]}
+                onChange={null} />
             </p>
           </div>
       </div>
@@ -224,6 +247,7 @@ export class GetInfo extends Component {
         <div key={i}>
         <img key={i} src={this.state.photos[i].src} />
         <p style={{textAlign: 'center'}}>{this.state.photos[i].meta.ImageName}</p>
+        <p>Size : X Y</p>
         </div>
       );
     }
