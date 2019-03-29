@@ -5,6 +5,7 @@ import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
 import { getCredentials, getToken } from '../adalConfig';
+import {Redirect} from "react-router-dom";
 
 export class Trash extends Component {
     constructor(props) {
@@ -17,10 +18,14 @@ export class Trash extends Component {
             selectAll: false,
             showInfo: false,
             redirect: false,
+            redirectLink: '',
+            redirectOption: 0
         };
 
         this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
         this.RecoverSelectedImages = this.RecoverSelectedImages.bind(this);
+        this.renderRedirect = this.renderRedirect.bind(this);
+
 
 
         this.GetUserTrashedImages();
@@ -81,12 +86,63 @@ export class Trash extends Component {
     })
     }
 
+    renderRedirect()
+    {
+        let redirectLink;
+
+        switch (this.state.redirectOption)
+        {
+            case 1: // get info
+                redirectLink = 'trashinfo';
+                if (this.state.redirect)
+                {
+                    const selected = this.state.photos.filter((value, index, array) => {
+                        return value.selected;
+                    });
+                    return <Redirect to={{
+                        pathname: redirectLink,
+                        state: {
+                            photos: selected,
+                            redirectLink: 'trash'
+                        }}} />;
+                }
+                break;
+            case 2: // edit image
+                redirectLink = 'edit?src=' + this.state.redirectLink;
+                break;
+            case 3:
+                redirectLink = 'submit?src=' + this.state.redirectLink;
+        }
+
+        if (this.state.redirect)
+        {
+            return <Redirect to={redirectLink} />;
+        }
+    }
+    
+    onGetInfo = () =>
+    {
+        const selected = this.state.photos.filter((value) => { return value.selected; });
+
+        if (selected.length > 0 && !this.state.showInfo)
+        {
+            this.setState({
+                redirectLink: '',
+                redirectOption: 1,
+                redirect: true
+            });
+            return;
+        }
+
+        alert("Please select image(s).");
+    };
+
     render() {
         return (
             <div>
             <div>
             <div>
-            <Title title='PALETTE' />
+            <Title title='TRASH' />
             <div>{this.renderFunction()}</div>
             </div>
             </div>
@@ -101,8 +157,9 @@ export class Trash extends Component {
     renderFunction() {
         return (
             <div class="fnbar">
-            <button>Get Info</button>
-        <button onClick={this.RecoverSelectedImages}>Recover</button>
+                {this.renderRedirect()}
+                <button onClick={this.onGetInfo}>Get Info</button>
+                <button onClick={this.RecoverSelectedImages}>Recover</button>
             </div>
     )
     }

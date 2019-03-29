@@ -4,13 +4,8 @@ import '../index.css';
 import axios from 'axios'
 import {getCredentials, getToken, isAdmin} from '../adalConfig';
 import { Redirect } from 'react-router-dom'
-import { Dropdown } from 'semantic-ui-react'
 import { Button } from 'semantic-ui-react'
 
-const dropdownStyle = {
-    width: '350px',
-    marginRight: '20px'
-};
 
 export class LogView extends Component {
     constructor(props) {
@@ -18,21 +13,30 @@ export class LogView extends Component {
         let params = new URLSearchParams(window.location.search);
         console.log(JSON.parse(params.get('src')));
         this.state = {
-            images: JSON.parse(params.get('src')),
+            images: [],
             redirect: false,
             admin: false,
             validId: false,
             userId: "",
-            project: null,
-            projectOptions: []
+            logid: JSON.parse(params.get('src'))
         };
         
-        this.getProjectOptions = this.getProjectOptions.bind(this);
+        this.getLogImages = this.getLogImages.bind(this);
         this.onCancel = this.onCancel.bind(this);
-        this.onSubmit = this.onSubmit.bind(this);
-        
         this.componentDidMount();
-        this.getProjectOptions();
+        this.getLogImages();
+    }
+    
+    getLogImages(){
+        axios.get("/api/log/view/" + this.state.logid, { headers: { 'Authorization': "bearer " + getToken() } })
+            .then(res => {
+                console.log(res.data);
+                let images = [];
+                for(let i = 0 ; i < res.data.length; i++){
+                    images.push(res.data[i].IId);
+                }
+                this.setState({images:images});
+            })
     }
 
     componentDidMount() {
@@ -41,18 +45,6 @@ export class LogView extends Component {
         this.state.admin = isAdmin(getToken());
         console.log(this.state.admin);
         // todo valid id logic [have to change db]
-    }
-    
-    getProjectOptions(){
-        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                let projectOptions = [];
-                for(let i = 0 ; i < res.data.length; i++){
-                    let projectName = res.data[i].ProjectName;
-                    projectOptions.push({key: projectName, value: projectName , text: projectName});
-                }
-                this.setState({projectOptions:projectOptions});
-            })
     }
 
 
@@ -74,7 +66,7 @@ export class LogView extends Component {
     }
 
     renderRedirect = () => {
-        let redirectLink = 'palette';
+        let redirectLink = 'log';
         if (this.state.redirect) {
             return <Redirect to={redirectLink}/>
         }
@@ -88,7 +80,7 @@ export class LogView extends Component {
     
     renderFunction() {
         return (
-            <div class="fnbar">
+            <div>
             {this.renderRedirect()}
                 <div className="submit-container">
                     <Button onClick={this.onCancel} primary>Back</Button>
@@ -100,10 +92,11 @@ export class LogView extends Component {
     
     renderContent() {
         const listItems = this.state.images.map((i) =>
-            <li><p><b>Name: </b>{i.meta.ImageName}</p><img src={i.src} alt="" className="img-responsive" width="800px" height="800px"/><br/></li>
+            <li><img src={"/api/image/" + i} alt="" className="img-responsive" width="800px" height="800px"/><br/></li>
         );
         return (
             <div>
+                <p>{this.state.images.length + " Image submitted"}</p>
                 <ul>{listItems}</ul>
             </div>
         );

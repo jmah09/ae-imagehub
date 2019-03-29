@@ -42,9 +42,21 @@ namespace AEImageHub.Controllers
             //TODO: currently the other users can access others palette 
             try
             {
-                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted)
-                                           .Include(i => i.ProjectLink)
-                                           .Include(i => i.TagLink);
+                var images = _context.Image.Select(i => new Image
+                {
+                    IId = i.IId,
+                    UId = i.UId,
+                    ImageName = i.ImageName,
+                    Size = i.Size,
+                    UploadedDate = i.UploadedDate,
+                    Type = i.Type,
+                    Trashed = i.Trashed,
+                    TrashedDate = i.TrashedDate,
+                    Submitted = i.Submitted,
+                    U = i.U,
+                    ProjectLink = i.ProjectLink,
+                    TagLink = i.TagLink
+                }).Where(i => i.UId == userid && !i.Trashed && !i.Submitted);
                 return JsonConvert.SerializeObject(images); //user's images
             }
             catch(Exception e)

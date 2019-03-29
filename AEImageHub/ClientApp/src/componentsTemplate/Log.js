@@ -57,20 +57,18 @@ export class Log extends Component {
         //inside a var an object called logs by calling this.state
         const {logs} = this.state;
         const tableData = [];
-        
         //building log obj for each log obj returned from server
         for (let i = 0; i < logs.length; i++){
             let log = {};
-            log.name = <Link to={{ pathname: "/" + logs[i].LId }}>{logs[i].LId}</Link>;
+            // change the log name format to date_time_user
+            log.name = <a href={"/logview?src=" + JSON.stringify(logs[i].LId)}>{logs[i].LId}</a>
+                 //<Link to={{ pathname: "/logview?src=" + JSON.stringify(logs[i].LId)}}>{logs[i].LId}</Link>;
             log.user = logs[i].U.UserName;
             log.date = logs[i].CreatedDate;
             tableData.push(log);
         }
         
-        //printing out the contents of tableData which contains log column data 
-        console.log(tableData);
-        
-
+        //printing out the contents of tableData which contains log column data
         const columns = [
             {
                 Header: 'Name',

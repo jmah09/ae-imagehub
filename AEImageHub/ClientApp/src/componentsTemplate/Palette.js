@@ -52,7 +52,7 @@ export class Palette extends Component {
     {
         let param = this.props.location.search;
         this.state.validId = param.includes("?"); // todo : temp fix
-        this.state.userId = param.substring(1, param.indexOf("@"));
+        this.state.userId = param.substring(1);
         this.state.admin = isAdmin(getToken());
         console.log("isAdmin ? " + this.state.admin);
         // todo valid id logic [have to change db]
