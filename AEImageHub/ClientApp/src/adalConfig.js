@@ -37,3 +37,7 @@ export const adalApiFetch = (fetch, url, options) =>
 adalFetch(authContext, adalConfig.endpoints.api, fetch, url, options);
 
 export const withAdalLoginApi = withAdalLogin(authContext, adalConfig.endpoints.api);
+
+export const getUser = () => {
+    return authContext.getCachedUser();
+};
