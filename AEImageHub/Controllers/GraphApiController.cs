@@ -47,7 +47,7 @@ namespace AEImageHub.Controllers
         [HttpGet]
         public object GetUsers()
         {
-        return JsonConvert.SerializeObject(_graphClient.Users.Request().GetAsync().Result);
+            return JsonConvert.SerializeObject(_graphClient.Users.Request().GetAsync().Result);
         }
 
         

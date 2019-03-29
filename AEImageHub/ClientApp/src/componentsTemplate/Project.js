@@ -4,6 +4,7 @@ import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import axios from 'axios'
 import { getToken } from '../adalConfig';
+import { Link } from 'react-router-dom';
 
 export class Project extends Component {
     
@@ -118,7 +119,7 @@ export class Project extends Component {
         
         for (let i = 0; i < projects.length; i++){
             let project = {};
-            project.name = projects[i].ProjectName;
+            project.name =  <Link to={{ pathname: "/" + projects[i].ProjectName }}>{projects[i].ProjectName}</Link>;
             project.date = projects[i].CreatedDate;
             project.description = projects[i].Description;
             tableData.push(project);

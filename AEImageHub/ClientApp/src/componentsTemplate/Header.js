@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getCredentials, getToken } from '../adalConfig';
+import { getCredentials, getToken, authContext} from '../adalConfig';
 
 import './Main.css';
 
 import logo from './img/logo.png';
 
 export class Header extends Component {
-
+    SignOut() {
+        authContext.logOut();
+    }
     // TODO
     render() {
 
@@ -23,9 +25,7 @@ export class Header extends Component {
                     </Link>
                     <div id="hdrname">
                         <span>{userid}</span>
-                        <a href="about:blank" style={{textDecoration: 'none', color:'#FFF'}}>
-                            <button>SIGN OUT</button>
-                        </a>
+                        <button onClick={this.SignOut}>Sign Out</button>
                     </div>
                 </div>
             </div>

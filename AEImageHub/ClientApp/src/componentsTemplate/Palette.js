@@ -19,7 +19,7 @@ export class Palette extends Component {
             photos: [],
             selectAll: false,
             showInfo: false,
-            redirect: false,
+            redirect: null,
             admin: false,
             validId: false,
             userId: '',
@@ -58,16 +58,30 @@ export class Palette extends Component {
         // todo valid id logic [have to change db]
     }
 
+
+    selectPhoto(event, obj) {
+        let photos = this.state.photos;
+        photos[obj.index].selected = !photos[obj.index].selected;
+        this.setState({photos: photos});
+    }
+
+    toggleSelect() {
+        let photos = this.state.photos.map((photo, index) => {
+            return {...photo, selected: !this.state.selectAll};
+        });
+        this.setState({photos: photos, selectAll: !this.state.selectAll});
+    }
+
     // get Images with the userid
     GetUserImages()
     {
         // TODO -- hardcoded for now
         let token = getToken();
-        let userid = getCredentials(token).name;
+        let userid = getCredentials(token).oid;
 
         // TODO -- add check for validId
         if (this.state.admin && this.state.validId)
-        { 
+        {
             console.log("ok");
             userid = this.state.userId;
         }
@@ -99,6 +113,7 @@ export class Palette extends Component {
             })
     }
 
+
     TrashSelectedImages()
     {
         const selected = this.state.photos.filter((value) => { return value.selected; });
@@ -118,7 +133,7 @@ export class Palette extends Component {
                 });
         })
     }
-
+    
     //
     // image
     //
@@ -185,16 +200,6 @@ export class Palette extends Component {
     }
 
     //
-    // submit
-    //
-    // TODO
-    onSubmit = () =>
-    {
-        // TODO
-        return null;
-    }
-
-    //
     // render
     //
     render()
@@ -232,11 +237,8 @@ export class Palette extends Component {
             case 2: // edit image
                 redirectLink = 'edit?src=' + this.state.redirectLink;
                 break;
-            /* case 3: // submit
-                redirectLink = 'submit';
-                break; */
-            default:
-                redirectLink = '';
+            case 3:
+                redirectLink = 'submit?src=' + this.state.redirectLink;
         }
 
         if (this.state.redirect)
@@ -244,13 +246,32 @@ export class Palette extends Component {
             return <Redirect to={redirectLink} />;
         }
     }
+    
+    
 
+    onSubmitBtnClick = () => {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        })
+
+        if (selected.length <= 0) {
+            alert("please select at least one image");
+        } else {
+            this.setState({
+                redirectLink: encodeURIComponent(JSON.stringify(selected)),
+                redirectOption: 3,
+                redirect: true
+            });
+        }
+    }
+    
+    
     renderFunction()
     {
         return (
             <div className="fnbar">
                 {this.renderRedirect()}
-                <button>Submit</button>
+                <button onClick={this.onSubmitBtnClick}>Submit</button>
                 <button onClick={this.onEditImage}>Edit Image</button>
                 <button onClick={this.onGetInfo}>Get Info</button>
                 <button onClick={this.TrashSelectedImages}>Delete</button>
@@ -273,14 +294,4 @@ export class Palette extends Component {
             </div>
         );
     }
-
-    handleGetInfoSubmit = () =>
-    {
-        this.setState({
-            photos: this.state.toSubmit,
-            toSubmit: [],
-            showInfo: false
-        });
-    }
-
 }

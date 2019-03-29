@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -113,8 +114,8 @@ namespace AEImageHub.Controllers
         {
             User user = new User()
             {
-                UId = (string)payload["UId"],
-                UserName = (string)payload["UserName"],
+                UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
+                UserName = (string)payload["UserName"], //todo 'name or username
                 Role = (string)payload["Role"],
                 Active = (bool)payload["Active"],
             };

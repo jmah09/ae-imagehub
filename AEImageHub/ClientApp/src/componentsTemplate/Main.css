@@ -160,5 +160,11 @@ h2 {
 }
 
 .addMedia button:hover {
-  background-color: #287AFF;
+    background-color: #287AFF;
+}
+
+.submit-container{
+    margin-left: 70px;
+    margin-top: 40px;
+    display: flex;
 }
