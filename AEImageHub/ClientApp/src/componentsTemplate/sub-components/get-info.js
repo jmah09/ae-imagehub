@@ -103,8 +103,22 @@ export class GetInfo extends Component {
   {
     let photos = this.state.photos;
 
-    
-    //photos.forEach((img) => { img.meta.TagLink = [e.target.value] });
+    //check if classification exists 
+    photos.forEach((img) => {
+      let tags = img.meta.TagLink;
+      let options = e.target.options;
+      for (let i = 0; i < options.length; i++){
+        console.log(options.length);
+        let option = options[i].selected;
+        console.log(option);
+        if (option && !tags.includes(options[i].value)){
+          tags.push(options[i].value)
+        }
+      }
+      
+      console.log(tags);
+      
+    });
 
     this.setState({ photos: photos });
   }
@@ -181,7 +195,7 @@ export class GetInfo extends Component {
 
     const class_options = this.state.classification;
     class_options[''] = placeholder;
-
+    
     return (
       <div id="getinfo">
           <div className="float-left">

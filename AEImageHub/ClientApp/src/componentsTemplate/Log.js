@@ -62,7 +62,7 @@ export class Log extends Component {
         for (let i = 0; i < logs.length; i++){
             let log = {};
             log.name = <Link to={{ pathname: "/" + logs[i].LId }}>{logs[i].LId}</Link>;
-            log.user = logs[i].UId;
+            log.user = logs[i].U.UserName;
             log.date = logs[i].CreatedDate;
             tableData.push(log);
         }
