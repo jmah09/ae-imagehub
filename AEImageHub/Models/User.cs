@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace AEImageHub.Models
 {
@@ -17,6 +18,8 @@ namespace AEImageHub.Models
         public bool Active { get; set; }
 
         public ICollection<Image> Image { get; set; }
+        
+        [JsonIgnore]
         public ICollection<Log> Log { get; set; }
     }
 }
