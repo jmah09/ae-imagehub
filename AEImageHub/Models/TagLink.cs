@@ -10,7 +10,7 @@ namespace AEImageHub.Models
         public string TagName { get; set; }
         public string IId { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public Image I { get; set; }
         [JsonIgnore]
         public Tag TagNameNavigation { get; set; }

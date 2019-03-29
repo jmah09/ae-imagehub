@@ -107,11 +107,45 @@ export class Search extends Component {
   {        
     e.preventDefault();
 
-    if (this.state.option === '')
-    {
-      alert('Please select an option.');
-      return;
-    }
+      if (this.state.option === '') {
+          alert('Please select an option.');
+          return;
+      }
+
+      ///////////////////////////////////////////////////////////////////////////
+      // Jae: I added below to test.
+      else if (this.state.option === 'Name' && !(this.state.input_1 === '')) {
+          axios.get("/api/search/image/" + this.state.input_1, { headers: { 'Authorization': "bearer " + getToken() } })
+              .then(res => {
+                  console.log("search by imagename: " + JSON.stringify(res));
+                  return res;
+              })
+      } else if (this.state.option === 'Classification' && !(this.state.input_1 === '')) {
+          axios.get("/api/search/tag/" + this.state.input_1, { headers: { 'Authorization': "bearer " + getToken() } })
+              .then(res => {
+                  console.log("search by tagname: " + JSON.stringify(res));
+                  return res;
+              })
+      } else if (this.state.option === 'Project' && !(this.state.input_1 === '')) {
+          axios.get("/api/search/project/" + this.state.input_1, { headers: { 'Authorization': "bearer " + getToken() } })
+              .then(res => {
+                  console.log("search by projectname: " + JSON.stringify(res));
+                  return res;
+              })
+      } else if (this.state.option === 'User' && !(this.state.input_1 === '')) {
+          axios.get("/api/search/user/" + this.state.input_1, { headers: { 'Authorization': "bearer " + getToken() } })
+              .then(res => {
+                  console.log("search by username: " + JSON.stringify(res));
+                  return res;
+              })
+      } else if (this.state.option === 'Date' && !(this.state.input_1 === '') && !(this.state.input_2 === '')) {
+          axios.get("/api/search/user/" + this.state.input_1.toString() + this.state.input_2.toString(), { headers: { 'Authorization': "bearer " + getToken() } })
+              .then(res => {
+                  console.log("search by uploadeddate: " + JSON.stringify(res));
+                  return res;
+              })
+      }
+      //////////////////////////////////////////////////////////////////////////////////
     
     let curQuery = this.buildQuery();
 
