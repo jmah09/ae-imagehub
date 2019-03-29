@@ -87,5 +87,36 @@ namespace AEImageHub.Controllers
             tag.Active = (bool)payload["Active"];
             _context.SaveChanges();
         }
+
+        /*
+        DELETE
+        API Endpoint: api/tag/:tagname
+        Description: Deletes tag from the server
+        Request Requirements:
+        1. User JWT in header field
+        2. Admin
+
+        Server response and status code:
+        200 - tag delete was successful
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to delete image
+        404 - image does not exist
+        */
+        [HttpDelete("{tagname}")]
+        public Object DeleteTag(string tagname)
+        {
+            try
+            { 
+                Tag tag = (Tag)_context.Tag.Where(t => t.TagName == tagname).First();
+                _context.Tag.Remove(tag);
+                _context.SaveChanges();
+                return ("delete tag success");
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
     }
+
 }
