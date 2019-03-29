@@ -19,7 +19,7 @@ namespace ImageServer.Controllers
         private readonly ihubDBContext _context;
         private readonly IImageRepository _repo;
 
-
+        
         public ImageController(ihubDBContext context, IImageRepository repo)
         {
             _context = context;
@@ -135,7 +135,7 @@ namespace ImageServer.Controllers
 
         /*
         PUT
-        API Endpoint: api/image/:image_id
+        API Endpoint: api/submit
         Description: Modify metadata or the image itself.
         Request Requirements:
         1. User JWT in header field
@@ -151,6 +151,7 @@ namespace ImageServer.Controllers
         [HttpPut("{imageid}")]
         public Object PutImage(string imageid, [FromBody] JObject payload)
         {
+            
             try
             { 
                 Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
@@ -165,6 +166,7 @@ namespace ImageServer.Controllers
                 return e;
             }
         }
+       
 
         /* DELETE
         API Endpoint: api/image/:image_id

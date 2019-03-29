@@ -4,6 +4,7 @@ import ReactTable from 'react-table'
 import axios from 'axios'
 import { getToken } from '../adalConfig';
 import 'core-js';
+import {Link} from "react-router-dom";
 
 export class Log extends Component {
     
@@ -60,7 +61,7 @@ export class Log extends Component {
         //building log obj for each log obj returned from server
         for (let i = 0; i < logs.length; i++){
             let log = {};
-            log.name = logs[i].LId;
+            log.name = <Link to={{ pathname: "/" + logs[i].LId }}>{logs[i].LId}</Link>;
             log.user = logs[i].UId;
             log.date = logs[i].CreatedDate;
             tableData.push(log);
