@@ -116,7 +116,7 @@ namespace AEImageHub.Controllers
             {
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
                 UserName = HttpContext.User.FindFirstValue("name"), //todo 'name or username
-                Role = "todo",
+                Role = "too",
                 Active = true,
             };
             _context.User.Add(user);
