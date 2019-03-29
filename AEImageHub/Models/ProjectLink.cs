@@ -10,7 +10,7 @@ namespace AEImageHub.Models
         public string ProjectName { get; set; }
         public string IId { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public Image I { get; set; }
         [JsonIgnore]
         public Project ProjectNameNavigation { get; set; }
