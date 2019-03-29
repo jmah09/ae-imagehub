@@ -41,7 +41,7 @@ namespace AEImageHub.Controllers
             try
             {
                 var images = _context.Image
-                                .Where(i => i.ImageName == imagename && i.Submitted);
+                                .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);
 
                 return JsonConvert.SerializeObject(images);
             }
@@ -66,7 +66,7 @@ namespace AEImageHub.Controllers
                 var images = new List<Image>();
                 foreach (var tl in taglink)
                 {
-                    if (tl.I.Submitted)
+                    if (tl.I.Submitted && !tl.I.Trashed)
                     {
                         images.Add(tl.I);
                     }
@@ -94,7 +94,7 @@ namespace AEImageHub.Controllers
                 var images = new List<Image>();
                 foreach (var pl in projectlink)
                 {
-                    if (pl.I.Submitted)
+                    if (pl.I.Submitted && !pl.I.Trashed)
                     {
                         images.Add(pl.I);
                     }
@@ -124,7 +124,7 @@ namespace AEImageHub.Controllers
                 {
                     foreach (var i in u.Image)
                     {
-                        if (i.Submitted)
+                        if (i.Submitted && !i.Trashed)
                         {
                             images.Add(i);
                         }
@@ -146,7 +146,7 @@ namespace AEImageHub.Controllers
             
             try
             {
-                var images = _context.Image.Where(i => i.UploadedDate >= startDate && i.UploadedDate <= endDate && i.Submitted);
+                var images = _context.Image.Where(i => i.UploadedDate >= startDate && i.UploadedDate <= endDate && i.Submitted && !i.Trashed);
                 return JsonConvert.SerializeObject(images);
             }
             catch (Exception e)
