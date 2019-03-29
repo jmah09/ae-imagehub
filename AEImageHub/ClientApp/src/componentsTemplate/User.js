@@ -22,6 +22,10 @@ export class User extends Component {
         this.props.history.push("/palette?" + userid);
     }
 
+    viewTrash(userid) {
+        this.props.history.push("/trash?" + userid);
+    }
+
     makeAdmin(userId) {
         console.log(userId);
         axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + getToken() } })
@@ -99,8 +103,7 @@ export class User extends Component {
         </button>
         </div>)
     });
-
-        // TODO
+        
         sub_columns.push({
             id: 'button2',
             accessor: 'uid',
@@ -112,6 +115,18 @@ export class User extends Component {
         </button>
         </div>)
     });
+
+        sub_columns.push({
+            id: 'button3',
+            accessor: 'uid',
+            Cell: ({value}) => (<div className="fnbar">
+                <button onClick={() => {
+                    this.viewTrash(value);
+                    // TODO
+                }}>VIEW TRASH
+                </button>
+            </div>)
+        });
 
 
         return (

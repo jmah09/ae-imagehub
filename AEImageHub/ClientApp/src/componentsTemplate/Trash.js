@@ -4,7 +4,7 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import { getCredentials, getToken } from '../adalConfig';
+import {getCredentials, getToken, isAdmin} from '../adalConfig';
 import {Redirect} from "react-router-dom";
 
 export class Trash extends Component {
@@ -19,7 +19,10 @@ export class Trash extends Component {
             showInfo: false,
             redirect: false,
             redirectLink: '',
-            redirectOption: 0
+            redirectOption: 0,
+            admin: false,
+            validId: false,
+            userId: ""
         };
 
         this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
@@ -27,10 +30,20 @@ export class Trash extends Component {
         this.renderRedirect = this.renderRedirect.bind(this);
 
 
-
+        this.componentDidMount();
         this.GetUserTrashedImages();
     }
 
+    componentDidMount()
+    {
+        let param = this.props.location.search;
+        this.state.validId = param.includes("?"); // todo : temp fix
+        this.state.userId = param.substring(1);
+        this.state.admin = isAdmin(getToken());
+        console.log("isAdminTrash ? " + this.state.admin);
+        // todo valid id logic [have to change db]
+    }
+    
     selectPhoto(event, obj) {
         console.log(obj);
         let photos = this.state.photos;
@@ -49,6 +62,14 @@ export class Trash extends Component {
     GetUserTrashedImages() {
         let token = getToken();
         let userid = getCredentials(token).oid;
+
+
+        // TODO -- add check for validId
+        if (this.state.admin && this.state.validId)
+        {
+            userid = this.state.userId;
+        }
+        
         axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
             .then(res => {
             var images = [];
