@@ -20,13 +20,11 @@ namespace ImageServer.Controllers
     public class SubmissionController : Controller
     {
         private readonly ihubDBContext _context;
-        private readonly IImageRepository _repo;
-
-        
+ 
+    
         public SubmissionController(ihubDBContext context, IImageRepository repo)
         {
             _context = context;
-            _repo = repo;
         }
    
         /*
@@ -37,9 +35,9 @@ namespace ImageServer.Controllers
         [HttpPost("")]
         public Object SubmitImage([FromBody] Submission submission)
         {
-            Log dbLog = GenerateLog();
+            Log dbLog = GenerateLog(submission.Images.Count.ToString() + " images submitted");
             List<Image> images = new List<Image>();
-            
+
             try
             {
                 _context.Add(dbLog);
@@ -49,17 +47,17 @@ namespace ImageServer.Controllers
             {
                 Console.Write(e);
                 return BadRequest("malform request log");
-            }           
-            
+            }
+
             foreach (string imageid in submission.Images)
-            {            
+            {
                 try
                 {
-                    Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                    Image image = (Image) _context.Image.Where(i => i.IId == imageid).First();
                     image.Submitted = true;
-                    ProjectLink dbProjectLink = GenerateProjectLink(image, submission.Project);                                
+                    ProjectLink dbProjectLink = GenerateProjectLink(image, submission.Project);
                     LogLink dbLogLink = GenerateLogLink(image, dbLog);
-                    
+
                     _context.Add(dbLogLink);
                     _context.Add(dbProjectLink);
                     _context.SaveChanges();
@@ -82,14 +80,15 @@ namespace ImageServer.Controllers
             };
         }
 
-        private Log GenerateLog()
+        private Log GenerateLog(string logContext)
         {
+            string[] uuid = Guid.NewGuid().ToString().Split("-");
             return new Log()
             {
-                LId = "log_" + Guid.NewGuid().ToString().Split("-")[-1],
+                LId = "log_" + uuid[uuid.Length-1],
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
                 CreatedDate =  DateTime.Now,
-                LogFile = "submit"
+                LogFile = logContext
             };
         }
 
@@ -100,8 +99,7 @@ namespace ImageServer.Controllers
                 IId = image.IId,
                 LId = log.LId
             };
-        }
-       
+        }    
     }
 }
 
