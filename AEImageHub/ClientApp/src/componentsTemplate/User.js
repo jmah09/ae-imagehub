@@ -35,6 +35,7 @@ export class User extends Component {
         axios.get("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
             var users = [];
+            console.log(res);
         res.data.map((user, index) => {
             users.push({
                 name: user.displayName, email: user.mail, uid: user.id, userPrincipalName: user.userPrincipalName
@@ -102,7 +103,7 @@ export class User extends Component {
         // TODO
         sub_columns.push({
             id: 'button2',
-            accessor: 'userPrincipalName',
+            accessor: 'uid',
             Cell: ({value}) => (<div className="fnbar">
             <button onClick={() => {
             this.viewPalette(value);
