@@ -29,7 +29,11 @@ export const getCredentials = (token) => {
 
 export const isAdmin = () => {
     const adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
-    return getUser().profile["groups"].includes(adminGroup);
+    let groupClaims = getUser().profile["groups"];
+    if (groupClaims != null) {
+        return getUser().profile["groups"].includes(adminGroup);
+    }
+    return false;
 };
 
 export const adalApiFetch = (fetch, url, options) =>

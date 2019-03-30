@@ -87,7 +87,13 @@ namespace AEImageHub.Controllers
         [HttpGet("{userid}")]
         public Object GetUser(string userid)
         {
-            return JsonConvert.SerializeObject(_context.User.Where(i => i.UId == userid).First());
+            var user = _context.User.FirstOrDefault(i => i.UId == userid);
+            if (user == null)
+            {
+                return NotFound("Couldn't Find a user with userid " + userid);
+            }
+            return JsonConvert.SerializeObject(_context.User.FirstOrDefault(i => i.UId == userid));
+          //  return JsonConvert.SerializeObject(_context.User.Where(i => i.UId == userid).FirstOrDefault());
         }
 
         /*
@@ -102,6 +108,7 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to view users’ profiles
         */
+        [Authorize (Policy = "Admins")]
         [HttpGet("")]
         public Object GetUsers()
         {
@@ -110,7 +117,7 @@ namespace AEImageHub.Controllers
 
         /* POST
         API Endpoint: api/user/
-        Description: Creates user profile(Admin only)
+        Description: Creates user profile
         Request Requirements:
         1. User JWT in header field
         2. Body containing user data
@@ -124,11 +131,17 @@ namespace AEImageHub.Controllers
         [HttpPost("")]
         public void PostUser()
         {
+            var role = "User";
+            if (isAdmin(HttpContext.User.FindAll("groups")))
+            {
+                role = "Admin";
+            }
+            
             User user = new User()
             {
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
-                UserName = HttpContext.User.FindFirstValue("name"), //todo 'name or username
-                Role = "too",
+                UserName = HttpContext.User.FindFirstValue("name"),
+                Role = role,
                 Active = true,
             };
             _context.User.Add(user);
@@ -157,6 +170,13 @@ namespace AEImageHub.Controllers
             user.Role = (string)payload["Role"];
             user.Active = (bool)payload["Active"];
             _context.SaveChanges();
+        }
+
+        private bool isAdmin(IEnumerable<Claim> groupClaims)
+        {
+            const string adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
+            return  groupClaims.Any(g => g.Value.Equals(adminGroup));
+            
         }
     }
 }
