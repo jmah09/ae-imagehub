@@ -25,9 +25,10 @@ export class Submit extends Component {
             validId: false,
             userId: "",
             project: null,
-            projectOptions: []
+            projectOptions: [],
+            submitted: false
         };
-        
+
         this.getProjectOptions = this.getProjectOptions.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.onDropdownChange = this.onDropdownChange.bind(this);
@@ -43,7 +44,7 @@ export class Submit extends Component {
         this.state.admin = isAdmin();
         // todo valid id logic [have to change db]
     }
-    
+
     getProjectOptions(){
         const that = this;
         adalGetToken(authContext, adalConfig.endpoints.api)
@@ -60,7 +61,7 @@ export class Submit extends Component {
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
         });
-        
+
     }
 
 
@@ -87,54 +88,57 @@ export class Submit extends Component {
             return <Redirect to={redirectLink}/>
         }
     }
-    
+
     onCancel(){
         this.setState({
             redirect: true
         })
     }
-    
-    onSubmit(){
+
+    onSubmit(event){
         if(!this.state.project){
             alert("please select a project");
             return;
         }
-        
+
         let images = [];
         for(let i = 0 ; i < this.state.images.length ; i++){
             images.push(this.state.images[i].meta.IId);
         }
 
-        const that = this;
-        adalGetToken(authContext, adalConfig.endpoints.api)
-            .then(function (token) {
-                axios({
-                    url: '/api/submit',
-                    method: 'POST',
-                    data: { images: images, project: that.state.project},
-                    headers: {
-                        'Authorization': "bearer " + token
-                    }
-                }).then(res => {
-                    console.log(res.data);
-                    that.setState({
-                        redirect: true
+        if (!this.state.submitted) {
+            const that = this;
+            this.setState({submitted: true});
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    axios({
+                        url: '/api/submit',
+                        method: 'POST',
+                        data: {images: images, project: that.state.project},
+                        headers: {
+                            'Authorization': "bearer " + token
+                        }
+                    }).then(res => {
+                        console.log(res.data);
+                        that.setState({
+                            redirect: true
+                        })
                     })
-                })
-            }).catch(function (err) {
-            console.log("Error: Couldn't get token")
-        });
-        
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
+        }
+
     }
-    
+
     onDropdownChange(event, data){
         this.setState({project:data.value});
     }
-    
+
     renderFunction() {
         return (
             <div class="fnbar">
-            {this.renderRedirect()}
+                {this.renderRedirect()}
                 <div className="submit-container">
                     <div style={dropdownStyle}>
                         <Dropdown
@@ -148,11 +152,11 @@ export class Submit extends Component {
                     <Button onClick={this.onSubmit} primary>Submit</Button>
                     <Button onClick={this.onCancel} primary>Cancel</Button>
                 </div>
-            
+
             </div>
         )
     }
-    
+
     renderContent() {
         console.log(this.state.images);
         const listItems = this.state.images.map((i) =>
