@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import { Dropdown } from './sub-components/form-dropdown';
 import { TextInput } from './sub-components/form-text-input';
-import { getToken } from '../adalConfig';
+import {adalConfig, authContext} from '../adalConfig';
 import axios from 'axios';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
@@ -10,19 +10,17 @@ import { Redirect } from 'react-router-dom';
 
 import '../index.css';
 import './Search.css';
+import {adalGetToken} from "react-adal";
 
 export class Search extends Component {
 
   constructor(props)
   {
 
-    const token = getToken();
 
     super(props);
 
     this.state = {
-      token,
-
       query: [],
       option: '',
       input_1: '',
@@ -63,14 +61,11 @@ export class Search extends Component {
   //
   // axios request
   //
-  getSearch = () =>
-  {
-    const request_param = { headers: { 'Authorization': "bearer " + this.state.token }};
+  getSearch = () => {
     let request_query = '';
-    let photos = [];  
+    let photos = [];
 
-    switch (this.state.option)
-    {
+    switch (this.state.option) {
       case 'Name':
         request_query = "/api/search/image/" + this.state.input_1;
         break;
@@ -89,43 +84,54 @@ export class Search extends Component {
       default:
         break;
     }
-    
-    axios.get(request_query, request_param)
-    .then((res) => {
-      console.log("RESULT : " + JSON.stringify(res.data));
 
-      photos = res.data.map((image, index) => {
-        photos.push({
-          src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-        });
-      });
-    })
-    .catch((err) => {
-      console.log(err.message);
+    adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(function (token) {
+          const request_param = {headers: {'Authorization': "bearer " + token}};
+          axios.get(request_query, request_param)
+              .then((res) => {
+                console.log("RESULT : " + JSON.stringify(res.data));
+
+                photos = res.data.map((image, index) => {
+                  photos.push({
+                    src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
+                  });
+                });
+              })
+              .catch((err) => {
+                console.log(err.message);
+              });
+        }).catch(function (err) {
+      console.log("Error: Couldn't get token")
     });
 
-    this.setState({ photos: photos });
+    this.setState({photos: photos});
   }
 
   handleSubmit = () => 
   {
     const selected = this.state.photos.filter((value) => { return value.selected; });
 
-    for (let i = 0; i < selected.length; i++)
-    {
-      axios.put("/api/image/" + selected[0].meta.IId, {
-          ImageName: null,
-          Trashed: null,
-          Submitted: false
-      })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
+    for (let i = 0; i < selected.length; i++) {
+      adalGetToken(authContext, adalConfig.endpoints.api)
+          .then(function (token) {
+            const request_param = {headers: {'Authorization': "bearer " + token}};
+            axios.put("/api/image/" + selected[0].meta.IId, {
+              ImageName: null,
+              Trashed: null,
+              Submitted: false
+            }, request_param)
+                .then(response => {
+                  console.log(response);
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+          }).catch(function (err) {
+        console.log("Error: Couldn't get token")
       });
+
     }
-  
     this.setState({ redirect: true });
   }
 
