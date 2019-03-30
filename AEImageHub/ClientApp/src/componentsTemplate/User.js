@@ -32,7 +32,7 @@ export class User extends Component {
             .then(res=> {
             console.log(res);
         alert("The selected User has been made an admin.");
-    })
+      })
     }
 
     getUsers() {

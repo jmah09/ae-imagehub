@@ -6,6 +6,8 @@ using AEImageHub.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -68,6 +70,18 @@ namespace ImageServer.Controllers
                     return BadRequest("malform request project");
                 }
             }
+
+            try
+            {
+               var username = HttpContext.User.FindFirstValue("name");
+               var logLink = "https://aeimagehub.azurewebsites.net/logview?src=%22" + dbLog.LId +"%22";
+                sendEmail(User.FindFirst(ClaimTypes.Email)?.Value, username, logLink);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.Message);
+            }
+
             return Ok();
         }
 
@@ -99,7 +113,42 @@ namespace ImageServer.Controllers
                 IId = image.IId,
                 LId = log.LId
             };
-        }    
+        }
+
+        private bool sendEmail(string address, string username, string logLink)
+        {
+            var fromAddress = new MailAddress("nlgpsag@gmail.com", "iHub");
+            var toAddress = new MailAddress(address, username);
+            const string password = "ulxozhttrefuudqs";
+            const string subject = "Imagehub Submission Log";
+            var body = "Hello " + username + "\nHere is your submission log " + logLink;
+            
+            var client = new SmtpClient {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network, 
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, password)
+            };
+            
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                client.Send(message);
+            }
+            /*client.Port = 587;
+            client.EnableSsl;
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.UseDefaultCredentials = false;
+            client.Host = "smtp.gmail.com";
+            mail.Subject = "this is a test email.";
+            mail.Body = "this is my test email body";*/
+            return false;
+        }
     }
 }
 
