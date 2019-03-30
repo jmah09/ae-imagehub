@@ -157,7 +157,7 @@ namespace ImageServer.Controllers
             try
             { 
                 Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
-                if (payload["UId"].Type != JTokenType.Null) { image.Submitted = (bool)payload["UId"]; };
+                if (payload["UId"].Type != JTokenType.Null) { image.UId = (string)payload["UId"]; };
                 if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
                 if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
                 if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
