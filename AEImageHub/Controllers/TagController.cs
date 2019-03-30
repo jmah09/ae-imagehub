@@ -130,7 +130,7 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
 
-        [HttpPost("/taglink")]
+        [HttpPost("taglink")]
         public Object PostTagLink([FromBody] JObject payload)
         {
             try
@@ -162,7 +162,7 @@ namespace AEImageHub.Controllers
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
         
-        [HttpDelete("/taglink/{imageid}")]
+        [HttpDelete("taglink/{imageid}")]
         public Object DeleteTagLink(string imageid)
         {
             try
