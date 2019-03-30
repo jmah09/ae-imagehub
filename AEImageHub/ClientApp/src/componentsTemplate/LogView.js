@@ -125,6 +125,7 @@ export class LogView extends Component {
                             Submitted: false
                         }, request_param))
                 }
+                console.log("here");
 
                 axios.all(promises)
                     .then(function (res) {
@@ -138,7 +139,6 @@ export class LogView extends Component {
             .catch(function (err) {
                 console.log("Error: Couldn't get token")
             });
-
     }
     
     onCancel(){
@@ -184,7 +184,6 @@ export class LogView extends Component {
                         />
                     )}
                 </div>
-            
             </div>
         )
     }

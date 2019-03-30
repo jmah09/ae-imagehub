@@ -160,7 +160,25 @@ namespace ImageServer.Controllers
                 if (payload["UId"].Type != JTokenType.Null) { image.UId = (string)payload["UId"]; };
                 if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
                 if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
-                if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
+                if (payload["Submitted"].Type != JTokenType.Null)
+                {
+                    image.Submitted = (bool)payload["Submitted"];
+                    if (!image.Submitted)
+                    {
+                        var projectlinks = _context.ProjectLink.Where(pl => pl.IId == imageid);
+                        var loglinks = _context.LogLink.Where(ll => ll.IId == imageid);
+                        foreach(var pl in projectlinks)
+                        {
+                            _context.ProjectLink.Remove(pl);
+                        }
+
+                        foreach (var ll in loglinks)
+                        {
+                            _context.LogLink.Remove(ll);
+                        }
+                    }
+                };
+                
                 _context.SaveChanges();
                 return imageid;
             }
