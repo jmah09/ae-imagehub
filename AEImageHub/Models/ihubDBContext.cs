@@ -64,6 +64,10 @@ namespace AEImageHub.Models
                     .HasColumnName("UId")
                     .HasMaxLength(128);
 
+                entity.Property(e => e.UploadedBy)
+                .IsRequired()
+                .HasMaxLength(128);
+
                 entity.Property(e => e.UploadedDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.U)
