@@ -106,33 +106,39 @@ export class LogView extends Component {
         }
     }
 
-    handleSubmit = () =>
-    {
+    handleSubmit = () => {
         let that = this;
-        const selected = this.state.images.filter((value) => { return value.selected; });
+        const selected = this.state.images.filter((value) => {
+            return value.selected;
+        });
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                const request_param = {headers: {'Authorization': "bearer " + token}};
+                let promises = [];
 
-        for (let i = 0; i < selected.length; i++) {
-            adalGetToken(authContext, adalConfig.endpoints.api)
-                .then(function (token) {
-                    const request_param = {headers: {'Authorization': "bearer " + token}};
-                    axios.put("/api/image/" + selected[0].meta.IId, {
-                        UId: null,
-                        ImageName: null,
-                        Trashed: null,
-                        Submitted: false
-                    }, request_param)
-                        .then(response => {
-                            console.log(response);
-                            that.setState({ redirect: true, redirectLink: "palette"});
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                }).catch(function (err) {
+                for (let i = 0; i < selected.length; i++) {
+                    promises.push(
+                        axios.put("/api/image/" + selected[i].meta.IId, {
+                            UId: null,
+                            ImageName: null,
+                            Trashed: null,
+                            Submitted: false
+                        }, request_param))
+                }
+
+                axios.all(promises)
+                    .then(function (res) {
+                        console.log(res);
+                        that.setState({redirect: true, redirectLink: "palette"});
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    });
+            })
+            .catch(function (err) {
                 console.log("Error: Couldn't get token")
             });
 
-        }
     }
     
     onCancel(){
