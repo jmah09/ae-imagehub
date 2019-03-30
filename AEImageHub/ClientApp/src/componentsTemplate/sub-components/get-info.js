@@ -108,15 +108,19 @@ export class GetInfo extends Component {
       let tags = img.meta.TagLink;
       let options = e.target.options;
       for (let i = 0; i < options.length; i++){
-        console.log(options.length);
         let option = options[i].selected;
-        console.log(option);
+        
         if (option && !tags.includes(options[i].value)){
           tags.push(options[i].value)
         }
+        
+        if (!options[i].selected){
+          tags.splice(i, 1);
+        }
+        
       }
-      
       console.log(tags);
+      
       
     });
 
@@ -195,6 +199,7 @@ export class GetInfo extends Component {
 
     const class_options = this.state.classification;
     class_options[''] = placeholder;
+    console.log(selected[0]);
     
     return (
       <div id="getinfo">
