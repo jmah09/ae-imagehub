@@ -4,8 +4,9 @@ import './index.css';
 import FlipMove from 'react-flip-move';
 import UploadIcon from './UploadIcon.svg';
 import axios from 'axios';
-import { getToken } from '../../adalConfig';
+import {adalConfig, authContext} from '../../adalConfig';
 import Popup from 'reactjs-popup';
+import {adalGetToken} from "react-adal";
 
 
 const styles = {
@@ -225,24 +226,31 @@ class ReactImageUploadComponent extends React.Component {
     uploadImagesToServer() {
         this.state.files.map((picture, index) => {
             var fd = new FormData();
+            const that = this;
             fd.append('image', picture, picture.name);
-            axios({
-                url: '/api/image/',
-                method: 'POST',
-                data: fd,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': "bearer " + getToken()
-                }
-            }).then(res => {
-                delete this.state.files[index]
-                this.state.pictures[index].status = true;
-                this.props.onChange(this.state.files, this.state.pictures);
-                }).catch(err => {
-                    delete this.state.files[index]
-                    this.state.pictures[index].status = false;
-                    this.props.onChange(this.state.files, this.state.pictures);
-            })
+            
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    axios({
+                        url: '/api/image/',
+                        method: 'POST',
+                        data: fd,
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'Authorization': "bearer " + token
+                        }
+                    }).then(res => {
+                        delete that.state.files[index]
+                        that.state.pictures[index].status = true;
+                        that.props.onChange(that.state.files, that.state.pictures);
+                    }).catch(err => {
+                        delete that.state.files[index]
+                        that.state.pictures[index].status = false;
+                        that.props.onChange(that.state.files, that.state.pictures);
+                    })
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
         })
     }
 

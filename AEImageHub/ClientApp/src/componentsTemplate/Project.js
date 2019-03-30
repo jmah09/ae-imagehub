@@ -3,8 +3,9 @@ import { Title } from './Title';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import axios from 'axios'
-import { getToken } from '../adalConfig';
+import {adalConfig, authContext} from '../adalConfig';
 import { Link } from 'react-router-dom';
+import {adalGetToken} from "react-adal";
 
 export class Project extends Component {
     
@@ -19,51 +20,77 @@ export class Project extends Component {
 
     // get all projects
     GetProjects() {
-        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                return res;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        return res;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
 
     // get a project with projectname
     GetProject(projectname) {
-        axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("project: " + JSON.stringify(res));
-                return res ;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log("project: " + JSON.stringify(res));
+                        return res ;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
 
     // post a project
     PostProject(payload) {
-        axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
 
     // put a project with project name
     PutProject(projectname,payload) {
-        axios.put("/api/project" + projectname, payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.put("/api/project" + projectname, payload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
     ///////////////////////////////////////////////////////////
 
     componentDidMount() {
-        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                this.setState({projects: res.data})
-            }).catch (err => {
-            console.log(err);
-        })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project", { headers: { 'Authorization': "bearer " +  token } })
+                    .then(res => {
+                        this.setState({projects: res.data})
+                    }).catch (err => {
+                    console.log(err);
+                })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
     
     

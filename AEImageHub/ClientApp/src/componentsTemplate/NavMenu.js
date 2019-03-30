@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import { getToken, isAdmin } from '../adalConfig';
+import { isAdmin } from '../adalConfig';
 import './Main.css';
 
 export class NavMenu extends Component {
@@ -9,8 +9,7 @@ export class NavMenu extends Component {
 
     render() {
 
-        let token = getToken();
-        let status = isAdmin(token);
+        let status = isAdmin();
     
         if (!status) {
             return (

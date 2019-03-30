@@ -1,7 +1,8 @@
 ﻿import React, { Component } from 'react';
 import { Title } from './Title';
 import axios from 'axios';
-import { getCredentials, getToken, isAdmin } from '../adalConfig';
+import {getUser, isAdmin, adalConfig, authContext} from '../adalConfig';
+import {adalGetToken} from "react-adal";
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import { Redirect } from 'react-router-dom';
@@ -53,7 +54,7 @@ export class Palette extends Component {
         let param = this.props.location.search;
         this.state.validId = param.includes("?"); // todo : temp fix
         this.state.userId = param.substring(1);
-        this.state.admin = isAdmin(getToken());
+        this.state.admin = isAdmin();
         console.log("isAdmin ? " + this.state.admin);
         // todo valid id logic [have to change db]
     }
@@ -76,8 +77,7 @@ export class Palette extends Component {
     GetUserImages()
     {
         // TODO -- hardcoded for now
-        let token = getToken();
-        let userid = getCredentials(token).oid;
+        let userid = getUser().profile.oid;
 
         // TODO -- add check for validId
         if (this.state.admin && this.state.validId)
@@ -86,31 +86,39 @@ export class Palette extends Component {
             userid = this.state.userId;
         }
 
-        axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token } })
-            .then(res => {
-                var images = [];
+        var images = [];
 
-                res.data.map((image, index) => {
-                    images.push({
-                        src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-                    });
-                });
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
 
-                // TODO -- question efficiency
-                for (let i = 0; i < this.state.photos.length; i++)
-                {
-                    for (let j = 0; j < images.length; j++)
-                    {
-                        if (images[j].src === this.state.photos[i].src)
+                        res.data.map((image, index) => {
+                            images.push({
+                                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
+                            });
+                        });
+
+                        // TODO -- question efficiency
+                        for (let i = 0; i < that.state.photos.length; i++)
                         {
-                            Object.assign(images[j].meta, this.state.photos[i].meta);
-                            break;
+                            for (let j = 0; j < images.length; j++)
+                            {
+                                if (images[j].src === that.state.photos[i].src)
+                                {
+                                    Object.assign(images[j].meta, that.state.photos[i].meta);
+                                    break;
+                                }
+                            }
                         }
-                    }
-                }
 
-                this.setState({photos: images})
-            })
+                        that.setState({photos: images})
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+        
     }
 
 
@@ -121,16 +129,23 @@ export class Palette extends Component {
 
         selected.map((image, index) => {
             image.meta.Trashed = true;
-            axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
-                .then(response => {
-                    console.log(response);
-                    this.setState({
-                        photos: notSelected
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            const that = this;
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + token } })
+                        .then(response => {
+                            console.log(response);
+                            that.setState({
+                                photos: notSelected
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
+
         })
     }
     

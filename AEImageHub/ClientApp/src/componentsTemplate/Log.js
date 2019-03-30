@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import ReactTable from 'react-table'
 import axios from 'axios'
-import { getToken } from '../adalConfig';
+import {adalConfig, authContext} from '../adalConfig';
 import 'core-js';
 import {Link} from "react-router-dom";
+import {adalGetToken} from "react-adal";
 
 export class Log extends Component {
     
@@ -19,27 +20,44 @@ export class Log extends Component {
 
     // get all Logs
     static GetLogs() {
-        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                return res;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/log", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        return res;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
 
     // get a log with logid
     static GetLog(logid) {
-        axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                return res;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/log/" + logid, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        return res;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
     ///////////////////////////////////////////////////////////
     
     //componentDidMount() will give is the response.data from server response
     componentDidMount() {
-        axios.get("/api/log", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                this.setState({logs: res.data});
-            })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/log", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        that.setState({logs: res.data});
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+
     }
 
     render() {

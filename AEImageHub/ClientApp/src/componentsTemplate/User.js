@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Title } from './Title';
 import axios from 'axios';
-import {getToken} from '../adalConfig';
+import {adalConfig, authContext, getToken} from '../adalConfig';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
+import {adalGetToken} from "react-adal";
 
 export class User extends Component {
 
@@ -28,25 +29,40 @@ export class User extends Component {
 
     makeAdmin(userId) {
         console.log(userId);
-        axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res=> {
-            console.log(res);
-        alert("The selected User has been made an admin.");
-      })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.post("/api/graph/" + userId, null, {headers: {'Authorization': "bearer " + token}})
+                    .then(res => {
+                        console.log(res);
+                        alert("The selected User has been made an admin.");
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+        
     }
 
     getUsers() {
-        axios.get("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-            var users = [];
-            console.log(res);
-        res.data.map((user, index) => {
-            users.push({
-                name: user.displayName, email: user.mail, uid: user.id, userPrincipalName: user.userPrincipalName
-            })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/graph", {headers: {'Authorization': "bearer " + token}})
+                    .then(res => {
+                        var users = [];
+                        console.log(res);
+                        res.data.map((user, index) => {
+                            users.push({
+                                name: user.displayName,
+                                email: user.mail,
+                                uid: user.id,
+                                userPrincipalName: user.userPrincipalName
+                            })
+                        });
+                        that.setState({users: users});
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
         });
-        this.setState({ users: users });
-    })
     }
 
     render() {

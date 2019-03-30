@@ -2,10 +2,11 @@
 import { Title } from './Title';
 import '../index.css';
 import axios from 'axios'
-import {getCredentials, getToken, isAdmin} from '../adalConfig';
+import {adalConfig, authContext, isAdmin} from '../adalConfig';
+import {adalGetToken} from "react-adal";
+
 import { Redirect } from 'react-router-dom'
 import { Button } from 'semantic-ui-react'
-
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
@@ -32,21 +33,27 @@ export class LogView extends Component {
     }
     
     getLogImages(){
-        axios.get("/api/log/view/" + this.state.logid, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log(res.data);
-                let images = [];
-                for(let i = 0 ; i < res.data.length; i++){
-                    images.push(res.data[i].IId);
-                }
-                this.setState({images:images});
-            })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/log/view/" + that.state.logid, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log(res.data);
+                        let images = [];
+                        for(let i = 0 ; i < res.data.length; i++){
+                            images.push(res.data[i].IId);
+                        }
+                        that.setState({images:images});
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
 
     componentDidMount() {
         let param = this.props.location.search;
         this.state.userId = param.substring(1, param.indexOf("@"));
-        this.state.admin = isAdmin(getToken());
+        this.state.admin = isAdmin();
         console.log(this.state.admin);
         // todo valid id logic [have to change db]
     }
