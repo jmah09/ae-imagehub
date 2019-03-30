@@ -10,7 +10,10 @@ export class Dropdown extends Component {
   render()
   {
     return (
-      <select multiple id={this.props.id} onChange={this.props.onChange}>
+      <select
+        {...this.props.multiple ? 'multiple' : null}
+        id={this.props.id}
+        onChange={this.props.onChange}>
         {this.renderList()}
       </select>
     );
@@ -32,8 +35,8 @@ export class Dropdown extends Component {
     {
       let key = this.props.options[keys[i]];
       render.push(
-        <option selected={key.selected} type="checkbox" key={i} value={keys[i]} name={key.name}>
-          {key.name}
+        <option selected={key[1]} key={i} value={keys[i]} name={key[0]}>
+          {key[0]}
         </option>
       );
     }

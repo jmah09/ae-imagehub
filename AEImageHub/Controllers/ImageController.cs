@@ -149,6 +149,7 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
         [HttpPut("{imageid}")]
+        [AllowAnonymous]
         public Object PutImage(string imageid, [FromBody] JObject payload)
         {
             
