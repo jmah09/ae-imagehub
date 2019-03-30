@@ -41,6 +41,7 @@ export class LogView extends Component {
     
     getLogImages() {
         const that = this;
+        console.log("/api/log/view/" + that.state.logid);
         adalGetToken(authContext, adalConfig.endpoints.api)
             .then(function (token) {
                 axios.get("/api/log/view/" + that.state.logid, {headers: {'Authorization': "bearer " + token}}).bind(this)
@@ -52,25 +53,14 @@ export class LogView extends Component {
                                 src: "/api/image/" + image.IId, width: 1, height: 1, alt: image.IId, meta: image
                             });
                         });
-
-                        // TODO -- question efficiency
-                        for (let i = 0; i < this.state.images.length; i++)
-                        {
-                            for (let j = 0; j < images.length; j++)
-                            {
-                                if (images[j].src === this.state.images[i].src)
-                                {
-                                    Object.assign(images[j].meta, this.state.images[i].meta);
-                                    break;
-                                }
-                            }
-                        }
-                        this.setState({images:images});
-                    }).bind(this);
+                        that.setState({images:images});
+                    })
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
         })
     }
+    
+    
 
     selectPhoto(event, obj) {
         let photos = this.state.images;
