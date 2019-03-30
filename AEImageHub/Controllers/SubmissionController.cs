@@ -115,7 +115,7 @@ namespace ImageServer.Controllers
             };
         }
 
-        private bool sendEmail(string address, string username, string logLink)
+        private void sendEmail(string address, string username, string logLink)
         {
             var fromAddress = new MailAddress("nlgpsag@gmail.com", "iHub");
             var toAddress = new MailAddress(address, username);
@@ -140,14 +140,6 @@ namespace ImageServer.Controllers
             {
                 client.Send(message);
             }
-            /*client.Port = 587;
-            client.EnableSsl;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.UseDefaultCredentials = false;
-            client.Host = "smtp.gmail.com";
-            mail.Subject = "this is a test email.";
-            mail.Body = "this is my test email body";*/
-            return false;
         }
     }
 }
