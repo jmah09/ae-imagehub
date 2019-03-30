@@ -84,7 +84,7 @@ export class Project extends Component {
             .then(function (token) {
                 axios.get("/api/project", { headers: { 'Authorization': "bearer " +  token } })
                     .then(res => {
-                        this.setState({projects: res.data})
+                        that.setState({projects: res.data})
                     }).catch (err => {
                     console.log(err);
                 })
