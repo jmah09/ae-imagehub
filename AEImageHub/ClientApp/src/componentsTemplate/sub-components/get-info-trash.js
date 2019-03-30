@@ -9,6 +9,9 @@ import axios from 'axios';
 
 import './get-info.css';
 
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+
 export class GetInfoTrash extends Component {
 
     constructor(props)
@@ -26,7 +29,9 @@ export class GetInfoTrash extends Component {
 
             redirectLink: props.location.state.redirectLink,
             redirectOption: false,
-            redirect: false
+            redirect: false,
+            photoIndex: 0,
+            isOpen: false
         }
 
         this.getClassification();
@@ -140,9 +145,37 @@ export class GetInfoTrash extends Component {
 
     renderFunction()
     {
+        const { photoIndex, isOpen } = this.state;
+        let images = [];
+        this.state.photos.map((i) =>
+            images.push(i.src)
+        );
+        console.log(images);
+        
         return (
             <div className="fnbar">
                 <button onClick={this.onCancel}>Close</button>
+                <button type="button" onClick={() => this.setState({ isOpen: true })}>
+                    Zoom
+                </button>
+                {isOpen && (
+                    <Lightbox
+                        mainSrc={images[photoIndex]}
+                        nextSrc={images[(photoIndex + 1) % images.length]}
+                        prevSrc={images[(photoIndex + images.length - 1) % images.length]}
+                        onCloseRequest={() => this.setState({ isOpen: false })}
+                        onMovePrevRequest={() =>
+                            this.setState({
+                                photoIndex: (photoIndex + images.length - 1) % images.length
+                            })
+                        }
+                        onMoveNextRequest={() =>
+                            this.setState({
+                                photoIndex: (photoIndex + 1) % images.length
+                            })
+                        }
+                    />
+                )}
             </div>
         );
 

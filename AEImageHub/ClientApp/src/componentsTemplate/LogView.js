@@ -6,6 +6,8 @@ import {getCredentials, getToken, isAdmin} from '../adalConfig';
 import { Redirect } from 'react-router-dom'
 import { Button } from 'semantic-ui-react'
 
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
 
 export class LogView extends Component {
     constructor(props) {
@@ -18,7 +20,9 @@ export class LogView extends Component {
             admin: false,
             validId: false,
             userId: "",
-            logid: JSON.parse(params.get('src'))
+            logid: JSON.parse(params.get('src')),
+            photoIndex: 0,
+            isOpen: false
         };
         
         this.getLogImages = this.getLogImages.bind(this);
@@ -79,11 +83,39 @@ export class LogView extends Component {
     }
     
     renderFunction() {
+        const { photoIndex, isOpen } = this.state;
+        let images = [];
+        this.state.images.map((i) =>
+            images.push("/api/image/" + i)
+        );
+        console.log(images);
+        
         return (
             <div>
             {this.renderRedirect()}
-                <div className="submit-container">
+                <div className="fnbar">
                     <Button onClick={this.onCancel} primary>Back</Button>
+                    <button type="button" onClick={() => this.setState({ isOpen: true })}>
+                        Zoom
+                    </button>
+                    {isOpen && (
+                        <Lightbox
+                            mainSrc={images[photoIndex]}
+                            nextSrc={images[(photoIndex + 1) % images.length]}
+                            prevSrc={images[(photoIndex + images.length - 1) % images.length]}
+                            onCloseRequest={() => this.setState({ isOpen: false })}
+                            onMovePrevRequest={() =>
+                                this.setState({
+                                    photoIndex: (photoIndex + images.length - 1) % images.length
+                                })
+                            }
+                            onMoveNextRequest={() =>
+                                this.setState({
+                                    photoIndex: (photoIndex + 1) % images.length
+                                })
+                            }
+                        />
+                    )}
                 </div>
             
             </div>
@@ -94,6 +126,7 @@ export class LogView extends Component {
         const listItems = this.state.images.map((i) =>
             <li><img src={"/api/image/" + i} alt="" className="img-responsive" width="800px" height="800px"/><br/></li>
         );
+        
         return (
             <div>
                 <p>{this.state.images.length + " Image(s) submitted"}</p>

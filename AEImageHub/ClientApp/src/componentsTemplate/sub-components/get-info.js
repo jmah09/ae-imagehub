@@ -9,6 +9,9 @@ import axios from 'axios';
 
 import './get-info.css';
 
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+
 export class GetInfo extends Component {
 
   constructor(props)
@@ -26,7 +29,9 @@ export class GetInfo extends Component {
 
       redirectLink: props.location.state.redirectLink,
       redirectOption: false,
-      redirect: false
+      redirect: false,
+      photoIndex: 0,
+      isOpen: false
     }
 
     this.getClassification();
@@ -152,22 +157,51 @@ export class GetInfo extends Component {
   // render
   //
   render() {
+    
+    
     return (
       <div>
         <Title title='GET INFO' />
         {this.renderRedirect()}
         {this.renderFunction()}
         {this.renderGetInfo()}
+        
       </div>
     );
   }
   
   renderFunction()
   {
+    const { photoIndex, isOpen } = this.state;
+    let images = [];
+    this.state.photos.map((i) =>
+        images.push(i.src)
+    );
     return (
       <div className="fnbar">
         <button onClick={this.onCancel}>Cancel</button>
         <button onClick={this.onSave}>Save</button>
+        <button type="button" onClick={() => this.setState({ isOpen: true })}>
+          Zoom
+        </button>
+        {isOpen && (
+            <Lightbox
+                mainSrc={images[photoIndex]}
+                nextSrc={images[(photoIndex + 1) % images.length]}
+                prevSrc={images[(photoIndex + images.length - 1) % images.length]}
+                onCloseRequest={() => this.setState({ isOpen: false })}
+                onMovePrevRequest={() =>
+                    this.setState({
+                      photoIndex: (photoIndex + images.length - 1) % images.length
+                    })
+                }
+                onMoveNextRequest={() =>
+                    this.setState({
+                      photoIndex: (photoIndex + 1) % images.length
+                    })
+                }
+            />
+        )}
       </div>
     );
   
