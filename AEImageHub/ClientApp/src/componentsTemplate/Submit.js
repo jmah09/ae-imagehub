@@ -95,7 +95,7 @@ export class Submit extends Component {
         })
     }
 
-    onSubmit(event){
+    onSubmit(){
         if(!this.state.project){
             alert("please select a project");
             return;
