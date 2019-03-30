@@ -54,7 +54,7 @@ export class LogView extends Component {
 
                 <div>
                     <div>
-                        <Title title='SUBMIT IMAGES'/>
+                        <Title title='SUBMISSION LOG'/>
                         <div>{this.renderFunction()}</div>
                     </div>
                 </div>
