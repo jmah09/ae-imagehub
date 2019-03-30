@@ -6,6 +6,8 @@ using AEImageHub.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,26 +22,24 @@ namespace ImageServer.Controllers
     public class SubmissionController : Controller
     {
         private readonly ihubDBContext _context;
-        private readonly IImageRepository _repo;
-
-        
+ 
+    
         public SubmissionController(ihubDBContext context, IImageRepository repo)
         {
             _context = context;
-            _repo = repo;
         }
    
         /*
         Post
-        API Endpoint: api/image/:image_id
+        API Endpoint: api/submit
         Description: Submits images to a project
         */
         [HttpPost("")]
         public Object SubmitImage([FromBody] Submission submission)
         {
-            Log dbLog = GenerateLog();
+            Log dbLog = GenerateLog(submission.Images.Count.ToString() + " images submitted");
             List<Image> images = new List<Image>();
-            
+
             try
             {
                 _context.Add(dbLog);
@@ -49,17 +49,17 @@ namespace ImageServer.Controllers
             {
                 Console.Write(e);
                 return BadRequest("malform request log");
-            }           
-            
+            }
+
             foreach (string imageid in submission.Images)
-            {            
+            {
                 try
                 {
-                    Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                    Image image = (Image) _context.Image.Where(i => i.IId == imageid).First();
                     image.Submitted = true;
-                    ProjectLink dbProjectLink = GenerateProjectLink(image, submission.Project);                                
+                    ProjectLink dbProjectLink = GenerateProjectLink(image, submission.Project);
                     LogLink dbLogLink = GenerateLogLink(image, dbLog);
-                    
+
                     _context.Add(dbLogLink);
                     _context.Add(dbProjectLink);
                     _context.SaveChanges();
@@ -70,6 +70,18 @@ namespace ImageServer.Controllers
                     return BadRequest("malform request project");
                 }
             }
+
+            try
+            {
+               var username = HttpContext.User.FindFirstValue("name");
+               var logLink = "https://aeimagehub.azurewebsites.net/logview?src=%22" + dbLog.LId +"%22";
+                sendEmail(User.FindFirst(ClaimTypes.Email)?.Value, username, logLink);
+            }
+            catch (Exception e)
+            {
+                Console.Write(e.Message);
+            }
+
             return Ok();
         }
 
@@ -82,14 +94,15 @@ namespace ImageServer.Controllers
             };
         }
 
-        private Log GenerateLog()
+        private Log GenerateLog(string logContext)
         {
+            string[] uuid = Guid.NewGuid().ToString().Split("-");
             return new Log()
             {
-                LId = "log_" + Guid.NewGuid().ToString().Split("-")[-1],
+                LId = "log_" + uuid[uuid.Length-1],
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
                 CreatedDate =  DateTime.Now,
-                LogFile = "submit"
+                LogFile = logContext
             };
         }
 
@@ -101,7 +114,33 @@ namespace ImageServer.Controllers
                 LId = log.LId
             };
         }
-       
+
+        private void sendEmail(string address, string username, string logLink)
+        {
+            var fromAddress = new MailAddress("nlgpsag@gmail.com", "iHub");
+            var toAddress = new MailAddress(address, username);
+            const string password = "ulxozhttrefuudqs";
+            const string subject = "Imagehub Submission Log";
+            var body = "Hello " + username + "\nHere is your submission log " + logLink;
+            
+            var client = new SmtpClient {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network, 
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, password)
+            };
+            
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                client.Send(message);
+            }
+        }
     }
 }
 

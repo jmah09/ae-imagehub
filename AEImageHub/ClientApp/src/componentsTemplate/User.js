@@ -22,19 +22,24 @@ export class User extends Component {
         this.props.history.push("/palette?" + userid);
     }
 
+    viewTrash(userid) {
+        this.props.history.push("/trash?" + userid);
+    }
+
     makeAdmin(userId) {
         console.log(userId);
         axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res=> {
             console.log(res);
         alert("The selected User has been made an admin.");
-    })
+      })
     }
 
     getUsers() {
         axios.get("/api/graph", { headers: { 'Authorization': "bearer " + getToken() } })
             .then(res => {
             var users = [];
+            console.log(res);
         res.data.map((user, index) => {
             users.push({
                 name: user.displayName, email: user.mail, uid: user.id, userPrincipalName: user.userPrincipalName
@@ -98,11 +103,10 @@ export class User extends Component {
         </button>
         </div>)
     });
-
-        // TODO
+        
         sub_columns.push({
             id: 'button2',
-            accessor: 'userPrincipalName',
+            accessor: 'uid',
             Cell: ({value}) => (<div className="fnbar">
             <button onClick={() => {
             this.viewPalette(value);
@@ -111,6 +115,18 @@ export class User extends Component {
         </button>
         </div>)
     });
+
+        sub_columns.push({
+            id: 'button3',
+            accessor: 'uid',
+            Cell: ({value}) => (<div className="fnbar">
+                <button onClick={() => {
+                    this.viewTrash(value);
+                    // TODO
+                }}>VIEW TRASH
+                </button>
+            </div>)
+        });
 
 
         return (

@@ -42,9 +42,21 @@ namespace AEImageHub.Controllers
             //TODO: currently the other users can access others palette 
             try
             {
-                var images = _context.Image.Where(i => i.UId == userid && !i.Trashed && !i.Submitted)
-                                           .Include(i => i.ProjectLink)
-                                           .Include(i => i.TagLink);
+                var images = _context.Image.Select(i => new Image
+                {
+                    IId = i.IId,
+                    UId = i.UId,
+                    ImageName = i.ImageName,
+                    Size = i.Size,
+                    UploadedDate = i.UploadedDate,
+                    Type = i.Type,
+                    Trashed = i.Trashed,
+                    TrashedDate = i.TrashedDate,
+                    Submitted = i.Submitted,
+                    U = i.U,
+                    ProjectLink = i.ProjectLink,
+                    TagLink = i.TagLink
+                }).Where(i => i.UId == userid && !i.Trashed && !i.Submitted);
                 return JsonConvert.SerializeObject(images); //user's images
             }
             catch(Exception e)
@@ -110,14 +122,14 @@ namespace AEImageHub.Controllers
         */
 
         [HttpPost("")]
-        public void PostUser([FromBody] JObject payload)
+        public void PostUser()
         {
             User user = new User()
             {
                 UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
-                UserName = (string)payload["UserName"], //todo 'name or username
-                Role = (string)payload["Role"],
-                Active = (bool)payload["Active"],
+                UserName = HttpContext.User.FindFirstValue("name"), //todo 'name or username
+                Role = "too",
+                Active = true,
             };
             _context.User.Add(user);
             _context.SaveChanges();

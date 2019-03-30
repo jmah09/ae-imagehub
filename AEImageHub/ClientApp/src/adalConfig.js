@@ -2,7 +2,7 @@ import { AuthenticationContext, adalFetch, withAdalLogin } from 'react-adal';
 
 // todo : change (tenant and api) to ae.onmicrosoft.com once domain has been established
 // todo : document this
-const adalConfig = {
+export const adalConfig = {
     tenant: 'gwangjaehotmail.onmicrosoft.com',
     clientId: 'a42cbd10-bbd7-414f-b9f8-733274fea3c1',
     endpoints: {
@@ -37,3 +37,7 @@ export const adalApiFetch = (fetch, url, options) =>
 adalFetch(authContext, adalConfig.endpoints.api, fetch, url, options);
 
 export const withAdalLoginApi = withAdalLogin(authContext, adalConfig.endpoints.api);
+
+export const getUser = () => {
+    return authContext.getCachedUser();
+};

@@ -181,6 +181,7 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
 
+        [Authorize (Policy = "Admins")]
         [HttpDelete(("{uri}"))]
         public IActionResult DeleteImage(string uri)
         {

@@ -17,7 +17,6 @@ export class Submit extends Component {
     constructor(props) {
         super(props);
         let params = new URLSearchParams(window.location.search);
-        console.log(JSON.parse(params.get('src')));
         this.state = {
             images: JSON.parse(params.get('src')),
             redirect: false,
@@ -28,13 +27,10 @@ export class Submit extends Component {
             projectOptions: []
         };
         
-        this.GetUserImages = this.GetUserImages.bind(this);
         this.getProjectOptions = this.getProjectOptions.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.onDropdownChange = this.onDropdownChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
-        
-        this.GetUserImages();
         this.componentDidMount();
 
         this.getProjectOptions();
@@ -44,31 +40,7 @@ export class Submit extends Component {
         let param = this.props.location.search;
         this.state.userId = param.substring(1, param.indexOf("@"));
         this.state.admin = isAdmin(getToken());
-        console.log(this.state.admin);
         // todo valid id logic [have to change db]
-    }
-
-    // get Images with the userid
-    GetUserImages() {
-        // todo hardcoded for now
-        let token = getToken();
-        let userid = getCredentials(token).name;
-        console.log(userid);
-        if (this.state.admin) { 
-            // todo add check for validId
-            console.log("ok");
-            //userid = this.state.userId
-        }
-        axios.get("/api/user/" + userid + "/images", {headers: {'Authorization': "bearer " + token}})
-            .then(res => {
-                var images = [];
-                res.data.map((image, index) => {
-                    images.push({
-                        src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-                    });
-                })
-                this.setState({photos: images})
-            })
     }
     
     getProjectOptions(){
@@ -124,9 +96,6 @@ export class Submit extends Component {
         for(let i = 0 ; i < this.state.images.length ; i++){
             images.push(this.state.images[i].meta.IId);
         }
-
-        console.log("123456");
-        console.log({ images: images, project: this.state.project});
         axios({
             url: '/api/submit',
             method: 'POST',

@@ -14,6 +14,8 @@ import { User } from './componentsTemplate/User';
 import { Upload } from './componentsTemplate/Upload';
 import { ImageEditor } from './componentsTemplate/ImageEditor'
 import { Submit } from './componentsTemplate/Submit'
+import { LogView } from './componentsTemplate/LogView'
+import {GetInfoTrash} from "./componentsTemplate/sub-components/get-info-trash";
 
 export default class App extends Component {
     displayName = App.name
@@ -27,8 +29,10 @@ export default class App extends Component {
                 <Route path='/upload' component={Upload} />
                 <Route path='/palette' component={Palette} />
                 <Route path='/getinfo' component={GetInfo} />
+                <Route path='/trashinfo' component={GetInfoTrash} />
                 <Route path='/edit' component={ImageEditor} />
                 <Route path='/log' component={Log} />
+                <Route path='/logview' component={LogView} />
                 <Route path='/trash' component={Trash} />
                 <Route path='/project' component={Project} />
                 <Route path='/metadata' component={Metadata} />

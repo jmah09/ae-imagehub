@@ -4,7 +4,9 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import { getCredentials, getToken } from '../adalConfig';
+import {authContext, getCredentials, getToken, isAdmin, adalConfig} from '../adalConfig';
+import {Redirect} from "react-router-dom";
+import {adalGetToken} from "react-adal";
 
 export class Trash extends Component {
     constructor(props) {
@@ -17,15 +19,32 @@ export class Trash extends Component {
             selectAll: false,
             showInfo: false,
             redirect: false,
+            redirectLink: '',
+            redirectOption: 0,
+            admin: false,
+            validId: false,
+            userId: ""
         };
 
         this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
         this.RecoverSelectedImages = this.RecoverSelectedImages.bind(this);
+        this.renderRedirect = this.renderRedirect.bind(this);
+        this.deleteSelected = this.deleteSelected.bind(this);
 
-
+        this.componentDidMount();
         this.GetUserTrashedImages();
     }
 
+    componentDidMount()
+    {
+        let param = this.props.location.search;
+        this.state.validId = param.includes("?"); // todo : temp fix
+        this.state.userId = param.substring(1);
+        this.state.admin = isAdmin(getToken());
+        console.log("isAdminTrash ? " + this.state.admin);
+        // todo valid id logic [have to change db]
+    }
+    
     selectPhoto(event, obj) {
         console.log(obj);
         let photos = this.state.photos;
@@ -39,11 +58,44 @@ export class Trash extends Component {
     });
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
     }
+    
+
+    deleteSelected() {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        selected.map((image, index) => {
+            image.meta.Trashed = false;
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token){
+                    axios.delete("api/image/" + image.meta.IId, { headers: { 'Authorization': "bearer " + token } })
+                        .then(function (res) {
+                            window.location.reload();
+                        }).catch(function (err) {
+                        console.log(err.response);
+                    });
+                });
+        })
+    }
+    
 
     // get Images with the userid
     GetUserTrashedImages() {
         let token = getToken();
         let userid = getCredentials(token).oid;
+
+
+        // TODO -- add check for validId
+        if (this.state.admin && this.state.validId)
+        {
+            userid = this.state.userId;
+        }
+        
         axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
             .then(res => {
             var images = [];
@@ -81,12 +133,63 @@ export class Trash extends Component {
     })
     }
 
+    renderRedirect()
+    {
+        let redirectLink;
+
+        switch (this.state.redirectOption)
+        {
+            case 1: // get info
+                redirectLink = 'trashinfo';
+                if (this.state.redirect)
+                {
+                    const selected = this.state.photos.filter((value, index, array) => {
+                        return value.selected;
+                    });
+                    return <Redirect to={{
+                        pathname: redirectLink,
+                        state: {
+                            photos: selected,
+                            redirectLink: 'trash'
+                        }}} />;
+                }
+                break;
+            case 2: // edit image
+                redirectLink = 'edit?src=' + this.state.redirectLink;
+                break;
+            case 3:
+                redirectLink = 'submit?src=' + this.state.redirectLink;
+        }
+
+        if (this.state.redirect)
+        {
+            return <Redirect to={redirectLink} />;
+        }
+    }
+    
+    onGetInfo = () =>
+    {
+        const selected = this.state.photos.filter((value) => { return value.selected; });
+
+        if (selected.length > 0 && !this.state.showInfo)
+        {
+            this.setState({
+                redirectLink: '',
+                redirectOption: 1,
+                redirect: true
+            });
+            return;
+        }
+
+        alert("Please select image(s).");
+    };
+
     render() {
         return (
             <div>
             <div>
             <div>
-            <Title title='PALETTE' />
+            <Title title='TRASH' />
             <div>{this.renderFunction()}</div>
             </div>
             </div>
@@ -99,12 +202,24 @@ export class Trash extends Component {
 
     // TODO
     renderFunction() {
-        return (
-            <div class="fnbar">
-            <button>Get Info</button>
-        <button onClick={this.RecoverSelectedImages}>Recover</button>
-            </div>
-    )
+        if (isAdmin(getToken())) {
+            return (
+                <div class="fnbar">
+                    {this.renderRedirect()}
+                    <button onClick={this.onGetInfo}>Get Info</button>
+                    <button onClick={this.RecoverSelectedImages}>Recover</button>
+                    <button onClick={this.deleteSelected}>Delete</button>
+                </div>
+            )
+        } else {
+            return (
+                <div class="fnbar">
+                    {this.renderRedirect()}
+                    <button onClick={this.onGetInfo}>Get Info</button>
+                    <button onClick={this.RecoverSelectedImages}>Recover</button>
+                </div>
+            )
+        }
     }
 
     // TODO

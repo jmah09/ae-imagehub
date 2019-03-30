@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getCredentials, getToken, authContext} from '../adalConfig';
+import {getCredentials, getToken, authContext, getUser} from '../adalConfig';
 
 import './Main.css';
 
@@ -14,8 +14,7 @@ export class Header extends Component {
     // TODO
     render() {
 
-        let token = getToken();
-        let userid = getCredentials(token).name;
+        let userid = getUser().profile.name;
 
         return (
             <div id="Header">

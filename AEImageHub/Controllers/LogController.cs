@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using AEImageHub.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -37,9 +39,11 @@ namespace AEImageHub.Controllers
         [HttpGet("")]
         public Object GetLogs()
         {
+            
             try
             {
-                return JsonConvert.SerializeObject(_context.Log);
+                return JsonConvert.SerializeObject(_context.Log.
+                    Include(l => l.U));
             }
             catch(Exception e)
             {
