@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import ReactTable from 'react-table'
 import axios from 'axios'
-import { getToken } from '../adalConfig';
+import {adalConfig, authContext} from '../adalConfig';
+import {adalGetToken} from "react-adal";
 
 
 export class Metadata extends Component {
@@ -31,15 +32,20 @@ export class Metadata extends Component {
         let _tagLink = tagLink;         // array (probably empty?)
 
         let tagPayload = {TagName: _tagName, Description: _description, Active: _isActive, TagLink: _tagLink};
-        axios.put("api/tag/" + _tagName, tagPayload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully changed tag!");
-                console.log(res);
-            })
-            .catch(res => {
-                console.log("caught error for changing tag!");
-                console.log(res);
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.put("api/tag/" + _tagName, tagPayload, {headers: {'Authorization': "bearer " + token}})
+                    .then(res => {
+                        console.log("successfully changed tag!");
+                        console.log(res);
+                    })
+                    .catch(res => {
+                        console.log("caught error for changing tag!");
+                        console.log(res);
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
 
     changeMetaTag(metaName, isActive, isMandatory) {
@@ -51,15 +57,21 @@ export class Metadata extends Component {
         }
 
         let metaPayload = {MetaName: _metaName, Active: _isActive, Mandatory: _isMandatory};
-        axios.put("api/metadata/" + _metaName, metaPayload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully changed metadata!");
-                console.log(res);
-            })
-            .catch(res => {
-                console.log("caught error for changing metadata!");
-                console.log(res);
-            })
+        
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.put("api/metadata/" + _metaName, metaPayload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log("successfully changed metadata!");
+                        console.log(res);
+                    })
+                    .catch(res => {
+                        console.log("caught error for changing metadata!");
+                        console.log(res);
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
 
     createTag(tagName, description) {
@@ -72,44 +84,58 @@ export class Metadata extends Component {
         console.log("inside createTag!");
         console.log(tagPayload);
 
-        axios.post("api/tag", tagPayload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully created tag!");
-                // alert("New Classification Created. Name: " + this.state.newTag + ", Description: " + _description);
-                console.log(res);
-            })
-            .catch(res => {
-                console.log("caught error for creating tag!");
-                console.log(res);
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.post("api/tag", tagPayload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log("successfully created tag!");
+                        // alert("New Classification Created. Name: " + this.state.newTag + ", Description: " + _description);
+                        console.log(res);
+                    })
+                    .catch(res => {
+                        console.log("caught error for creating tag!");
+                        console.log(res);
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+        
     }
 
     componentDidMount() {
-        axios.get("/api/tag", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully grabbed tag!");
-                console.log("this is the result: ");
-                console.log(res.data);
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/tag", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log("successfully grabbed tag!");
+                        console.log("this is the result: ");
+                        console.log(res.data);
 
-                this.setState({classification: res.data});
-            })
-            .catch(res => {
-                console.log("caught error for getting tag!");
-                console.log(res);
-            });
+                        that.setState({classification: res.data});
+                    })
+                    .catch(res => {
+                        console.log("caught error for getting tag!");
+                        console.log(res);
+                    });
 
-        axios.get("/api/metadata", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully grabbed metadata!");
-                console.log("this is the result: ");
-                console.log(res.data);
+                axios.get("/api/metadata", { headers: { 'Authorization': "bearer " +  token } })
+                    .then(res => {
+                        console.log("successfully grabbed metadata!");
+                        console.log("this is the result: ");
+                        console.log(res.data);
 
-                this.setState({metadata: res.data});
-            })
-            .catch(res => {
-                console.log("caught error for getting tag!");
-                console.log(res);
-            });
+                        that.setState({metadata: res.data});
+                    })
+                    .catch(res => {
+                        console.log("caught error for getting tag!");
+                        console.log(res);
+                    });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+        
+        
         
         this.setState({showTags: true, showMeta: false, showAdd: false});
     }
