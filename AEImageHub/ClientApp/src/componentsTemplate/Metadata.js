@@ -15,11 +15,9 @@ export class Metadata extends Component {
             metadata: [],
             newTag: "",
             newDescription: "",
-            deleteTag: "",
             showTags: true,
             showMeta: false,
             showNew: true,
-            showDelete: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -85,10 +83,6 @@ export class Metadata extends Component {
                 console.log(res);
             })
     }
-    
-    deleteTag(tagToDelete) {
-        
-    }
 
     componentDidMount() {
         axios.get("/api/tag", { headers: { 'Authorization': "bearer " + getToken() } })
@@ -117,7 +111,7 @@ export class Metadata extends Component {
                 console.log(res);
             });
         
-        this.setState({showTags: true, showMeta: false, showAdd: false, showDelete: false});
+        this.setState({showTags: true, showMeta: false, showAdd: false});
     }
 
     render() {
@@ -154,9 +148,8 @@ export class Metadata extends Component {
 
 
     handleSubmit(event) {
-        console.log("Event: ");
-        console.log(event);
         let _description = this.state.newDescription;
+        
         if (_description === "") {
             _description = this.state.newTag;
         }
@@ -164,14 +157,10 @@ export class Metadata extends Component {
             this.createTag(this.state.newTag, _description);
             this.setState({newTag: ""});
         }
-        else if (this.state.newTag === "") {
-            if (!(this.state.deleteTag === "")) {
-                this.deleteTag(this.state.deleteTag);
-            }
-        }
         else {
             alert("Please input name for new classification.");
         }
+        
     }
 
 
@@ -179,8 +168,7 @@ export class Metadata extends Component {
         return (
             <div>
                 <div className="fnbar">
-                    <button onClick={()=>{this.setState({showDelete: !this.state.showDelete, showAdd: false});}}>DELETE CLASSIFICATION</button>
-                    <button onClick={()=>{this.setState({showAdd: !this.state.showAdd, showDelete: false});}}>ADD CLASSIFICATION</button>
+                    <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>ADD CLASSIFICATION</button>
                 </div>
                 <div className={this.state.showAdd ? '' : 'hidden'}>
                     <br />
@@ -204,21 +192,6 @@ export class Metadata extends Component {
                     <br />
                     <br />
                 </div>
-                <div className={this.state.showDelete ? '' : 'hidden'}>
-                    <br />
-                    <form onSubmit={this.handleSubmit} className="handleTag">
-                        DELETE CLASSIFICATION
-                        <br />
-                        Name of Classification to delete:
-                        <label>
-                            <input type="text" name="newTag" color={'black'} value={this.state.deleteTag} onChange={this.handleChange} />
-                        </label>
-                        <input type="submit" value="DELETE"/>
-                    </form>
-                    <br />
-                    <br />
-                    <br />
-                </div>
             </div>
         )
     }
@@ -226,10 +199,9 @@ export class Metadata extends Component {
     // TODO
     renderMetadata() {
         if(this.state) {
-            console.log("this is metadata!");
-            console.log(this.state.metadata);
+            // console.log("this is metadata!");
+            // console.log(this.state.metadata);
             const metadata = this.state.metadata;
-            console.log(metadata);
 
 
             const statusStyle = {
