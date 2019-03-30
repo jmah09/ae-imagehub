@@ -96,7 +96,7 @@ export class LogView extends Component {
         );
         return (
             <div>
-                <p>{this.state.images.length + " Images submitted"}</p>
+                <p>{this.state.images.length + " Image(s) submitted"}</p>
                 <ul>{listItems}</ul>
             </div>
         );
