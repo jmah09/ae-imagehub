@@ -181,7 +181,7 @@ export class GetInfo extends Component {
 
     const class_options = this.state.classification;
     class_options[''] = placeholder;
-
+    
     return (
       <div id="getinfo">
           <div className="float-left">
@@ -213,7 +213,7 @@ export class GetInfo extends Component {
               <TextInput 
                 disabled={true}
                 id='getinfo_user'
-                value={selected.length > 1 ? 'Various' : selected[0].meta.UId} // TODO -- GET USERNAME
+                value={selected.length > 1 ? 'Various' : selected[0].meta.U.UserName} // TODO -- GET USERNAME
                 onChange={null} />
               <br />
             </p>
