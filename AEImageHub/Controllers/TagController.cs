@@ -131,7 +131,7 @@ namespace AEImageHub.Controllers
         */
 
         [HttpPost("")]
-        public Object PostLTagLink([FromBody] JObject payload)
+        public Object PostTagLink([FromBody] JObject payload)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace AEImageHub.Controllers
         /*
         DELETE
         API Endpoint: api/tag/taglink/:imageid
-        Description: Deletes taglink from the server
+        Description: Deletes taglink of imageid from the server
         Request Requirements:
         1. User JWT in header field
 
@@ -161,20 +161,25 @@ namespace AEImageHub.Controllers
         200 - taglink delete was successful
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         */
-        /*
-        [HttpPost("{imageid}")]
+        
+        [HttpDelete("{imageid}")]
         public Object DeleteTagLink(string imageid)
         {
             try
             {
-                TagLink taglinks = _context
+                var taglinks = _context.TagLink.Where(tl => tl.IId == imageid);
+                foreach (var tl in taglinks)
+                {
+                    _context.TagLink.Remove(tl);
+                }
+                _context.SaveChanges();
+                return ("delete taglinks success");
             }
             catch (Exception e)
             {
                 return e;
             }
         }
-        */
     }
 
 }
