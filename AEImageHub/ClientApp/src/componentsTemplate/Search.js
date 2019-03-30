@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import { Dropdown } from './sub-components/form-dropdown';
 import { TextInput } from './sub-components/form-text-input';
-import {adalConfig, authContext} from '../adalConfig';
+import { adalConfig, authContext, getUser } from '../adalConfig';
+import { adalGetToken } from "react-adal";
 import axios from 'axios';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
@@ -10,7 +11,6 @@ import { Redirect } from 'react-router-dom';
 
 import '../index.css';
 import './Search.css';
-import {adalGetToken} from "react-adal";
 
 export class Search extends Component {
 
@@ -21,7 +21,6 @@ export class Search extends Component {
     super(props);
 
     this.state = {
-      query: [],
       option: '',
       input_1: '',
       input_2: '',
@@ -31,10 +30,14 @@ export class Search extends Component {
       showResults: false,
 
       photos: [],
+      query: [],
+      filteredPhotos: [],
       selectAll: false,
 
       redirect: false
     };
+
+    console.log(this.state.filteredPhotos.length)
 
     this.dropdown_options = {
       '': ['Select Option', null],
@@ -65,7 +68,8 @@ export class Search extends Component {
     let request_query = '';
     let photos = [];
 
-    switch (this.state.option) {
+    switch (this.state.option)
+    {
       case 'Name':
         request_query = "/api/search/image/" + this.state.input_1;
         break;
@@ -86,53 +90,69 @@ export class Search extends Component {
     }
 
     adalGetToken(authContext, adalConfig.endpoints.api)
-        .then(function (token) {
-          const request_param = {headers: {'Authorization': "bearer " + token}};
-          axios.get(request_query, request_param)
-              .then((res) => {
-                console.log("RESULT : " + JSON.stringify(res.data));
+      .catch(() => { console.log("Error: Couldn't get token"); })
+      .then((token) => {
+        const request_param = {headers: {'Authorization': "bearer " + token}};
 
-                photos = res.data.map((image, index) => {
-                  photos.push({
-                    src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-                  });
-                });
-              })
-              .catch((err) => {
-                console.log(err.message);
-              });
-        }).catch(function (err) {
-      console.log("Error: Couldn't get token")
-    });
-
-    this.setState({photos: photos});
+        axios.get(request_query, request_param)
+          .catch((err) => { console.log(err.message); })
+          .then((res) => {
+            photos = res.data.map((image, index) => {
+              return { src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image };
+            });
+            console.log(JSON.stringify('1'+photos));
+            this.setState({
+              filteredPhotos: photos,
+              photos: photos,
+              showResults: true
+            });
+          });
+      })
+      .catch((err) => { console.log(err.message); });
   }
 
   handleSubmit = () => 
   {
-    const selected = this.state.photos.filter((value) => { return value.selected; });
+    let selected = this.state.photos.filter((value) => { return value.selected; });
+    let promise = [];
 
-    for (let i = 0; i < selected.length; i++) {
-      adalGetToken(authContext, adalConfig.endpoints.api)
+    for (let i = 0; i < selected.length; i++)
+    {
+      promise.push(
+        new Promise((resolve, reject) => {
+          adalGetToken(authContext, adalConfig.endpoints.api)
           .then(function (token) {
+
             const request_param = {headers: {'Authorization': "bearer " + token}};
-            axios.put("/api/image/" + selected[0].meta.IId, {
+            let image = selected[i].meta;
+  
+            axios.put("/api/image/" + image.IId, {
+              UId: getUser().profile.oid,
               ImageName: null,
               Trashed: null,
-              Submitted: false
-            }, request_param)
-                .then(response => {
-                  console.log(response);
-                })
-                .catch(error => {
-                  console.log(error);
-                });
-          }).catch(function (err) {
-        console.log("Error: Couldn't get token")
-      });
+              Submitted: 'False'
+              }, request_param
+            )
+            .then((res) => {
+              console.log(res); 
+              resolve();
+            })
+            .catch((err) => {
+              console.log(err);
+              reject();
+            });
 
+          })
+          .catch(function () {
+            console.log("Error: Couldn't get token");
+            reject();
+          });          
+        })
+      )
     }
-    this.setState({ redirect: true });
+
+    Promise.all(promise)
+    .then(() => { this.setState({ redirect: true }); });
   }
 
   //
@@ -158,15 +178,15 @@ export class Search extends Component {
     this.setState({ [e.target.id]: e.target.value });
   }
 
-  buildQuery = (e) =>
+  buildQuery = () =>
   {
     let input_1 = this.state.input_1 !== '' ? this.state.input_1 : null;
     let input_2 = this.state.input_1 !== '' ? this.state.input_2 : null;
 
     if (this.state.option === 'Date')
     {
-      input_1 = parseInt(input_1);
-      input_2 = parseInt(input_2);
+      input_1 = parseInt(input_1, 10);
+      input_2 = parseInt(input_2, 10);
     }
 
     let res = {
@@ -199,26 +219,18 @@ export class Search extends Component {
       return;
     }
 
-    let allQuery = this.state.query;
-    allQuery.push(curQuery);
+    this.getSearch()
 
-    this.setState({
-      query: allQuery,
-      input_1: '',
-      input_2: '',
-
-      showResults: true
-    });
-
-    this.getSearch();
-
-    while(this.state.photos.length < 1)
+    // TODO
+    while(!this.state.showResults)
     {
       await this.sleep(300);
     }
 
-    console.log('test')
-    this.setState({});
+    this.setState({
+      input_1: '',
+      input_2: ''
+    });
   }
 
   sleep(ms) {
@@ -231,47 +243,99 @@ export class Search extends Component {
 
     let curQuery = this.buildQuery();
 
+    if (this.state.option === '')
+    {
+      alert('Please select an option.');
+      return;
+    }
+
     if (!curQuery.input_1)
     {
       return;
     }
 
     if (this.state.option === 'Date' && (!curQuery.input_1 || !curQuery.input_2))
-   {
+    {
       alert('Please search with the correct date format: yyyymmdd');
       return;
     }
 
+    let filteredPhotos = this.state.filteredPhotos.filter((item) => {
+      let res = false;
+
+      switch (this.state.option)
+      {
+        case 'Name':
+           res = item.meta.ImageName.includes(this.state.input_1);
+           break;
+        case 'Classification':
+          for (let i = 0; i < item.TagLink.length; i++)
+          {
+            if (item.meta.TagLink[i].toLowerCase() === this.state.input_1.toLowerCase())
+            {
+              res = true;
+            }
+          }
+          break;
+        case 'Project':
+          for (let i = 0; i < item.ProjectLink.length; i++)
+          {
+            if (item.meta.ProjectLink[i].toLowerCase() === this.state.input_1.toLowerCase())
+            {
+              res = true;
+            }
+          }
+          break;
+        case 'User':
+          res = item.meta.UserName.toLowerCase() === this.state.input_1.toLowerCase();
+        case 'Date':
+          // TODO
+          break;
+        default:
+          break;
+      }
+
+      return res;
+    });
+
+    console.log(JSON.stringify(this.filteredPhotos));
+
+    // add query
     let allQuery = this.state.query;
     allQuery.push(curQuery);
 
     this.setState({
       query: allQuery,
       input_1: '',
-      input_2: ''
-    });
+      input_2: '',
 
-    this.getSearch();
+      filteredPhotos: filteredPhotos
+    });
 
     console.log(JSON.stringify(this.state.query, null, 4));
   }
 
+  onRemoveFilter = () =>
+  {
+    //
+  }
+
   selectPhoto = (e, obj) =>
   {
-    let photos = this.state.photos;
+    let photos = this.state.filteredPhotos;
     photos[obj.index].selected = !photos[obj.index].selected;
 
-    this.setState({ photos });
+    this.setState({ filteredPhotos: photos });
   }
 
   toggleSelect = () => 
   {
-    let photos = this.state.photos.map((photo, index) => {
+    let photos = this.state.filteredPhotos.map((photo, index) => {
       return {...photo, selected: !this.state.selectAll};
     });
 
     this.setState({
-      photos: photos,
+      filteredPhotos: photos,
       selectAll: !this.state.selectAll
     });
   }
@@ -302,14 +366,14 @@ export class Search extends Component {
     );
   }
 
-  renderFunction()
+  renderFunction = () =>
   {
-    if (this.state.showResults && this.state.photos.length > 0)
+    if (this.state.showResults && this.state.filteredPhotos.length > 0)
     {
       return (
         <div className="fnbar">
           <button onClick={this.handleSubmit}>Add To Palette</button>
-          <button>Get Info</button>
+          <button>WIP: Get Info</button>
           <button onClick={this.toggleSelect}>Select All</button>
         </div>
       );
@@ -354,14 +418,14 @@ export class Search extends Component {
   {
     if (this.state.showResults)
     {
-      if (this.state.photos.length > 0)
+      if (this.state.filteredPhotos.length > 0)
       {
         return (
           <div id="search-content">
-            <p>Found {this.state.photos.length} results.</p>
-            {this.state.photos.length > 0
+            <p>Found {this.state.filteredPhotos.length} results.</p>
+            {this.state.filteredPhotos.length > 0
               ? <Gallery
-                photos={this.state.photos}
+                photos={this.state.filteredPhotos}
                 columns={4}
                 onClick={this.selectPhoto}
                 ImageComponent={SelectedImage}
@@ -378,22 +442,4 @@ export class Search extends Component {
       return null;
     }
   }
-}
-
-export class SearchButton extends Component {
-
-  constructor(props)
-  {
-
-    super(props);
-
-  }
-
-  render()
-  {
-    return (
-      <button type="submit" onClick={this.props.onClick}>{this.props.name}</button>
-    );
-  }
-
 }
