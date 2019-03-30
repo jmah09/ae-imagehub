@@ -4,8 +4,9 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import {getCredentials, getToken, isAdmin} from '../adalConfig';
+import {authContext, getCredentials, getToken, isAdmin, adalConfig} from '../adalConfig';
 import {Redirect} from "react-router-dom";
+import {adalGetToken} from "react-adal";
 
 export class Trash extends Component {
     constructor(props) {
@@ -28,7 +29,7 @@ export class Trash extends Component {
         this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
         this.RecoverSelectedImages = this.RecoverSelectedImages.bind(this);
         this.renderRedirect = this.renderRedirect.bind(this);
-
+        this.deleteSelected = this.deleteSelected.bind(this);
 
         this.componentDidMount();
         this.GetUserTrashedImages();
@@ -57,6 +58,31 @@ export class Trash extends Component {
     });
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
     }
+    
+
+    deleteSelected() {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        selected.map((image, index) => {
+            image.meta.Trashed = false;
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token){
+                    axios.delete("api/image/" + image.meta.IId, { headers: { 'Authorization': "bearer " + token } })
+                        .then(function (res) {
+                            alert("Delete Succesful");
+                        }).catch(function (err) {
+                        console.log(err.response);
+                    });
+                });
+        })
+    }
+    
 
     // get Images with the userid
     GetUserTrashedImages() {
@@ -176,13 +202,24 @@ export class Trash extends Component {
 
     // TODO
     renderFunction() {
-        return (
-            <div class="fnbar">
-                {this.renderRedirect()}
-                <button onClick={this.onGetInfo}>Get Info</button>
-                <button onClick={this.RecoverSelectedImages}>Recover</button>
-            </div>
-    )
+        if (isAdmin(getToken())) {
+            return (
+                <div class="fnbar">
+                    {this.renderRedirect()}
+                    <button onClick={this.onGetInfo}>Get Info</button>
+                    <button onClick={this.RecoverSelectedImages}>Recover</button>
+                    <button onClick={this.deleteSelected}>Delete</button>
+                </div>
+            )
+        } else {
+            return (
+                <div class="fnbar">
+                    {this.renderRedirect()}
+                    <button onClick={this.onGetInfo}>Get Info</button>
+                    <button onClick={this.RecoverSelectedImages}>Recover</button>
+                </div>
+            )
+        }
     }
 
     // TODO
