@@ -75,7 +75,7 @@ export class Trash extends Component {
                 .then(function (token){
                     axios.delete("api/image/" + image.meta.IId, { headers: { 'Authorization': "bearer " + token } })
                         .then(function (res) {
-                            alert("Delete Succesful");
+                            window.location.reload();
                         }).catch(function (err) {
                         console.log(err.response);
                     });
