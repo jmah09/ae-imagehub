@@ -15,22 +15,14 @@ export class Metadata extends Component {
             metadata: [],
             newTag: "",
             newDescription: "",
+            showTags: true,
+            showMeta: false,
+            showNew: true,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-
-    GetTags() {
-        axios.get("/api/tag", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("successfully grabbed tag!");
-                console.log(res);
-            })
-            .catch(res => {
-                console.log("caught error for getting tag!");
-                console.log(res);
-            })
-    };
+    
 
     changeActiveTag(tagName, isActive, description, tagLink) {
         let _tagName = tagName;         // string
@@ -118,24 +110,31 @@ export class Metadata extends Component {
                 console.log("caught error for getting tag!");
                 console.log(res);
             });
+        
+        this.setState({showTags: true, showMeta: false, showAdd: false});
     }
 
     render() {
 
         return (
             <div>
-                <Title title='MANAGEMENT: METADATA' />
-                {this.renderMetadata()}
-                <br />
-                <br />
-                <Title title='MANAGEMENT: CLASSIFICATION' />
-                {this.renderAddTag()}
-                <br />
-                <br />
-                <br />
-                <br />
-                <br />
-                {this.renderClassification()}
+                <div className={this.state.showTags ? '' : 'hidden'}>
+                    <Title title='MANAGEMENT: CLASSIFICATION' />
+                    <div className="fnbar">
+                        <button onClick={()=>{this.setState({showMeta: true, showTags: false});}}>Show Metadata</button>
+                        <button onClick={()=>{this.setState({showTags: true, showMeta: false});}}>Show Classification</button>
+                    </div>
+                    {this.renderAddTag()}
+                    {this.renderClassification()}
+                </div>
+                <div className={this.state.showMeta ? '' : 'hidden'}>
+                    <Title title='MANAGEMENT: METADATA' />
+                    <div className="fnbar">
+                        <button onClick={()=>{this.setState({showMeta: true, showTags: false});}}>Show Metadata</button>
+                        <button onClick={()=>{this.setState({showTags: true, showMeta: false});}}>Show Classification</button>
+                    </div>
+                    {this.renderMetadata()}
+                </div>
             </div>
         );
     }
@@ -150,36 +149,49 @@ export class Metadata extends Component {
 
     handleSubmit(event) {
         let _description = this.state.newDescription;
+        
         if (_description === "") {
             _description = this.state.newTag;
         }
         if (!(this.state.newTag === "")) {
             this.createTag(this.state.newTag, _description);
+            this.setState({newTag: ""});
         }
         else {
             alert("Please input name for new classification.");
         }
+        
     }
 
 
     renderAddTag() {
         return (
-            <div >
-                <br />
-                <form onSubmit={this.handleSubmit} className="addTag">
-                    ADD NEW CLASSIFICATION
+            <div>
+                <div className="fnbar">
+                    <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>ADD CLASSIFICATION</button>
+                </div>
+                <div className={this.state.showAdd ? '' : 'hidden'}>
                     <br />
-                    New Classification Name:
-                    <label>
-                        <input type="text" name="newTag" color={'black'} value={this.state.newTag} onChange={this.handleChange} />
-                    </label>
+                    <form onSubmit={this.handleSubmit} className="handleTag">
+                        ADD NEW CLASSIFICATION
+                        <br />
+                        New Classification Name:
+                        <label>
+                            <input type="text" name="newTag" color={'black'} value={this.state.newTag} onChange={this.handleChange} />
+                        </label>
+                        <br />
+                        New Description Name:
+                        <label>
+                            <input type="text" name="newDescription" color={'black'} value={this.state.newDescription} onChange={this.handleChange} />
+                        </label>
+                        <input type="submit" value="Add"/>
+                    </form>
                     <br />
-                    New Description Name:
-                    <label>
-                        <input type="text" name="newDescription" color={'black'} value={this.state.newDescription} onChange={this.handleChange} />
-                    </label>
-                    <input type="submit" value="Submit"/>
-                </form>
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                </div>
             </div>
         )
     }
@@ -187,10 +199,9 @@ export class Metadata extends Component {
     // TODO
     renderMetadata() {
         if(this.state) {
-            console.log("this is metadata!");
-            console.log(this.state.metadata);
+            // console.log("this is metadata!");
+            // console.log(this.state.metadata);
             const metadata = this.state.metadata;
-            console.log(metadata);
 
 
             const statusStyle = {
@@ -276,7 +287,7 @@ export class Metadata extends Component {
 
             const columns = [
                 {
-                    Header: 'Tag Name',
+                    Header: 'Classification Name',
                     accessor:'TagName'
                 },
                 {
