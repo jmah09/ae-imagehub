@@ -166,6 +166,8 @@ namespace ImageServer.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine("Reached 169");
+                Console.WriteLine(e.Message);
                 return e;
             }
         }

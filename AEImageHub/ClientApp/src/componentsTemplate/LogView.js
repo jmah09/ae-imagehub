@@ -38,13 +38,12 @@ export class LogView extends Component {
         
         this.getLogImages();
     }
-    
-    getLogImages() {
+
+    getLogImages(){
         const that = this;
-        console.log("/api/log/view/" + that.state.logid);
         adalGetToken(authContext, adalConfig.endpoints.api)
             .then(function (token) {
-                axios.get("/api/log/view/" + that.state.logid, {headers: {'Authorization': "bearer " + token}}).bind(this)
+                axios.get("/api/log/view/" + that.state.logid, { headers: { 'Authorization': "bearer " + token } })
                     .then(res => {
                         console.log(res.data);
                         let images = [];
@@ -57,10 +56,10 @@ export class LogView extends Component {
                     })
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
-        })
+        });
     }
-    
-    
+
+
 
     selectPhoto(event, obj) {
         let photos = this.state.images;
@@ -109,22 +108,30 @@ export class LogView extends Component {
 
     handleSubmit = () =>
     {
+        let that = this;
         const selected = this.state.images.filter((value) => { return value.selected; });
 
-        for (let i = 0; i < selected.length; i++)
-        {
-            axios.put("/api/image/" + selected[0].meta.IId, {
-                ImageName: null,
-                Trashed: null,
-                Submitted: false
-            })
-                .then(response => {
-                    console.log(response);
-                    this.setState({ redirect: true, redirectLink: "palette"});
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+        for (let i = 0; i < selected.length; i++) {
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    const request_param = {headers: {'Authorization': "bearer " + token}};
+                    axios.put("/api/image/" + selected[0].meta.IId, {
+                        UId: null,
+                        ImageName: null,
+                        Trashed: null,
+                        Submitted: false
+                    }, request_param)
+                        .then(response => {
+                            console.log(response);
+                            that.setState({ redirect: true, redirectLink: "palette"});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
+
         }
     }
     
@@ -147,7 +154,7 @@ export class LogView extends Component {
             <div>
             {this.renderRedirect()}
                 <div className="fnbar">
-                    <Button onClick={this.handleSubmit} primary>Add To Palette</Button>
+                    <Button onClick={this.handleSubmit} primary>Back To Palette</Button>
                     <Button onClick={this.onCancel} primary>Back</Button>
                     <button type="button" onClick={() => this.setState({ isOpen: true })}>
                         Zoom
@@ -183,10 +190,10 @@ export class LogView extends Component {
                 <p>{this.state.images.length + " Image(s) submitted"}</p>
                 <Gallery
                     photos={this.state.images}
-                    columns={3}
+                    columns={1}
                     onClick={this.selectPhoto}
                     ImageComponent={SelectedImage}
-                    margin={4}
+                    margin={6}
                     direction={"row"} />
             </div>
         );
