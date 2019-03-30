@@ -10,6 +10,9 @@ import { Button } from 'semantic-ui-react'
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
+import SelectedImage from './SelectedImage';
+import Gallery from './custom-photo-gallery';
+
 export class LogView extends Component {
     constructor(props) {
         super(props);
@@ -25,13 +28,17 @@ export class LogView extends Component {
             photoIndex: 0,
             isOpen: false
         };
-        
+
         this.getLogImages = this.getLogImages.bind(this);
+        this.selectPhoto = this.selectPhoto.bind(this);
+        this.toggleSelect = this.toggleSelect.bind(this);
         this.onCancel = this.onCancel.bind(this);
         this.componentDidMount();
+        this.handleSubmit = this.handleSubmit.bind(this);
+        
         this.getLogImages();
     }
-    
+
     getLogImages(){
         const that = this;
         adalGetToken(authContext, adalConfig.endpoints.api)
@@ -40,14 +47,31 @@ export class LogView extends Component {
                     .then(res => {
                         console.log(res.data);
                         let images = [];
-                        for(let i = 0 ; i < res.data.length; i++){
-                            images.push(res.data[i].IId);
-                        }
+                        res.data.map((image, index) => {
+                            images.push({
+                                src: "/api/image/" + image.IId, width: 1, height: 1, alt: image.IId, meta: image
+                            });
+                        });
                         that.setState({images:images});
                     })
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
         });
+    }
+
+
+
+    selectPhoto(event, obj) {
+        let photos = this.state.images;
+        photos[obj.index].selected = !photos[obj.index].selected;
+        this.setState({images: photos});
+    }
+
+    toggleSelect() {
+        let photos = this.state.images.map((photo, index) => {
+            return {...photo, selected: !this.state.selectAll};
+        });
+        this.setState({images: photos, selectAll: !this.state.selectAll});
     }
 
     componentDidMount() {
@@ -77,15 +101,44 @@ export class LogView extends Component {
     }
 
     renderRedirect = () => {
-        let redirectLink = 'log';
         if (this.state.redirect) {
-            return <Redirect to={redirectLink}/>
+            return <Redirect to={this.state.redirectLink}/>
+        }
+    }
+
+    handleSubmit = () =>
+    {
+        let that = this;
+        const selected = this.state.images.filter((value) => { return value.selected; });
+
+        for (let i = 0; i < selected.length; i++) {
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    const request_param = {headers: {'Authorization': "bearer " + token}};
+                    axios.put("/api/image/" + selected[0].meta.IId, {
+                        UId: null,
+                        ImageName: null,
+                        Trashed: null,
+                        Submitted: false
+                    }, request_param)
+                        .then(response => {
+                            console.log(response);
+                            that.setState({ redirect: true, redirectLink: "palette"});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
+
         }
     }
     
     onCancel(){
         this.setState({
-            redirect: true
+            redirect: true,
+            redirectLink: "log"
         })
     }
     
@@ -93,7 +146,7 @@ export class LogView extends Component {
         const { photoIndex, isOpen } = this.state;
         let images = [];
         this.state.images.map((i) =>
-            images.push("/api/image/" + i)
+            images.push(i.src)
         );
         console.log(images);
         
@@ -101,6 +154,7 @@ export class LogView extends Component {
             <div>
             {this.renderRedirect()}
                 <div className="fnbar">
+                    <Button onClick={this.handleSubmit} primary>Back To Palette</Button>
                     <Button onClick={this.onCancel} primary>Back</Button>
                     <button type="button" onClick={() => this.setState({ isOpen: true })}>
                         Zoom
@@ -130,14 +184,17 @@ export class LogView extends Component {
     }
     
     renderContent() {
-        const listItems = this.state.images.map((i) =>
-            <li><img src={"/api/image/" + i} alt="" className="img-responsive" width="800px" height="800px"/><br/></li>
-        );
         
         return (
             <div>
                 <p>{this.state.images.length + " Image(s) submitted"}</p>
-                <ul>{listItems}</ul>
+                <Gallery
+                    photos={this.state.images}
+                    columns={1}
+                    onClick={this.selectPhoto}
+                    ImageComponent={SelectedImage}
+                    margin={6}
+                    direction={"row"} />
             </div>
         );
     }

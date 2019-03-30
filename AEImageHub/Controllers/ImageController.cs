@@ -99,7 +99,8 @@ namespace ImageServer.Controllers
                 UploadedDate = DateTime.Now,
                 Type = _repo.GetFileExtension(image),
                 Trashed = false,
-                Submitted = false
+                Submitted = false,
+                UploadedBy = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
             };
             return img;
         }
@@ -156,6 +157,7 @@ namespace ImageServer.Controllers
             try
             { 
                 Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                if (payload["UId"].Type != JTokenType.Null) { image.Submitted = (bool)payload["UId"]; };
                 if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
                 if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
                 if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
@@ -164,6 +166,8 @@ namespace ImageServer.Controllers
             }
             catch (Exception e)
             {
+                Console.WriteLine("Reached 169");
+                Console.WriteLine(e.Message);
                 return e;
             }
         }

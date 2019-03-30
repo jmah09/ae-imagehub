@@ -43,7 +43,6 @@ export class Palette extends Component {
         this.renderRedirect = this.renderRedirect.bind(this);
 
         this.GetUserImages();
-
     }
 
     //
@@ -149,28 +148,6 @@ export class Palette extends Component {
         })
     }
     
-    //
-    // image
-    //
-    selectPhoto(event, obj)
-    {
-        let photos = this.state.photos;
-        photos[obj.index].selected = !photos[obj.index].selected;
-
-        this.setState({ photos: photos });
-    }
-
-    toggleSelect() 
-    {
-        let photos = this.state.photos.map((photo, index) => {
-            return { ...photo, selected: !this.state.selectAll };
-        });
-
-        this.setState({
-            photos: photos,
-            selectAll: !this.state.selectAll
-        });
-    }
 
     //
     // get info
