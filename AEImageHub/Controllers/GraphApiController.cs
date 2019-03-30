@@ -50,14 +50,10 @@ namespace AEImageHub.Controllers
             return JsonConvert.SerializeObject(_graphClient.Users.Request().GetAsync().Result);
         }
 
-        
-        
-        // function to make a user an admin
-        // 202
-        
+
         /**
          * Post
-        API Endpoint: api/graph/:userPrincipalName
+        API Endpoint: api/graph/:oid
         Description: Make a non-admin user an admin
         Request Requirements:
         1. A valid JWT token of an admin user
@@ -66,14 +62,14 @@ namespace AEImageHub.Controllers
         202 - accepted
         400 - bad request : user is already an admin
          */
-        [HttpPost("{userPrincipalName}")]
-        public IActionResult EditUsers(string userPrincipalName)
+        [HttpPost("{oid}")]
+        public IActionResult EditUsers(string oid)
         {
             const string adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
-            var usersGroups = _graphClient.Users[userPrincipalName].MemberOf.Request().GetAsync().Result;
+            var usersGroups = _graphClient.Users[oid].MemberOf.Request().GetAsync().Result;
           
             if (!usersGroups.Any(g => g is Group && g.Id == adminGroup)){
-                var user = _graphClient.Users[userPrincipalName].Request().Select("id").GetAsync().Result;
+                var user = _graphClient.Users[oid].Request().Select("id").GetAsync().Result;
                  _graphClient.Groups[adminGroup].Members.References.Request().AddAsync(user);
                 return Accepted();
             }
