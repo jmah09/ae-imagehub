@@ -232,7 +232,7 @@ export class GetInfo extends Component {
               <TextInput 
                 disabled={true}
                 id='getinfo_user'
-                value={selected.length > 1 ? 'Various' : selected[0].meta.UId} // TODO -- GET USERNAME
+                value={selected.length > 1 ? 'Various' : selected[0].meta.U.UserName} // TODO -- GET USERNAME
                 onChange={null} />
               <br />
             </p>
