@@ -9,8 +9,8 @@ const adalConfig = {
         api: 'a42cbd10-bbd7-414f-b9f8-733274fea3c1'
     },
     postLogoutRedirectUri: window.location.origin,
-    redirectUri: 'https://aeimagehub.azurewebsites.net',
-    //redirectUri: 'http://localhost:5000/palette',
+    //redirectUri: 'https://aeimagehub.azurewebsites.net',
+    redirectUri: 'http://localhost:5000/palette',
     cacheLocation: 'sessionStorage'
 };
 
