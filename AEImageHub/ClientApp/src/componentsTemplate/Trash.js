@@ -4,7 +4,7 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import {authContext, getCredentials, getToken, isAdmin, adalConfig} from '../adalConfig';
+import {authContext, getCredentials, getToken, isAdmin, adalConfig, getUser} from '../adalConfig';
 import {Redirect} from "react-router-dom";
 import {adalGetToken} from "react-adal";
 
@@ -40,7 +40,7 @@ export class Trash extends Component {
         let param = this.props.location.search;
         this.state.validId = param.includes("?"); // todo : temp fix
         this.state.userId = param.substring(1);
-        this.state.admin = isAdmin(getToken());
+        this.state.admin = isAdmin();
         console.log("isAdminTrash ? " + this.state.admin);
         // todo valid id logic [have to change db]
     }
@@ -86,51 +86,61 @@ export class Trash extends Component {
 
     // get Images with the userid
     GetUserTrashedImages() {
-        let token = getToken();
-        let userid = getCredentials(token).oid;
+        let userid = getUser().profile.oid;
 
 
         // TODO -- add check for validId
-        if (this.state.admin && this.state.validId)
-        {
+        if (this.state.admin && this.state.validId) {
             userid = this.state.userId;
         }
         
-        axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
-            .then(res => {
-            var images = [];
-        res.data.map((image, index) => {
-            images.push({
-                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-            });
-    })
-        console.log(res.data);
-        this.setState({ photos: images })
-    })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/user/" + userid + "/images/trashed", {headers: {'Authorization': "bearer " + token}})
+                    .then(res => {
+                        var images = [];
+                        res.data.map((image, index) => {
+                            images.push({
+                                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
+                            });
+                        })
+                        console.log(res.data);
+                        that.setState({photos: images})
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
 
     RecoverSelectedImages() {
         const selected = this.state.photos.filter((value, index, array) => {
             return value.selected;
-    })
+        })
 
         const notSelected = this.state.photos.filter((value, index, array) => {
             return !value.selected;
-    })
+        })
 
         selected.map((image, index) => {
             image.meta.Trashed = false;
-        axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-            console.log(response);
-        this.setState({
-            photos: notSelected
+            const that = this;
+            adalGetToken(authContext, adalConfig.endpoints.api)
+                .then(function (token) {
+                    axios.put("/api/image/" + image.meta.IId, image.meta, {headers: {'Authorization': "bearer " + token }})
+                        .then(response => {
+                            console.log(response);
+                            that.setState({
+                                photos: notSelected
+                            })
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                }).catch(function (err) {
+                console.log("Error: Couldn't get token")
+            });
         })
-    })
-    .catch(error => {
-            console.log(error);
-    });
-    })
     }
 
     renderRedirect()
@@ -202,7 +212,7 @@ export class Trash extends Component {
 
     // TODO
     renderFunction() {
-        if (isAdmin(getToken())) {
+        if (isAdmin()) {
             return (
                 <div class="fnbar">
                     {this.renderRedirect()}

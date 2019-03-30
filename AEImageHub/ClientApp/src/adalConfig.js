@@ -27,10 +27,9 @@ export const getCredentials = (token) => {
     return JSON.parse(window.atob(base64));
 };
 
-export const isAdmin = (token) => {
-    let decoded_token = getCredentials(token);
+export const isAdmin = () => {
     const adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
-    return decoded_token["groups"].includes(adminGroup);
+    return getUser().profile["groups"].includes(adminGroup);
 };
 
 export const adalApiFetch = (fetch, url, options) =>
