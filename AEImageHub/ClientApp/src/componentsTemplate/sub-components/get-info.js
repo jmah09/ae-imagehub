@@ -23,6 +23,7 @@ export class GetInfo extends Component {
 
       classification: {},
       photos: props.location.state.photos,
+      tag: [],
 
       redirectLink: props.location.state.redirectLink,
       redirectOption: false,
@@ -102,29 +103,22 @@ export class GetInfo extends Component {
   handleClassificationChange = (e) =>
   {
     let photos = this.state.photos;
+    let tags;
 
     //check if classification exists 
     photos.forEach((img) => {
-      let tags = img.meta.TagLink;
+      tags = img.meta.TagLink;
       let options = e.target.options;
       for (let i = 0; i < options.length; i++){
         let option = options[i].selected;
-        
         if (option && !tags.includes(options[i].value)){
           tags.push(options[i].value)
         }
-        
-        if (!options[i].selected){
-          tags.splice(i, 1);
-        }
-        
       }
-      console.log(tags);
-      
-      
+      this.setState({ photos: photos, tag: tags});
     });
-
-    this.setState({ photos: photos });
+    
+    console.log(this.state.tag);
   }
 
   onCancel = () =>
@@ -143,7 +137,8 @@ export class GetInfo extends Component {
       redirectOption: true,
       redirect: true
     });
-  }
+    console.log(this.state.tag);
+  };
   
   //
   // redirect
@@ -199,7 +194,6 @@ export class GetInfo extends Component {
 
     const class_options = this.state.classification;
     class_options[''] = placeholder;
-    console.log(selected[0]);
     
     return (
       <div id="getinfo">
@@ -239,6 +233,7 @@ export class GetInfo extends Component {
             <h2>CLASSIFICATION :</h2>
             <p>
               <Dropdown
+                multiple={true}  
                 id="getinfo_class"
                 options={class_options}
                 onChange={this.handleClassificationChange} />
