@@ -117,6 +117,64 @@ namespace AEImageHub.Controllers
                 return e;
             }
         }
+
+        /*
+        POST
+        API Endpoint: api/tag/taglink
+        Description: Creates taglink
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        201 - Taglink creation was successful
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        */
+
+        [HttpPost("")]
+        public Object PostLTagLink([FromBody] JObject payload)
+        {
+            try
+            {
+                TagLink taglink = new TagLink()
+                {
+                    TagName = (string)payload["TagName"],
+                    IId = (string)payload["IId"]
+                };
+                _context.TagLink.Add(taglink);
+                _context.SaveChanges();
+                return "success";
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
+
+        /*
+        DELETE
+        API Endpoint: api/tag/taglink/:imageid
+        Description: Deletes taglink from the server
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - taglink delete was successful
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        */
+        /*
+        [HttpPost("{imageid}")]
+        public Object DeleteTagLink(string imageid)
+        {
+            try
+            {
+                TagLink taglinks = _context
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
+        */
     }
 
 }

@@ -29,7 +29,7 @@ namespace ImageServer.Controllers
    
         /*
         Post
-        API Endpoint: api/image/:image_id
+        API Endpoint: api/submit
         Description: Submits images to a project
         */
         [HttpPost("")]
