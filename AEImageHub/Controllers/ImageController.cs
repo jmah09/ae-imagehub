@@ -99,7 +99,8 @@ namespace ImageServer.Controllers
                 UploadedDate = DateTime.Now,
                 Type = _repo.GetFileExtension(image),
                 Trashed = false,
-                Submitted = false
+                Submitted = false,
+                UploadedBy = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
             };
             return img;
         }
