@@ -23,7 +23,6 @@ export class GetInfo extends Component {
 
       classification: {},
       photos: props.location.state.photos,
-      tag: [],
 
       redirectLink: props.location.state.redirectLink,
       redirectOption: false,
@@ -93,11 +92,12 @@ export class GetInfo extends Component {
   handleNameChange = (e) =>
   {
     let photos = this.state.photos;
-
-    photos.forEach((img) => { img.meta.ImageName = e.target.value });
-
+    photos.forEach((img) => {
+      img.meta.ImageName = e.target.value;
+    });
+    
     this.setState({ photos: photos });
-  }
+  };
 
   // TODO
   handleClassificationChange = (e) =>
@@ -115,29 +115,58 @@ export class GetInfo extends Component {
           tags.push(options[i].value)
         }
       }
-      this.setState({ photos: photos, tag: tags});
+      this.setState({ photos: photos});
+      console.log(this.state.photos);
     });
-    
-    console.log(this.state.tag);
-  }
+  };
 
-  onCancel = () =>
+  onCancel = (e) =>
   {
     this.setState({
       redirectOption: false,
       redirect: true
     });
-  }
+    e.preventDefault();
+  };
 
   // TODO -- SAVE METADATA TO DATABASE INSTEAD
   // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
-  onSave = () =>
+  onSave = (e) =>
   {
+    let photos = this.state.photos;
+    let tags;
+    let imageID;
+    for (let i = 0; i < photos.length; i++){
+      tags = photos[i].meta.TagLink;
+      console.log(tags);
+      imageID = photos[i].meta.IId;
+      
+      axios.delete("/api/tag/taglink/:" + imageID, 
+          {header: {'Authorization': "bearer " + this.state.token}
+      }).then (response =>{
+        console.log(response)
+      }).catch( error => {
+        console.log(error);
+      });
+      
+      for (let k = 0; k < tags.length; k++){
+        axios.post("/api/tag/tagLink", {
+          TagName: tags[k],
+          IId: imageID,
+        }, {headers: {'Authorization': "bearer " + this.state.token}
+        }).then( response => {
+          console.log(response);
+        }).catch (error => {
+          console.log(error);
+        });
+      }
+    }
+    
     this.setState({
       redirectOption: true,
       redirect: true
     });
-    console.log(this.state.tag);
+    e.preventDefault();
   };
   
   //
