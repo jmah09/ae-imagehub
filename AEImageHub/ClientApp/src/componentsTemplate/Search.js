@@ -442,7 +442,6 @@ export class Search extends Component {
     );
   }
 
-  // TODO
   renderFilters = () =>
   {
     let filters = this.state.filters;
@@ -454,7 +453,7 @@ export class Search extends Component {
 
       if (filter.option === 'Date')
       {
-        //
+        // TODO
       }
       else
       {
