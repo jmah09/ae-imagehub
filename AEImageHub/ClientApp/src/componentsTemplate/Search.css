@@ -41,3 +41,25 @@
 #search-content {
     margin: 15px 0px 0px 15px;
 }
+
+/* filters */
+
+#search-filters {
+  margin: 10px 0px 10px 15px;
+}
+
+#search-filters button {
+  background-color: #a6a6a6;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  margin: 0px 10px 0px 0px;
+  padding: 2px 10px;
+  font-size: 15px;
+  color: #FFF;
+}
+
+.cancel-icon {
+  width: 10px;
+  padding: 0px 5px 3px 0px;
+}
