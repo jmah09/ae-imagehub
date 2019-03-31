@@ -91,7 +91,7 @@ export class GetInfo extends Component {
 
   handleNameChange = (e) =>
   {
-    let photos = this.state.photos;
+    const photos = this.state.photos.filter((value) => { return value.selected; });
     photos.forEach((img) => {
       img.meta.ImageName = e.target.value;
     });
@@ -142,7 +142,7 @@ export class GetInfo extends Component {
       imageID = photos[i].meta.IId;
       
       axios.delete("/api/tag/taglink/:" + imageID, 
-          {header: {'Authorization': "bearer " + this.state.token}
+          {headers: {'Authorization': "bearer " + this.state.token}
       }).then (response =>{
         console.log(response)
       }).catch( error => {
