@@ -51,22 +51,6 @@ namespace AEImageHub.Controllers
             }
         }
 
-        [HttpGet("image/{imageid}")]
-        public Object GetImageWithImageid(string imageid)
-        {
-            try
-            {
-                var images = _context.Image
-                                .Where(i => i.IId == imageid && i.Submitted && !i.Trashed);
-
-                return JsonConvert.SerializeObject(images);
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }
-
         [HttpGet("tag/{tagname}")]
         public Object GetImagesWithTagname(string tagname)
         {
