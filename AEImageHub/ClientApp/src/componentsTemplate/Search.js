@@ -432,10 +432,10 @@ export class Search extends Component {
             value={this.state.input_2}
             onChange={this.handleTextChange} />
           : null}
-        {this.state.showResults
+        {this.state.showResults && this.state.filteredPhotos.length > 0
           ? null
           : <button type="submit" onClick={this.onSearch} onKeyPress={this.onPressEnter}>Search</button>}
-        {this.state.showResults
+        {this.state.showResults && this.state.filteredPhotos.length > 0
           ? <button type="submit" onClick={this.onAddFilter}>Add Filter</button>
           : null}
       </div>
@@ -460,7 +460,7 @@ export class Search extends Component {
       {
         res.push(
           <button key={i} onClick={() => this.onRemoveFilter(i)}>
-            <img src={cancelIcon} className="cancel-icon"	alt="cancel icon" />{i}. {filter.option}: {filter.input_1}
+            <img src={cancelIcon} className="cancel-icon"	alt="cancel icon" />{filter.option}: {filter.input_1}
           </button>
         );
       }
