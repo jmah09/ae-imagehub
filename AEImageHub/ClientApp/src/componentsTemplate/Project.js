@@ -12,10 +12,29 @@ export class Project extends Component {
     constructor (props){
         super(props);
         this.state  = {
-            projects: {}
-        }
+            projects: {},
+            showAdd: false,
+            ProjectName: "",
+            CreatedDate: "",
+            Description: "",
+            Active: true
+        };
+        
+        this.handleChange = this.handleChange.bind(this);
+        this.PostProject = this.PostProject.bind(this);
     }
 
+    handleChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+    
+    
     // Jae
 
     // get all projects
@@ -46,20 +65,30 @@ export class Project extends Component {
     };
 
     // post a project
-    PostProject(payload) {
+    PostProject(event) {
+        event.preventDefault();
+        let date = new Date();
+        const that = this;
+        
+        if (this.state.ProjectName === "") return alert("Please fill in the Project Name");
+        this.setState({CreatedDate: date.toDateString()});
+        
         adalGetToken(authContext, adalConfig.endpoints.api)
             .then(function (token) {
+                let payload = that.state;
                 axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + token } })
                     .then(response => {
                         console.log(response);
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.log(error);
+                        alert("The Project Name already exists!")
                     });
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
         });
-    }
+    }   
 
     // put a project with project name
     PutProject(projectname,payload) {
@@ -103,13 +132,48 @@ export class Project extends Component {
             </div>
         );
     }
+    
 
     // TODO
     renderFunction() {
         return (
+            <div>
             <div className="fnbar">
-                <button>Create Project</button>
+                <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>CREATE PROJECT</button>
             </div>
+                <div className={this.state.showAdd ? '' : 'hidden'}>
+                <br />
+                <form onSubmit={this.PostProject} className="handleTag">
+                    ADD NEW PROJECT
+                    <br />
+                    Project Name:
+                    <label>
+                        <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
+                    </label>
+                    <br />
+                    Project Description:
+                    <label>
+                        <input type="text" name="Description" value={this.state.Description} onChange={this.handleChange} />
+                    </label>
+                    <br />
+                    Active?:
+                    <label>
+                        <input 
+                            type="checkbox" 
+                            name="Active"
+                            checked={this.state.Active}
+                            onChange={this.handleChange} />
+                    </label>
+                    <input type="submit" value="Add"/>
+                </form>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                </div>
+            </div>
+            
         )
     }
 
@@ -122,7 +186,6 @@ export class Project extends Component {
         
         
         // get a project info
-        this.GetProject('Capilano Bridge');
 
         /*
         // Post project

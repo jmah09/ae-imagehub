@@ -85,7 +85,7 @@ namespace AEImageHub.Controllers
         2. Project credentials
 
         Server response and status code:
-        201 - Project creation was successful
+        200 - Project creation was successful
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to create project
         */
@@ -109,7 +109,7 @@ namespace AEImageHub.Controllers
             }
             catch (Exception e)
             {
-                return e;
+                return BadRequest(e.Message);
             }
         }
 
