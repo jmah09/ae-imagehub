@@ -141,7 +141,7 @@ export class GetInfo extends Component {
       console.log(tags);
       imageID = photos[i].meta.IId;
       
-      axios.delete("/api/tag/taglink:" + imageID, 
+      axios.delete("/api/tag/taglink/" + imageID, 
           {headers: {'Authorization': "bearer " + this.state.token}
       }).then (response =>{
         console.log(response)
