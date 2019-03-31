@@ -9,6 +9,13 @@ import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import { Redirect } from 'react-router-dom';
 
+/*
+* Icon made by Egor Rumyantsev
+* From www.flaticon.com
+* Licensed by Creative Commons 3.0 BY
+*/
+import cancelIcon from './sub-components/cancel.svg';
+
 import '../index.css';
 import './Search.css';
 
@@ -16,7 +23,6 @@ export class Search extends Component {
 
   constructor(props)
   {
-
 
     super(props);
 
@@ -30,14 +36,12 @@ export class Search extends Component {
       showResults: false,
 
       photos: [],
-      query: [],
+      filters: [],
       filteredPhotos: [],
       selectAll: false,
 
       redirect: false
     };
-
-    console.log(this.state.filteredPhotos.length)
 
     this.dropdown_options = {
       '': ['Select Option', null],
@@ -90,17 +94,31 @@ export class Search extends Component {
     }
 
     adalGetToken(authContext, adalConfig.endpoints.api)
-      .catch(() => { console.log("Error: Couldn't get token"); })
+      .catch(() => { console.log("Could not get token"); })
       .then((token) => {
         const request_param = {headers: {'Authorization': "bearer " + token}};
 
         axios.get(request_query, request_param)
           .catch((err) => { console.log(err.message); })
           .then((res) => {
+            let prev = '';
+
+            // assuming the bug has repeats of the image
+            /* for (let i = 0; i < res.data.length; i++)
+            {
+              let image = res.data[i];
+
+              if (image.IId !== prev)
+              {
+                prev = image.IId;
+                photos.push({ src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.ImageName, meta: image });
+              }
+            } */
+
             photos = res.data.map((image, index) => {
               return { src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image };
             });
-            console.log(JSON.stringify('1'+photos));
+
             this.setState({
               filteredPhotos: photos,
               photos: photos,
@@ -133,13 +151,13 @@ export class Search extends Component {
               Submitted: 'False'
               }, request_param
             )
-            .then((res) => {
-              console.log(res); 
-              resolve();
-            })
             .catch((err) => {
               console.log(err);
               reject();
+            })
+            .then((res) => {
+              console.log(res); 
+              resolve();
             });
 
           })
@@ -148,11 +166,10 @@ export class Search extends Component {
             reject();
           });          
         })
-      )
+      );
     }
 
-    Promise.all(promise)
-    .then(() => { this.setState({ redirect: true }); });
+    Promise.all(promise).then(() => { this.setState({ redirect: true }); });
   }
 
   //
@@ -162,7 +179,8 @@ export class Search extends Component {
   {
     this.setState({ option: e.target.value });
 
-    if (e.target.value === 'Date') {
+    if (e.target.value === 'Date')
+    {
       this.setState({ showDateInput: true });
     }
     else {
@@ -198,6 +216,15 @@ export class Search extends Component {
     return res;
   }
 
+  // TODO
+  onPressEnter(e)
+  {
+    if (e.key === 'Enter')
+    {
+      //
+    }
+  }
+
   onSearch = async (e) =>
   {
     if (this.state.option === '')
@@ -219,31 +246,16 @@ export class Search extends Component {
       return;
     }
 
-    this.getSearch()
-
-    // TODO
-    while(!this.state.showResults)
-    {
-      await this.sleep(300);
-    }
-
-    this.setState({
-      input_1: '',
-      input_2: ''
-    });
+    this.getSearch();
   }
 
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  onAddFilter = (e) => 
+  onAddFilter = async (e) => 
   {
     e.preventDefault();
 
     let curQuery = this.buildQuery();
 
-    if (this.state.option === '')
+    if (curQuery.option === '')
     {
       alert('Please select an option.');
       return;
@@ -254,70 +266,101 @@ export class Search extends Component {
       return;
     }
 
-    if (this.state.option === 'Date' && (!curQuery.input_1 || !curQuery.input_2))
+    if (curQuery.option === 'Date' && (!curQuery.input_1 || !curQuery.input_2))
     {
       alert('Please search with the correct date format: yyyymmdd');
       return;
     }
 
-    let filteredPhotos = this.state.filteredPhotos.filter((item) => {
-      let res = false;
-
-      switch (this.state.option)
-      {
-        case 'Name':
-           res = item.meta.ImageName.includes(this.state.input_1);
-           break;
-        case 'Classification':
-          for (let i = 0; i < item.TagLink.length; i++)
-          {
-            if (item.meta.TagLink[i].toLowerCase() === this.state.input_1.toLowerCase())
-            {
-              res = true;
-            }
-          }
-          break;
-        case 'Project':
-          for (let i = 0; i < item.ProjectLink.length; i++)
-          {
-            if (item.meta.ProjectLink[i].toLowerCase() === this.state.input_1.toLowerCase())
-            {
-              res = true;
-            }
-          }
-          break;
-        case 'User':
-          res = item.meta.UserName.toLowerCase() === this.state.input_1.toLowerCase();
-        case 'Date':
-          // TODO
-          break;
-        default:
-          break;
-      }
-
-      return res;
-    });
-
-    console.log(JSON.stringify(this.filteredPhotos));
+    let filteredPhotos = await this.performFilter(this.state.filteredPhotos, curQuery);
 
     // add query
-    let allQuery = this.state.query;
-    allQuery.push(curQuery);
+    let allFilters = this.state.filters;
+    allFilters.push(curQuery);
 
     this.setState({
-      query: allQuery,
+      filters: allFilters,
       input_1: '',
       input_2: '',
 
       filteredPhotos: filteredPhotos
     });
-
-    console.log(JSON.stringify(this.state.query, null, 4));
   }
 
-  onRemoveFilter = () =>
+  onRemoveFilter = async (index) =>
   {
-    //
+    if (this.state.filters.length === 1)
+    {
+      this.setState({
+        filters: [],
+        filteredPhotos: this.state.photos
+      });
+      
+      return;
+    }
+
+    let filters = this.state.filters;
+    filters.splice(index, 1);
+    let filteredPhotos = this.state.photos;
+
+    for (let i = 0; i < filters.length; i++)
+    {
+      let filter = filters[0];
+      
+      filteredPhotos = await this.performFilter(filteredPhotos, filter);
+    }
+
+    this.setState({
+      filters: filters,
+      filteredPhotos: filteredPhotos
+    });
+  }
+
+  performFilter(photos, filter)
+  {
+    return new Promise(resolve => {
+      let filtered = photos.filter((item) => {
+        let res = false;
+  
+        switch (filter.option)
+        {
+          case 'Name':
+            res = item.meta.ImageName.includes(filter.input_1);
+            break;
+          case 'Classification':
+            for (let i = 0; i < item.meta.TagLink.length; i++)
+            {
+              if (item.meta.TagLink[i].toLowerCase() === filter.input_1.toLowerCase())
+              {
+                res = true;
+                break;
+              }
+            }
+            break;
+          case 'Project':
+            for (let i = 0; i < item.meta.ProjectLink.length; i++)
+            {
+              if (item.meta.ProjectLink[i].toLowerCase() === filter.input_1.toLowerCase())
+              {
+                res = true;
+                break;
+              }
+            }
+            break;
+          case 'User':
+            res = item.meta.UserName.toLowerCase() === filter.input_1.toLowerCase();
+          case 'Date':
+            // TODO -- DATE LOGIC
+            break;
+          default:
+            break;
+        }
+  
+        return res;
+      });
+      
+      resolve(filtered);
+    });
   }
 
   selectPhoto = (e, obj) =>
@@ -349,7 +392,6 @@ export class Search extends Component {
     }
   }
 
-
   //
   // render
   //
@@ -360,26 +402,12 @@ export class Search extends Component {
         <Title title='SEARCH' />
         {this.renderRedirect()}
         {this.renderSearchBar()}
+        {this.renderFilters()}
         {this.renderFunction()}
         {this.renderContent()}
       </div>
     );
   }
-
-  renderFunction = () =>
-  {
-    if (this.state.showResults && this.state.filteredPhotos.length > 0)
-    {
-      return (
-        <div className="fnbar">
-          <button onClick={this.handleSubmit}>Add To Palette</button>
-          <button>WIP: Get Info</button>
-          <button onClick={this.toggleSelect}>Select All</button>
-        </div>
-      );
-    }
-  }
-
 
   renderSearchBar = () =>
   {
@@ -406,7 +434,7 @@ export class Search extends Component {
           : null}
         {this.state.showResults
           ? null
-          : <button type="submit" onClick={this.onSearch}>Search</button>}
+          : <button type="submit" onClick={this.onSearch} onKeyPress={this.onPressEnter}>Search</button>}
         {this.state.showResults
           ? <button type="submit" onClick={this.onAddFilter}>Add Filter</button>
           : null}
@@ -414,28 +442,69 @@ export class Search extends Component {
     );
   }
 
-  renderContent()
+  // TODO
+  renderFilters = () =>
+  {
+    let filters = this.state.filters;
+    let res = [];
+
+    for (let i = 0; i < filters.length; i++)
+    {
+      let filter = filters[i];
+
+      if (filter.option === 'Date')
+      {
+        //
+      }
+      else
+      {
+        res.push(
+          <button key={i} onClick={() => this.onRemoveFilter(i)}>
+            <img src={cancelIcon} className="cancel-icon"	alt="cancel icon" />{i}. {filter.option}: {filter.input_1}
+          </button>
+        );
+      }
+    }
+
+    return (
+      <div id="search-filters">
+        {res}
+      </div>
+    );
+  }
+
+  renderFunction = () =>
+  {
+    if (this.state.showResults && this.state.filteredPhotos.length > 0)
+    {
+      return (
+        <div className="fnbar">
+          <button onClick={this.handleSubmit}>Add To Palette</button>
+          <button>WIP: Get Info</button>
+          <button onClick={this.toggleSelect}>Select All</button>
+        </div>
+      );
+    }
+  }
+
+  renderContent = () =>
   {
     if (this.state.showResults)
     {
-      if (this.state.filteredPhotos.length > 0)
-      {
-        return (
-          <div id="search-content">
-            <p>Found {this.state.filteredPhotos.length} results.</p>
-            {this.state.filteredPhotos.length > 0
-              ? <Gallery
-                photos={this.state.filteredPhotos}
-                columns={4}
-                onClick={this.selectPhoto}
-                ImageComponent={SelectedImage}
-                margin={4}
-                direction={"row"} />
-              : null}
-          </div>
-        );
-      }
-      
+      return (
+        <div id="search-content">
+          <p>Found {this.state.filteredPhotos.length} results.</p>
+          {this.state.filteredPhotos.length > 0
+            ? <Gallery
+              photos={this.state.filteredPhotos}
+              columns={4}
+              onClick={this.selectPhoto}
+              ImageComponent={SelectedImage}
+              margin={4}
+              direction={"row"} />
+            : null}
+        </div>
+      );
     }
     else
     {
