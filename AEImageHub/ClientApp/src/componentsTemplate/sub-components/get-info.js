@@ -135,7 +135,8 @@ export class GetInfo extends Component {
   {
     let photos = this.state.photos;
     let tags;
-    let imageID;
+      let imageID;
+      console.log(JSON.stringify(photos)); 
     for (let i = 0; i < photos.length; i++){
       tags = photos[i].meta.TagLink;
       console.log(tags);
@@ -148,7 +149,8 @@ export class GetInfo extends Component {
       }).catch( error => {
         console.log(error);
       });
-      
+
+        console.log(tags.length);      
       for (let k = 0; k < tags.length; k++){
         axios.post("/api/tag/taglink", {
           TagName: tags[k],
