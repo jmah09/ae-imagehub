@@ -209,7 +209,7 @@ export class Project extends Component {
         
         for (let i = 0; i < projects.length; i++){
             let project = {};
-            project.name =  <Link to={{ pathname: "/" + projects[i].ProjectName }}>{projects[i].ProjectName}</Link>;
+            project.name =  <Link to={{ pathname: "/search?project=" + projects[i].ProjectName }}>{projects[i].ProjectName}</Link>;
             project.date = projects[i].CreatedDate;
             project.description = projects[i].Description;
             tableData.push(project);
