@@ -40,10 +40,21 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                var images = _context.Image
-                                .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);
+                if (imagename.Contains("\""))
+                {
+                    var images = _context.Image
+                        .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);        
 
-                return JsonConvert.SerializeObject(images);
+                    return JsonConvert.SerializeObject(images);
+                }
+                else
+                {
+                    var images = _context.Image
+                        .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed);        
+
+                    return JsonConvert.SerializeObject(images);
+                }
+
             }
             catch (Exception e)
             {
@@ -56,13 +67,26 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                var taglink = _context.TagLink.Select(tl => new TagLink
+                List<TagLink> taglink;
+                if (!tagname.Contains("\""))
                 {
-                    TlinkId = tl.TlinkId,
-                    TagName = tl.TagName,
-                    I = tl.I
-                }).Where(tl => tl.TagName == tagname).ToList();
-
+                    taglink = _context.TagLink.Select(tl => new TagLink
+                    {
+                        TlinkId = tl.TlinkId,
+                        TagName = tl.TagName,
+                        I = tl.I
+                    }).Where(tl => tl.TagName.Contains(tagname)).ToList();
+                }
+                else
+                {
+                    taglink = _context.TagLink.Select(tl => new TagLink
+                    {
+                        TlinkId = tl.TlinkId,
+                        TagName = tl.TagName,
+                        I = tl.I
+                    }).Where(tl => tl.TagName == tagname).ToList();
+                }
+               
                 var images = new List<Image>();
                 foreach (var tl in taglink)
                 {
@@ -82,15 +106,29 @@ namespace AEImageHub.Controllers
         [HttpGet("project/{projectname}")]
         public Object GetImagesWithProjectname(string projectname)
         {
+            List<ProjectLink> projectlink;
             try
             {
-                var projectlink = _context.ProjectLink.Select(pl => new ProjectLink
+                if (!projectname.Contains("\""))
                 {
-                    PlinkId = pl.PlinkId,
-                    ProjectName = pl.ProjectName,
-                    I = pl.I
-                }).Where(pl => pl.ProjectName == projectname).ToList();
-
+                     projectlink = _context.ProjectLink.Select(pl => new ProjectLink
+                    {
+                        PlinkId = pl.PlinkId,
+                        ProjectName = pl.ProjectName,
+                        I = pl.I
+                    }).Where(pl => pl.ProjectName.Contains(projectname)).ToList();
+                }
+                else
+                {
+                    projectname = projectname.Replace("\"","");
+                    projectlink = _context.ProjectLink.Select(pl => new ProjectLink
+                    {
+                        PlinkId = pl.PlinkId,
+                        ProjectName = pl.ProjectName,
+                        I = pl.I
+                    }).Where(pl => pl.ProjectName == projectname).ToList();
+                }
+                
                 var images = new List<Image>();
                 foreach (var pl in projectlink)
                 {
@@ -99,25 +137,41 @@ namespace AEImageHub.Controllers
                         images.Add(pl.I);
                     }
                 }
+
                 return JsonConvert.SerializeObject(images);
+
             }
             catch (Exception e)
             {
                 return e;
             }
         }
-        
+
         [HttpGet("user/{username}")]
         public Object GetImagesWithUsername(string username)
         {
             try
             {
-                var users = _context.User.Select(u => new User
+                List<User> users;
+                if (!username.Contains("\""))
                 {
-                    UId = u.UId,
-                    UserName = u.UserName,
-                    Image = u.Image
-                }).Where(u => u.UserName == username).ToList();
+                    users = _context.User.Select(u => new User
+                    {
+                        UId = u.UId,
+                        UserName = u.UserName,
+                        Image = u.Image
+                    }).Where(u => u.UserName.Contains(username)).ToList();
+                }
+                else
+                {
+                    users = _context.User.Select(u => new User
+                    {
+                        UId = u.UId,
+                        UserName = u.UserName,
+                        Image = u.Image
+                    }).Where(u => u.UserName == username).ToList();
+                }
+                
 
                 var images = new List<Image>();
                 foreach (var u in users)
