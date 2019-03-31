@@ -150,7 +150,7 @@ export class GetInfo extends Component {
       });
       
       for (let k = 0; k < tags.length; k++){
-        axios.post("/api/tag/tagLink", {
+        axios.post("/api/tag/taglink", {
           TagName: tags[k],
           IId: imageID,
         }, {headers: {'Authorization': "bearer " + this.state.token}
