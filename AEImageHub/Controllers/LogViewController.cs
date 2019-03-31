@@ -36,8 +36,6 @@ namespace AEImageHub.Controllers
         [HttpGet("{logid}")]
         public Object GetLogLinks(string logid)
         {
-            
-            Debug.Write("\n\n"+logid + "\n\n");
             try
             {
                 return JsonConvert.SerializeObject(_context.LogLink.Where(l => l.LId == logid));
@@ -47,5 +45,6 @@ namespace AEImageHub.Controllers
                 return e;
             }
         }
+        
     }
 }

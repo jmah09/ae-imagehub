@@ -21,6 +21,7 @@ namespace AEImageHub.Models
         public bool Trashed { get; set; }
         public DateTime? TrashedDate { get; set; }
         public bool Submitted { get; set; }
+        public string UploadedBy { get; set; }
 
         public User U { get; set; }
         public ICollection<LogLink> LogLink { get; set; }

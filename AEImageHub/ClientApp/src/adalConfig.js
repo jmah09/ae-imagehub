@@ -2,7 +2,7 @@ import { AuthenticationContext, adalFetch, withAdalLogin } from 'react-adal';
 
 // todo : change (tenant and api) to ae.onmicrosoft.com once domain has been established
 // todo : document this
-const adalConfig = {
+export const adalConfig = {
     tenant: 'gwangjaehotmail.onmicrosoft.com',
     clientId: 'a42cbd10-bbd7-414f-b9f8-733274fea3c1',
     endpoints: {
@@ -10,7 +10,7 @@ const adalConfig = {
     },
     postLogoutRedirectUri: window.location.origin,
     //redirectUri: 'https://aeimagehub.azurewebsites.net',
-    redirectUri: 'http://localhost:5000/palette',
+    redirectUri: 'http://localhost:5000/',
     cacheLocation: 'sessionStorage'
 };
 
@@ -27,10 +27,13 @@ export const getCredentials = (token) => {
     return JSON.parse(window.atob(base64));
 };
 
-export const isAdmin = (token) => {
-    let decoded_token = getCredentials(token);
+export const isAdmin = () => {
     const adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
-    return decoded_token["groups"].includes(adminGroup);
+    let groupClaims = getUser().profile["groups"];
+    if (groupClaims != null) {
+        return getUser().profile["groups"].includes(adminGroup);
+    }
+    return false;
 };
 
 export const adalApiFetch = (fetch, url, options) =>

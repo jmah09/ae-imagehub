@@ -3,67 +3,128 @@ import { Title } from './Title';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import axios from 'axios'
-import { getToken } from '../adalConfig';
+import {adalConfig, authContext} from '../adalConfig';
 import { Link } from 'react-router-dom';
+import {adalGetToken} from "react-adal";
 
 export class Project extends Component {
     
     constructor (props){
         super(props);
         this.state  = {
-            projects: {}
-        }
+            projects: {},
+            showAdd: false,
+            ProjectName: "",
+            CreatedDate: "",
+            Description: "",
+            Active: true
+        };
+        
+        this.handleChange = this.handleChange.bind(this);
+        this.PostProject = this.PostProject.bind(this);
     }
 
+    handleChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+    
+    
     // Jae
 
     // get all projects
     GetProjects() {
-        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                return res;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        return res;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
 
     // get a project with projectname
     GetProject(projectname) {
-        axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                console.log("project: " + JSON.stringify(res));
-                return res ;
-            })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project/" + projectname, { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        console.log("project: " + JSON.stringify(res));
+                        return res ;
+                    })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     };
 
     // post a project
-    PostProject(payload) {
-        axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
+    PostProject(event) {
+        event.preventDefault();
+        let date = new Date();
+        const that = this;
+        
+        if (this.state.ProjectName === "") return alert("Please fill in the Project Name");
+        this.setState({CreatedDate: date.toDateString()});
+        
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                let payload = that.state;
+                axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(response => {
+                        console.log(response);
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        alert("The Project Name already exists!")
+                    });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+    }   
 
     // put a project with project name
     PutProject(projectname,payload) {
-        axios.put("/api/project" + projectname, payload, { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.put("/api/project" + projectname, payload, { headers: { 'Authorization': "bearer " + token } })
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
+
+    searchProject(projectName) {
+        this.props.history.push("/search?project=" + projectName);
+    }
+    
     ///////////////////////////////////////////////////////////
 
     componentDidMount() {
-        axios.get("/api/project", { headers: { 'Authorization': "bearer " + getToken() } })
-            .then(res => {
-                this.setState({projects: res.data})
-            }).catch (err => {
-            console.log(err);
-        })
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/project", { headers: { 'Authorization': "bearer " +  token } })
+                    .then(res => {
+                        that.setState({projects: res.data})
+                    }).catch (err => {
+                    console.log(err);
+                })
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
     }
     
     
@@ -76,13 +137,48 @@ export class Project extends Component {
             </div>
         );
     }
+    
 
     // TODO
     renderFunction() {
         return (
+            <div>
             <div className="fnbar">
-                <button>Create Project</button>
+                <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>CREATE PROJECT</button>
             </div>
+                <div className={this.state.showAdd ? '' : 'hidden'}>
+                <br />
+                <form onSubmit={this.PostProject} className="handleTag">
+                    ADD NEW PROJECT
+                    <br />
+                    Project Name:
+                    <label>
+                        <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
+                    </label>
+                    <br />
+                    Project Description:
+                    <label>
+                        <input type="text" name="Description" value={this.state.Description} onChange={this.handleChange} />
+                    </label>
+                    <br />
+                    Active?:
+                    <label>
+                        <input 
+                            type="checkbox" 
+                            name="Active"
+                            checked={this.state.Active}
+                            onChange={this.handleChange} />
+                    </label>
+                    <input type="submit" value="Add"/>
+                </form>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                </div>
+            </div>
+            
         )
     }
 
@@ -95,7 +191,6 @@ export class Project extends Component {
         
         
         // get a project info
-        this.GetProject('Capilano Bridge');
 
         /*
         // Post project
@@ -119,7 +214,10 @@ export class Project extends Component {
         
         for (let i = 0; i < projects.length; i++){
             let project = {};
-            project.name =  <Link to={{ pathname: "/" + projects[i].ProjectName }}>{projects[i].ProjectName}</Link>;
+            project.name =  <Link to={{ pathname: "/search?project=" + projects[i].ProjectName }} 
+                                  onClick={() => window.location.refresh()}>
+                {projects[i].ProjectName}</Link>;
+            
             project.date = projects[i].CreatedDate;
             project.description = projects[i].Description;
             tableData.push(project);

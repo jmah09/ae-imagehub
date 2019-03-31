@@ -4,10 +4,11 @@ import { TextInput } from '../sub-components/form-text-input';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import axios from 'axios';
-import { getToken } from '../../adalConfig';
+import {adalConfig, authContext} from '../../adalConfig';
 import { Redirect } from 'react-router-dom';
 
 import './edit-image.css';
+import {adalGetToken} from "react-adal";
 
 export class ImageEditor extends Component {
 
@@ -81,21 +82,28 @@ export class ImageEditor extends Component {
   submitImage = () =>
   {    
     var fd = new FormData();
+    const that = this;
 
     fd.append('image', this.dataURItoBlob(this.cropper.getCroppedCanvas().toDataURL()), "edited image");
-    axios({
-      url: '/api/image/',
-      method: 'POST',
-      data: fd,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': "bearer " + getToken()
-      }
-    })
-    .then(res => {
-      this.setState({ redirect: true });
-    })
-  }
+    adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(function (token) {
+          axios({
+            url: '/api/image/',
+            method: 'POST',
+            data: fd,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': "bearer " + token
+            }
+          })
+              .then(res => {
+                that.setState({ redirect: true });
+              })
+        }).catch(function (err) {
+      console.log("Error: Couldn't get token")
+    });
+    
+  };
 
   //
   // edit image functions

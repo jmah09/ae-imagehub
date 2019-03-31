@@ -16,6 +16,7 @@
     "react-grid": "^1.1.7",
     "react-grid-gallery": "^0.5.4",
     "react-image-gallery": "^0.8.14",
+    "react-image-lightbox": "^5.1.0",
     "react-images": "^0.5.19",
     "react-images-upload": "^1.2.6",
     "react-photo-gallery": "^6.3.2",

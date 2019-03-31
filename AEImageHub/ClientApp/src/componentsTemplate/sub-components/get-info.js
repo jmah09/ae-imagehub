@@ -4,29 +4,32 @@ import { TextInput } from './form-text-input';
 import { Dropdown } from './form-dropdown';
 import { Redirect } from 'react-router-dom';
 
-import { getToken } from '../../adalConfig';
 import axios from 'axios';
 
 import './get-info.css';
+
+import Lightbox from "react-image-lightbox";
+import "react-image-lightbox/style.css";
+import {adalGetToken} from "react-adal";
+import {authContext, adalConfig} from "../../adalConfig";
 
 export class GetInfo extends Component {
 
   constructor(props)
   {
 
-    const token = getToken();
 
     super(props);
 
     this.state = {
-      token: token,
-
       classification: {},
       photos: props.location.state.photos,
 
       redirectLink: props.location.state.redirectLink,
       redirectOption: false,
-      redirect: false
+      redirect: false,
+      photoIndex: 0,
+      isOpen: false
     }
 
     this.getClassification();
@@ -37,22 +40,30 @@ export class GetInfo extends Component {
   //
   getClassification = () =>
   {
-    axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + this.state.token }})
-      .then((res) => {
-        let obj = {};
-        obj[''] = '';
+    const that = this;
+    adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(function (token) {
+          axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + token }})
+              .then((res) => {
+                let obj = {};
+                obj[''] = '';
 
-        res.data.forEach((item) => {
-          let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
-          obj[name] = {
-            name: name,
-            selected: false
-          };
-        });
+                res.data.forEach((item) => {
+                  let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
+                  obj[name] = {
+                    name: name,
+                    selected: false
+                  };
+                });
 
-        this.setState({ classification: obj });
-      })
-      .catch((err) => { console.log(err); });
+                that.setState({ classification: obj });
+              })
+              .catch((err) => { console.log(err); });
+        }).catch(function (err) {
+      console.log("Error: Couldn't get token")
+    });
+    
+
   }
 
   getProject = () =>
@@ -197,22 +208,51 @@ export class GetInfo extends Component {
   // render
   //
   render() {
+    
+    
     return (
       <div>
         <Title title='GET INFO' />
         {this.renderRedirect()}
         {this.renderFunction()}
         {this.renderGetInfo()}
+        
       </div>
     );
   }
   
   renderFunction()
   {
+    const { photoIndex, isOpen } = this.state;
+    let images = [];
+    this.state.photos.map((i) =>
+        images.push(i.src)
+    );
     return (
       <div className="fnbar">
         <button onClick={this.onCancel}>Cancel</button>
         <button onClick={this.onSave}>Save</button>
+        <button type="button" onClick={() => this.setState({ isOpen: true })}>
+          Zoom
+        </button>
+        {isOpen && (
+            <Lightbox
+                mainSrc={images[photoIndex]}
+                nextSrc={images[(photoIndex + 1) % images.length]}
+                prevSrc={images[(photoIndex + images.length - 1) % images.length]}
+                onCloseRequest={() => this.setState({ isOpen: false })}
+                onMovePrevRequest={() =>
+                    this.setState({
+                      photoIndex: (photoIndex + images.length - 1) % images.length
+                    })
+                }
+                onMoveNextRequest={() =>
+                    this.setState({
+                      photoIndex: (photoIndex + 1) % images.length
+                    })
+                }
+            />
+        )}
       </div>
     );
   

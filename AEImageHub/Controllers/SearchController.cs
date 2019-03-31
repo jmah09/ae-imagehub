@@ -141,11 +141,10 @@ namespace AEImageHub.Controllers
         [HttpGet("date/{udate}")]
         public Object GetImagesWithUploadedDate(string udate)
         {
-            DateTime startDate = DateTime.Parse(udate.Substring(4, 2) + "/" + udate.Substring(6, 2) + "/" + udate.Substring(0,4));
-            DateTime endDate = DateTime.Parse(udate.Substring(12, 2) + "/" + udate.Substring(14, 2) + "/" + udate.Substring(8, 4));
-            
             try
             {
+                DateTime startDate = DateTime.Parse(udate.Substring(4, 2) + "/" + udate.Substring(6, 2) + "/" + udate.Substring(0, 4));
+                DateTime endDate = DateTime.Parse(udate.Substring(12, 2) + "/" + udate.Substring(14, 2) + "/" + udate.Substring(8, 4));
                 var images = _context.Image.Where(i => i.UploadedDate >= startDate && i.UploadedDate <= endDate && i.Submitted && !i.Trashed);
                 return JsonConvert.SerializeObject(images);
             }

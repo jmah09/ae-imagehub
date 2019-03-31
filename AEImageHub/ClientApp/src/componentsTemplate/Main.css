@@ -168,3 +168,39 @@ h2 {
     margin-top: 40px;
     display: flex;
 }
+
+
+.handleTag {
+  float: right;
+  margin: 0px;
+  padding: 0px 0px;
+  font-size: 15px;
+}
+
+.handleTag input[type="text"] {
+   width: 150px;
+ }
+
+.handleTag input[type="text"][name="newTag"] {
+  margin: 2px 0px 2px 9px;
+  width: 150px;
+}
+
+.handleTag input[type="submit"] {
+  background-color: #1B53AD;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  margin: -3px 0px 0px 20px;
+  padding: 2px 10px;
+  width: 80px;
+  color: #FFF;
+}
+
+.handleTag input[type="submit"]:hover {
+  background-color: #287AFF;
+}
+
+.hidden { 
+  display:none; 
+}

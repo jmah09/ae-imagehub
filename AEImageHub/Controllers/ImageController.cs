@@ -99,7 +99,8 @@ namespace ImageServer.Controllers
                 UploadedDate = DateTime.Now,
                 Type = _repo.GetFileExtension(image),
                 Trashed = false,
-                Submitted = false
+                Submitted = false,
+                UploadedBy = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
             };
             return img;
         }
@@ -149,20 +150,42 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
         [HttpPut("{imageid}")]
+        [AllowAnonymous]
         public Object PutImage(string imageid, [FromBody] JObject payload)
         {
             
             try
             { 
                 Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                if (payload["UId"].Type != JTokenType.Null) { image.UId = (string)payload["UId"]; };
                 if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
                 if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
-                if (payload["Submitted"].Type != JTokenType.Null) { image.Submitted = (bool)payload["Submitted"]; };
+                if (payload["Submitted"].Type != JTokenType.Null)
+                {
+                    image.Submitted = (bool)payload["Submitted"];
+                    if (!image.Submitted)
+                    {
+                        var projectlinks = _context.ProjectLink.Where(pl => pl.IId == imageid);
+                        var loglinks = _context.LogLink.Where(ll => ll.IId == imageid);
+                        foreach(var pl in projectlinks)
+                        {
+                            _context.ProjectLink.Remove(pl);
+                        }
+
+                        foreach (var ll in loglinks)
+                        {
+                            _context.LogLink.Remove(ll);
+                        }
+                    }
+                };
+                
                 _context.SaveChanges();
                 return imageid;
             }
             catch (Exception e)
             {
+                Console.WriteLine("Reached 169");
+                Console.WriteLine(e.Message);
                 return e;
             }
         }
@@ -181,6 +204,7 @@ namespace ImageServer.Controllers
         404 - image does not exist
         */
 
+        [Authorize (Policy = "Admins")]
         [HttpDelete(("{uri}"))]
         public IActionResult DeleteImage(string uri)
         {
