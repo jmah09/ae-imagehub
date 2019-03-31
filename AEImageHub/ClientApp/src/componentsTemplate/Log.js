@@ -85,7 +85,7 @@ export class Log extends Component {
         ];
         
         return (
-            <ReactTable data={tableData} columns={columns} />
+            <ReactTable data={tableData} columns={columns} defaultSorted={[{id : "date", desc: true}]}/>
         )
     }
 
