@@ -135,22 +135,24 @@ export class GetInfo extends Component {
   {
     let photos = this.state.photos;
     let tags;
-      let imageID;
-      console.log(JSON.stringify(photos)); 
+    let imageID;
+    console.log(JSON.stringify(photos));
+    
     for (let i = 0; i < photos.length; i++){
       tags = photos[i].meta.TagLink;
       console.log(tags);
       imageID = photos[i].meta.IId;
       
-      axios.delete("/api/tag/taglink/" + imageID, 
-          {headers: {'Authorization': "bearer " + this.state.token}
-      }).then (response =>{
-        console.log(response)
-      }).catch( error => {
-        console.log(error);
-      });
-
-        console.log(tags.length);      
+      if (tags.length > 0) {
+        axios.delete("/api/tag/taglink/" + imageID,
+            {headers: {'Authorization': "bearer " + this.state.token}
+            }).then (response =>{
+          console.log(response)
+        }).catch( error => {
+          console.log(error);
+        });
+      }
+      
       for (let k = 0; k < tags.length; k++){
         axios.post("/api/tag/taglink", {
           TagName: tags[k],
@@ -168,7 +170,6 @@ export class GetInfo extends Component {
       redirectOption: true,
       redirect: true
     });
-    e.preventDefault();
   };
   
   //
