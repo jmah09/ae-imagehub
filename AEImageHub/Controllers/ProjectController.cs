@@ -135,7 +135,7 @@ namespace AEImageHub.Controllers
                 if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
                 if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
                 if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
-                if (payload["Active"].Type != JTokenType.Null) { project.Description = (string)payload["Active"]; };
+                if (payload["Active"].Type != JTokenType.Null) { project.Active = (bool)payload["Active"]; };
                 _context.SaveChanges();
                 return "success";
             }
