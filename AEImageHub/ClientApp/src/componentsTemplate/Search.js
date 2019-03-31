@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import { Dropdown } from './sub-components/form-dropdown';
 import { TextInput } from './sub-components/form-text-input';
-import { adalConfig, authContext, getUser } from '../adalConfig';
+import {adalConfig, authContext, getUser, isAdmin} from '../adalConfig';
 import { adalGetToken } from "react-adal";
 import axios from 'axios';
 import Gallery from './custom-photo-gallery';
@@ -64,7 +64,17 @@ export class Search extends Component {
     }
 
   }
-
+  
+  componentDidMount()
+  {
+    let param = this.props.location.search;
+    if (param.includes("?project=")) {
+      this.state.input_1 = param.split("=")[1];
+      this.state.option = "Project";
+      this.getSearch();
+    }
+  }
+  
   //
   // axios request
   //

@@ -85,7 +85,7 @@ namespace AEImageHub.Controllers
         2. Project credentials
 
         Server response and status code:
-        201 - Project creation was successful
+        200 - Project creation was successful
         401 - the JWT attached to the header is invalid or expired(should redirect to login)
         403 - user not authorized to create project
         */
@@ -109,7 +109,7 @@ namespace AEImageHub.Controllers
             }
             catch (Exception e)
             {
-                return e;
+                return BadRequest(e.Message);
             }
         }
 
@@ -135,7 +135,7 @@ namespace AEImageHub.Controllers
                 if (payload["ProjectName"].Type != JTokenType.Null) { project.ProjectName = (string)payload["ProjectName"]; };
                 if (payload["CreatedDate"].Type != JTokenType.Null) { project.CreatedDate = (DateTime)payload["CreatedDate"]; };
                 if (payload["Description"].Type != JTokenType.Null) { project.Description = (string)payload["Description"]; };
-                if (payload["Active"].Type != JTokenType.Null) { project.Description = (string)payload["Active"]; };
+                if (payload["Active"].Type != JTokenType.Null) { project.Active = (bool)payload["Active"]; };
                 _context.SaveChanges();
                 return "success";
             }
