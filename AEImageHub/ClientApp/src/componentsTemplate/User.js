@@ -95,11 +95,12 @@ export class User extends Component {
             {
                 Header: 'Email',
                 accessor: 'email',
+                show: false
             },
             {
-                Header: 'Uid',
+                Header: 'UId',
                 accessor: 'uid',
-                show: false
+                show: true
             },
             {
                 Header: 'userPrincipalName',

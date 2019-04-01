@@ -91,6 +91,8 @@ export class Metadata extends Component {
                         console.log("successfully created tag!");
                         // alert("New Classification Created. Name: " + this.state.newTag + ", Description: " + _description);
                         console.log(res);
+                        window.location.reload()
+                        
                     })
                     .catch(res => {
                         console.log("caught error for creating tag!");
@@ -174,6 +176,7 @@ export class Metadata extends Component {
 
 
     handleSubmit(event) {
+        event.preventDefault();
         let _description = this.state.newDescription;
         
         if (_description === "") {
@@ -181,7 +184,7 @@ export class Metadata extends Component {
         }
         if (!(this.state.newTag === "")) {
             this.createTag(this.state.newTag, _description);
-            this.setState({newTag: ""});
+           // this.setState({newTag: ""});
         }
         else {
             alert("Please input name for new classification.");
