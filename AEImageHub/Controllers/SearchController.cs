@@ -42,15 +42,16 @@ namespace AEImageHub.Controllers
             {
                 if (imagename.Contains("\""))
                 {
-                    var images = _context.Image
-                        .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);        
+                    var images = this.CreateImageModel()
+                        .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);
 
                     return JsonConvert.SerializeObject(images);
                 }
                 else
                 {
-                    var images = _context.Image
-                        .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed);        
+                    imagename = imagename.Replace("\"", "");
+                    var images = this.CreateImageModel()
+                        .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed);
 
                     return JsonConvert.SerializeObject(images);
                 }
@@ -67,10 +68,10 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                List<TagLink> taglink;
+                List<TagLink> taglinks;
                 if (!tagname.Contains("\""))
                 {
-                    taglink = _context.TagLink.Select(tl => new TagLink
+                    taglinks = _context.TagLink.Select(tl => new TagLink
                     {
                         TlinkId = tl.TlinkId,
                         TagName = tl.TagName,
@@ -79,23 +80,44 @@ namespace AEImageHub.Controllers
                 }
                 else
                 {
-                    taglink = _context.TagLink.Select(tl => new TagLink
+                    tagname = tagname.Replace("\"", "");
+                    taglinks = _context.TagLink.Select(tl => new TagLink
                     {
                         TlinkId = tl.TlinkId,
                         TagName = tl.TagName,
+                        IId = tl.IId,
                         I = tl.I
-                    }).Where(tl => tl.TagName == tagname).ToList();
+                    })
+                    .Where(tl => tl.TagName == tagname).ToList();
                 }
-               
+
                 var images = new List<Image>();
-                foreach (var tl in taglink)
+
+                foreach (var tl in taglinks)
                 {
                     if (tl.I.Submitted && !tl.I.Trashed)
                     {
+                        tl.I.TagLink = _context.TagLink.Select(tl2 => new TagLink
+                        {
+                            TlinkId = tl2.TlinkId,
+                            TagName = tl2.TagName,
+                            IId = tl2.IId,
+                        }).Where(tl2 => tl2.IId == tl.I.IId).ToList();
+                        tl.I.ProjectLink = _context.ProjectLink.Select(pl2 => new ProjectLink
+                        {
+                            PlinkId = pl2.PlinkId,
+                            ProjectName = pl2.ProjectName,
+                            IId = pl2.IId,
+                        }).Where(pl2 => pl2.IId == tl.I.IId).ToList();
+                        tl.I.U = _context.User.Select(u2 => new User
+                        {
+                            UId = u2.UId,
+                            UserName = u2.UserName
+                        }).Where(u2 => u2.UId == tl.I.UId).First();
                         images.Add(tl.I);
                     }
                 }
-                    return JsonConvert.SerializeObject(images);
+                return JsonConvert.SerializeObject(images);
             }
             catch (Exception e)
             {
@@ -106,12 +128,12 @@ namespace AEImageHub.Controllers
         [HttpGet("project/{projectname}")]
         public Object GetImagesWithProjectname(string projectname)
         {
-            List<ProjectLink> projectlink;
+            List<ProjectLink> projectlinks;
             try
             {
                 if (!projectname.Contains("\""))
                 {
-                     projectlink = _context.ProjectLink.Select(pl => new ProjectLink
+                    projectlinks = _context.ProjectLink.Select(pl => new ProjectLink
                     {
                         PlinkId = pl.PlinkId,
                         ProjectName = pl.ProjectName,
@@ -120,20 +142,37 @@ namespace AEImageHub.Controllers
                 }
                 else
                 {
-                    projectname = projectname.Replace("\"","");
-                    projectlink = _context.ProjectLink.Select(pl => new ProjectLink
+                    projectname = projectname.Replace("\"", "");
+                    projectlinks = _context.ProjectLink.Select(pl => new ProjectLink
                     {
                         PlinkId = pl.PlinkId,
                         ProjectName = pl.ProjectName,
                         I = pl.I
                     }).Where(pl => pl.ProjectName == projectname).ToList();
                 }
-                
+
                 var images = new List<Image>();
-                foreach (var pl in projectlink)
+                foreach (var pl in projectlinks)
                 {
                     if (pl.I.Submitted && !pl.I.Trashed)
                     {
+                        pl.I.TagLink = _context.TagLink.Select(tl2 => new TagLink
+                        {
+                            TlinkId = tl2.TlinkId,
+                            TagName = tl2.TagName,
+                            IId = tl2.IId,
+                        }).Where(tl2 => tl2.IId == pl.I.IId).ToList();
+                        pl.I.ProjectLink = _context.ProjectLink.Select(pl2 => new ProjectLink
+                        {
+                            PlinkId = pl2.PlinkId,
+                            ProjectName = pl2.ProjectName,
+                            IId = pl2.IId,
+                        }).Where(pl2 => pl2.IId == pl.I.IId).ToList();
+                        pl.I.U = _context.User.Select(u2 => new User
+                        {
+                            UId = u2.UId,
+                            UserName = u2.UserName
+                        }).Where(u2 => u2.UId == pl.I.UId).First();
                         images.Add(pl.I);
                     }
                 }
@@ -164,6 +203,7 @@ namespace AEImageHub.Controllers
                 }
                 else
                 {
+                    username = username.Replace("\"", "");
                     users = _context.User.Select(u => new User
                     {
                         UId = u.UId,
@@ -171,7 +211,7 @@ namespace AEImageHub.Controllers
                         Image = u.Image
                     }).Where(u => u.UserName == username).ToList();
                 }
-                
+
 
                 var images = new List<Image>();
                 foreach (var u in users)
@@ -180,6 +220,23 @@ namespace AEImageHub.Controllers
                     {
                         if (i.Submitted && !i.Trashed)
                         {
+                            i.TagLink = _context.TagLink.Select(tl2 => new TagLink
+                            {
+                                TlinkId = tl2.TlinkId,
+                                TagName = tl2.TagName,
+                                IId = tl2.IId,
+                            }).Where(tl2 => tl2.IId == i.IId).ToList();
+                            i.ProjectLink = _context.ProjectLink.Select(pl2 => new ProjectLink
+                            {
+                                PlinkId = pl2.PlinkId,
+                                ProjectName = pl2.ProjectName,
+                                IId = pl2.IId,
+                            }).Where(pl2 => pl2.IId == i.IId).ToList();
+                            i.U = _context.User.Select(u2 => new User
+                            {
+                                UId = u2.UId,
+                                UserName = u2.UserName
+                            }).Where(u2 => u2.UId == i.UId).First();
                             images.Add(i);
                         }
                     }
@@ -191,7 +248,7 @@ namespace AEImageHub.Controllers
                 return e;
             }
         }
-        
+
         [HttpGet("date/{udate}")]
         public Object GetImagesWithUploadedDate(string udate)
         {
@@ -199,13 +256,33 @@ namespace AEImageHub.Controllers
             {
                 DateTime startDate = DateTime.Parse(udate.Substring(4, 2) + "/" + udate.Substring(6, 2) + "/" + udate.Substring(0, 4));
                 DateTime endDate = DateTime.Parse(udate.Substring(12, 2) + "/" + udate.Substring(14, 2) + "/" + udate.Substring(8, 4));
-                var images = _context.Image.Where(i => i.UploadedDate >= startDate && i.UploadedDate <= endDate && i.Submitted && !i.Trashed);
+                var images = this.CreateImageModel()
+                                    .Where(i => i.UploadedDate >= startDate && i.UploadedDate <= endDate && i.Submitted && !i.Trashed);
                 return JsonConvert.SerializeObject(images);
             }
             catch (Exception e)
             {
                 return e;
             }
+        }
+
+        private IQueryable<Image> CreateImageModel()
+        {
+            return _context.Image.Select(i => new Image
+            {
+                IId = i.IId,
+                UId = i.UId,
+                ImageName = i.ImageName,
+                Size = i.Size,
+                UploadedDate = i.UploadedDate,
+                Type = i.Type,
+                Trashed = i.Trashed,
+                TrashedDate = i.TrashedDate,
+                Submitted = i.Submitted,
+                U = i.U,
+                ProjectLink = i.ProjectLink,
+                TagLink = i.TagLink
+            });
         }
     }
 }
