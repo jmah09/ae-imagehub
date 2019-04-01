@@ -8,26 +8,28 @@ import './Main.css';
 import logo from './img/logo.png';
 
 export class Header extends Component {
-    SignOut() {
-        authContext.logOut();
-    }
 
-    render() {
+  SignOut()
+  {
+    authContext.logOut();
+  }
 
-        let userid = getUser().profile.name;
+  render()
+  {
+    let userid = getUser().profile.name;
 
-        return (
-            <div id="Header">
-                <div id="hdricon">
-                    <Link to={'/'}>
-                        <Image src={logo} />
-                    </Link>
-                    <div id="hdrname">
-                        <span>{userid}</span>
-                        <button onClick={this.SignOut}>Sign Out</button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    return (
+      <div id="Header">
+        <div id="hdricon">
+          <Link to={'/'}>
+            <Image src={logo} />
+          </Link>
+          <div id="hdrname">
+            <span>{userid}</span>
+            <button onClick={this.SignOut}>SIGN OUT</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }

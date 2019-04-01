@@ -357,8 +357,6 @@ export class Search extends Component {
 
     this.setState({
       filters: allFilters,
-      input_1: '',
-      input_2: '',
 
       filteredPhotos: filteredPhotos
     });
@@ -398,9 +396,11 @@ export class Search extends Component {
           case 'User':
             res = item.meta.UserName.toLowerCase() === filter.input_1.toLowerCase();
           case 'Date':
+            let filter_now = item.meta.UploadedDate.split('-')
             let filter_pre = filter.input_1.toString();
             let filter_post = filter.input_2.toString();
-            let date_now = new Date(item.meta.UploadedDate);
+
+            let date_now = new Date(filter_now[0] + ',' + filter_now[1] + ',' + filter_now[2]);
             let date_pre = new Date(filter_pre.substring(0,4) + ',' + filter_pre.substring(4,6) + ',' + filter_pre.substring(6,8));
             let date_post = new Date(filter_post.substring(0,4) + ',' + filter_post.substring(4,6) + ',' + filter_post.substring(6,8));
 
@@ -438,7 +438,7 @@ export class Search extends Component {
 
     for (let i = 0; i < filters.length; i++)
     {
-      let filter = filters[0];
+      let filter = filters[i];
       
       filteredPhotos = await this.performFilter(filteredPhotos, filter);
     }
