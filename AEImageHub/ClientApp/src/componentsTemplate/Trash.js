@@ -97,7 +97,7 @@ export class Trash extends Component {
 
         axios.all(promises)
             .then(function (res) {
-             //   window.location.reload();
+                window.location.reload();
             })
             .catch(function (err) {
                 console.log("Delete failed: " + err.response)
