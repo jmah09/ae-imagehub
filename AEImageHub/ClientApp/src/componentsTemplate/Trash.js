@@ -65,22 +65,28 @@ export class Trash extends Component {
             return value.selected;
         });
 
-        const notSelected = this.state.photos.filter((value, index, array) => {
-            return !value.selected;
-        });
+        let promises = [];
 
-        selected.map((image, index) => {
-            image.meta.Trashed = false;
-            adalGetToken(authContext, adalConfig.endpoints.api)
-                .then(function (token){
-                    axios.delete("api/image/" + image.meta.IId, { headers: { 'Authorization': "bearer " + token } })
-                        .then(function (res) {
-                            window.location.reload();
-                        }).catch(function (err) {
-                        console.log(err.response);
-                    });
-                });
-        })
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                for (let i = 0; i < selected.length; i++) {
+                    promises.push(
+                        axios.delete("api/image/" + selected[i].meta.IId,
+                            {headers: {'Authorization': "bearer " + token}})
+                    )
+                }
+            })
+            .catch(function (err) {
+                console.log("couldn't authorize: " + err.response)
+            });
+
+        axios.all(promises)
+            .then(function (res) {
+                window.location.reload();
+            })
+            .catch(function (err) {
+                console.log("Delete failed: " + err.response)
+            });
     }
     
 
@@ -116,31 +122,38 @@ export class Trash extends Component {
     RecoverSelectedImages() {
         const selected = this.state.photos.filter((value, index, array) => {
             return value.selected;
-        })
+        });
 
         const notSelected = this.state.photos.filter((value, index, array) => {
             return !value.selected;
-        })
+        });
 
-        selected.map((image, index) => {
-            image.meta.Trashed = false;
-            const that = this;
-            adalGetToken(authContext, adalConfig.endpoints.api)
-                .then(function (token) {
-                    axios.put("/api/image/" + image.meta.IId, image.meta, {headers: {'Authorization': "bearer " + token }})
-                        .then(response => {
-                            console.log(response);
-                            that.setState({
-                                photos: notSelected
-                            })
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                }).catch(function (err) {
-                console.log("Error: Couldn't get token")
+        let promises = [];
+        
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                for (let i = 0; i < selected.length; i++) {
+                    selected[i].meta.Trashed = false;
+                    promises.push(
+                        axios.put("/api/image/" + selected[i].meta.IId, selected[i].meta, 
+                        {headers: {'Authorization': "bearer " + token }})
+                    )
+                }
+             
+            }).catch(function (err) {
+            console.log("Error: Couldn't get : " + err.response)
+        });
+        
+        const that = this;
+        axios.all(promises)
+            .then(function (res){
+                that.setState({
+                    photos: notSelected
+                });
+            })
+            .catch(function (err){
+                console.log("Recover failed: " + err)
             });
-        })
     }
 
     renderRedirect()
