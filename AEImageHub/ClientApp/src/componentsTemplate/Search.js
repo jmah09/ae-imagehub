@@ -215,14 +215,19 @@ export class Search extends Component {
   //
   handleListChange = (e) =>
   {
-    this.setState({ option: e.target.value });
-
     if (e.target.value === 'Date')
     {
-      this.setState({ showDateInput: true });
+      this.setState({ 
+        option: e.target.value,
+        input_1: '',
+        input_2: '',
+        showDateInput: true
+      });
     }
     else {
       this.setState({
+        option: e.target.value,
+        input_1: '',
         input_2: '',
         showDateInput: false
       });
@@ -339,8 +344,8 @@ export class Search extends Component {
         return;
       }
 
-      let date_pre = new Date(filter_pre.substring(0,4) + ',' + filter_pre.substring(4,6) + ',' + filter_pre.substring(6,8));
-      let date_post = new Date(filter_post.substring(0,4) + ',' + filter_post.substring(4,6) + ',' + filter_post.substring(6,8));
+      let date_pre = new Date(filter_pre.substring(0,4) + '-' + filter_pre.substring(4,6) + '-' + filter_pre.substring(6,8));
+      let date_post = new Date(filter_post.substring(0,4) + '-' + filter_post.substring(4,6) + '-' + filter_post.substring(6,8));
 
       if (date_pre == 'Invalid Date' || date_post == 'Invalid Date')
       {
@@ -367,7 +372,7 @@ export class Search extends Component {
     return new Promise(resolve => {
       let filtered = photos.filter((item) => {
         let res = false;
-  
+        console.log(JSON.stringify(item,null,2));
         switch (filter.option)
         {
           case 'Name':
@@ -376,7 +381,7 @@ export class Search extends Component {
           case 'Classification':
             for (let i = 0; i < item.meta.TagLink.length; i++)
             {
-              if (item.meta.TagLink[i].toLowerCase() === filter.input_1.toLowerCase())
+              if (item.meta.TagLink[i].toLowerCase().includes(filter.input_1.toLowerCase()))
               {
                 res = true;
                 break;
@@ -386,7 +391,7 @@ export class Search extends Component {
           case 'Project':
             for (let i = 0; i < item.meta.ProjectLink.length; i++)
             {
-              if (item.meta.ProjectLink[i].toLowerCase() === filter.input_1.toLowerCase())
+              if (item.meta.ProjectLink[i].toLowerCase().includes(filter.input_1.toLowerCase()))
               {
                 res = true;
                 break;
@@ -394,15 +399,16 @@ export class Search extends Component {
             }
             break;
           case 'User':
-            res = item.meta.UserName.toLowerCase() === filter.input_1.toLowerCase();
+            res = item.meta.UserName.toLowerCase().includes(filter.input_1.toLowerCase());
           case 'Date':
-            let filter_now = item.meta.UploadedDate.split('-')
+            //let filter_now = item.meta.UploadedDate.split('-')
             let filter_pre = filter.input_1.toString();
             let filter_post = filter.input_2.toString();
 
-            let date_now = new Date(filter_now[0] + ',' + filter_now[1] + ',' + filter_now[2]);
-            let date_pre = new Date(filter_pre.substring(0,4) + ',' + filter_pre.substring(4,6) + ',' + filter_pre.substring(6,8));
-            let date_post = new Date(filter_post.substring(0,4) + ',' + filter_post.substring(4,6) + ',' + filter_post.substring(6,8));
+            //let date_now = new Date(filter_now[0] + '-' + filter_now[1] + '-' + filter_now[2]);
+            let date_now = new Date(item.meta.UploadedDate);
+            let date_pre = new Date(filter_pre.substring(0,4) + '-' + filter_pre.substring(4,6) + '-' + filter_pre.substring(6,8));
+            let date_post = new Date(filter_post.substring(0,4) + '-' + filter_post.substring(4,6) + '-' + filter_post.substring(6,8));
 
             if (date_pre <= date_now && date_now <= date_post)
             {
