@@ -143,42 +143,42 @@ export class GetInfo extends Component {
   // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
   onSave = () =>
   {
-    let photos = this.state.photos;
-    let tags;
-    let imageID;
-    console.log(JSON.stringify(photos));
-    
-    for (let i = 0; i < photos.length; i++){
-      tags = photos[i].meta.TagLink;
-      console.log(tags);
-      imageID = photos[i].meta.IId;
-      
-      if (tags.length > 0) {
-        axios.delete("/api/tag/taglink/" + imageID,
-            {headers: {'Authorization': "bearer " + this.state.token}
-            }).then (response =>{
-          console.log(response)
-        }).catch( error => {
-          console.log(error);
-        });
+    const photos = this.state.photos.filter((value) => {
+      return value.selected;
+    });
+    let that = this;
+    adalGetToken(authContext, adalConfig.endpoints.api).then(function (token){
+      const request_param= {headers: {'Authorization': "bearer " + token}};
+      let promises = [];
+      for (let i = 0; i < photos.length; i++){
+        let imageID = photos[i].meta.IId;
+        let tags = photos[i].meta.TagLink;
+        promises.push (
+            axios.delete("/api/tag/taglink/" + imageID, request_param).then( response => {
+              console.log(response);
+              for (let k = 0; k < tags.length; k++){
+                axios.post("/api/tag/taglink", {
+                  TagName: tags[k],
+                  IId: imageID,
+                }, request_param)
+              }
+            }).catch (error => {
+              console.log(error);
+            })
+        )
       }
       
-      for (let k = 0; k < tags.length; k++){
-        axios.post("/api/tag/taglink", {
-          TagName: tags[k],
-          IId: imageID,
-        }, {headers: {'Authorization': "bearer " + this.state.token}
-        }).then( response => {
-          console.log(response);
-        }).catch (error => {
-          console.log(error);
+      axios.all(promises).then(function (result){
+        console.log(result);
+        that.setState({
+          redirectOption: true,
+          redirect: true
         });
-      }
-    }
-    
-    this.setState({
-      redirectOption: true,
-      redirect: true
+      }).catch(error => {
+        console.log(error);
+      })
+    }).catch (error => {
+      console.log(error);
     });
   };
   
