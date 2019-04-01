@@ -78,6 +78,7 @@ export class Log extends Component {
         //building log obj for each log obj returned from server
         for (let i = 0; i < logs.length; i++){
             let log = {};
+            // change the log name format to date_time_user
             log.name = <a href={"/logview?src=" + JSON.stringify(logs[i].LId)}>{logs[i].LId}</a>
                 //<Link to={{ pathname: "/logview?src=" + JSON.stringify(logs[i].LId)}}>{logs[i].LId}</Link>;
             log.user = logs[i].U.UserName;
@@ -102,7 +103,7 @@ export class Log extends Component {
         ];
         
         return (
-            <ReactTable data={tableData} columns={columns} />
+            <ReactTable data={tableData} columns={columns} defaultSorted={[{id : "date", desc: true}]}/>
         )
     }
 

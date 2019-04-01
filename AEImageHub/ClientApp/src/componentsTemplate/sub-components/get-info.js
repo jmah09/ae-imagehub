@@ -102,41 +102,88 @@ export class GetInfo extends Component {
 
   handleNameChange = (e) =>
   {
-    let photos = this.state.photos;
-
-    photos.forEach((img) => { img.meta.ImageName = e.target.value });
-
+    const photos = this.state.photos.filter((value) => { return value.selected; });
+    photos.forEach((img) => {
+      img.meta.ImageName = e.target.value;
+    });
+    
     this.setState({ photos: photos });
-  }
+  };
 
   // TODO
   handleClassificationChange = (e) =>
   {
-    let photos = this.state.photos;
+    const photos = this.state.photos.filter((value) => {
+    return value.selected;
+  });
+    let tags;
 
-    
-    //photos.forEach((img) => { img.meta.TagLink = [e.target.value] });
-
-    this.setState({ photos: photos });
-  }
+    //check if classification exists 
+    photos.forEach((img) => {
+      tags = img.meta.TagLink;
+      let options = e.target.options;
+      for (let i = 0; i < options.length; i++){
+        let option = options[i].selected;
+        if (option && !tags.includes(options[i].value)){
+          tags.push(options[i].value)
+        }
+      }
+      this.setState({ photos: photos});
+      console.log(this.state.photos);
+    });
+  };
 
   onCancel = () =>
   {
     this.setState({
-      redirectOption: false,
+      //redirectOption: false,
       redirect: true
     });
-  }
+  };
 
   // TODO -- SAVE METADATA TO DATABASE INSTEAD
   // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
   onSave = () =>
   {
-    this.setState({
-      redirectOption: true,
-      redirect: true
+    const photos = this.state.photos.filter((value) => {
+      return value.selected;
     });
-  }
+    let that = this;
+    adalGetToken(authContext, adalConfig.endpoints.api).then(function (token){
+      const request_param= {headers: {'Authorization': "bearer " + token}};
+      let promises = [];
+      for (let i = 0; i < photos.length; i++){
+        let imageID = photos[i].meta.IId;
+        let tags = photos[i].meta.TagLink;
+        console.log("tag length" + tags.length);
+          promises.push (
+              axios.delete("/api/tag/taglink/" + imageID, request_param).then( response => {
+                console.log(response);
+                for (let k = 0; k < tags.length; k++){
+                  axios.post("/api/tag/taglink", {
+                    TagName: tags[k],
+                    IId: imageID,
+                  }, request_param)
+                }
+              }).catch (error => {
+                console.log(error);
+              })
+          )
+      }
+      
+      axios.all(promises).then(function (result){
+        console.log(result);
+        that.setState({
+          //redirectOption: true,
+          redirect: true
+        });
+      }).catch(error => {
+        console.log(error);
+      })
+    }).catch (error => {
+      console.log(error);
+    });
+  };
   
   //
   // redirect
@@ -232,7 +279,7 @@ export class GetInfo extends Component {
             <h2>IMAGE NAME :</h2>
             <p>
               <TextInput 
-                disabled={selected.length > 1 ? true : false}
+                disabled={selected.length > 1}
                 id='getinfo_name'
                 value={selected.length > 1 ? 'Various' : null}
                 placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ImageName}
@@ -260,6 +307,7 @@ export class GetInfo extends Component {
             <h2>CLASSIFICATION :</h2>
             <p>
               <Dropdown
+                multiple={true}  
                 id="getinfo_class"
                 options={class_options}
                 onChange={this.handleClassificationChange} />

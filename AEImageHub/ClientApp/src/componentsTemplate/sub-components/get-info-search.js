@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Title } from '../Title';
 import { TextInput } from './form-text-input';
+import { Dropdown } from './form-dropdown';
 import { Redirect } from 'react-router-dom';
 
 import {authContext, adalConfig} from "../../adalConfig";
@@ -12,7 +13,7 @@ import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 import {adalGetToken} from "react-adal";
 
-export class GetInfoTrash extends Component {
+export class GetInfoSearch extends Component {
 
     constructor(props)
     {
@@ -61,8 +62,8 @@ export class GetInfoTrash extends Component {
             }).catch(function (err) {
             console.log("Error: Couldn't get token")
         });
-        
-       
+
+
     };
 
     getProject = () =>
@@ -100,7 +101,7 @@ export class GetInfoTrash extends Component {
     }
 
 
-    
+
     onCancel = () =>
     {
         this.setState({
@@ -156,7 +157,7 @@ export class GetInfoTrash extends Component {
             images.push(i.src)
         );
         console.log(images);
-        
+
         return (
             <div className="fnbar">
                 <button onClick={this.onCancel}>Close</button>
@@ -195,7 +196,6 @@ export class GetInfoTrash extends Component {
         const class_options = this.state.classification;
         class_options[''] = placeholder;
 
-        console.log(selected);
         return (
             <div id="getinfo">
                 <div className="float-left">
@@ -227,13 +227,13 @@ export class GetInfoTrash extends Component {
                         <TextInput
                             disabled={true}
                             id='getinfo_user'
-                            value={selected.length > 1 ? 'Various' : selected[0].meta.U.UserName} 
+                            value={selected.length > 1 ? 'Various' : selected[0].meta.UId} // TODO -- GET USERNAME
                             onChange={null} />
                         <br />
                     </p>
                     <h2>CLASSIFICATION :</h2>
                     <p>
-                       { <TextInput //todo value
+                        { <TextInput //todo value
                             disabled={true}
                             id="getinfo_class"
                             value = {[]}

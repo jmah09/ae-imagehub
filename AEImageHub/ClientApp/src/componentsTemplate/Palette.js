@@ -152,10 +152,11 @@ export class Palette extends Component {
     //
     // get info
     //
-    onGetInfo = () =>
+    onGetInfo = (e) =>
     {
         const selected = this.state.photos.filter((value) => { return value.selected; });
-
+        console.log(selected);
+        
         if (selected.length > 0 && !this.state.showInfo)
         {
             this.setState({

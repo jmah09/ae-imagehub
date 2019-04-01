@@ -20,7 +20,7 @@ export class TextInput extends Component {
       this.placeholder = this.props.placeholder;
     }
   }
-
+  
   render()
   {
     this.setPlaceholder();
