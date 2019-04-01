@@ -42,14 +42,14 @@ namespace AEImageHub.Controllers
             {
                 if (imagename.Contains("\""))
                 {
+                    imagename = imagename.Replace("\"", "");
                     var images = this.CreateImageModel()
                         .Where(i => i.ImageName == imagename && i.Submitted && !i.Trashed);
 
                     return JsonConvert.SerializeObject(images);
                 }
                 else
-                {
-                    imagename = imagename.Replace("\"", "");
+                {      
                     var images = this.CreateImageModel()
                         .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed);
 
