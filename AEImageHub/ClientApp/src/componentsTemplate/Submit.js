@@ -23,7 +23,7 @@ export class Submit extends Component {
       redirect: false,
       admin: false,
       validId: false,
-      userId: "",
+      userId: '',
       project: null,
       projectOptions: [],
       submitted: false
@@ -70,17 +70,6 @@ export class Submit extends Component {
       .catch(function () { console.log("Error: Couldn't get token"); });
   }
 
-  //
-  // handle
-  //
-  handleDropdownChange = (event, data) =>
-  {
-    this.setState({ project: data.value });
-  }
-
-  //
-  // on
-  //
   onSubmit = () =>
   {
     if (!this.state.project)
@@ -105,7 +94,7 @@ export class Submit extends Component {
           axios({
             url: '/api/submit',
             method: 'POST',
-            data: { images: images, project: that.state.project },
+            data: { images: images, project: that.state.project.value },
             headers: {
               'Authorization': "bearer " + token
             }
@@ -118,6 +107,14 @@ export class Submit extends Component {
           console.log("Error: Couldn't get token");
         });
     }
+  }
+
+  //
+  // handle
+  //
+  handleDropdownChange = (event) =>
+  {
+    this.setState({ project: event });
   }
 
   onCancel = () =>
