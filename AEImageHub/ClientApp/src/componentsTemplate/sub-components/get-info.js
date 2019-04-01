@@ -131,18 +131,17 @@ export class GetInfo extends Component {
     });
   };
 
-  onCancel = (e) =>
+  onCancel = () =>
   {
     this.setState({
       redirectOption: false,
       redirect: true
     });
-    e.preventDefault();
   };
 
   // TODO -- SAVE METADATA TO DATABASE INSTEAD
   // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
-  onSave = (e) =>
+  onSave = () =>
   {
     let photos = this.state.photos;
     let tags;
@@ -277,7 +276,7 @@ export class GetInfo extends Component {
             <h2>IMAGE NAME :</h2>
             <p>
               <TextInput 
-                disabled={selected.length > 1 ? true : false}
+                disabled={selected.length > 1}
                 id='getinfo_name'
                 value={selected.length > 1 ? 'Various' : null}
                 placeholder={selected.length > 1 ? 'Various' : selected[0].meta.ImageName}
