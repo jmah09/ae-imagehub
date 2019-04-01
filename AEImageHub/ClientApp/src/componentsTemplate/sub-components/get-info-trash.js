@@ -30,7 +30,7 @@ export class GetInfoTrash extends Component {
             redirect: false,
             photoIndex: 0,
             isOpen: false
-        }
+        };
 
         this.getClassification();
     }
@@ -108,7 +108,7 @@ export class GetInfoTrash extends Component {
             redirectOption: false,
             redirect: true
         });
-    }
+    };
 
     // TODO -- SAVE METADATA TO DATABASE INSTEAD
     // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
