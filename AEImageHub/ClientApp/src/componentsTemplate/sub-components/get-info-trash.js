@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Title } from '../Title';
 import { TextInput } from './form-text-input';
-import { Dropdown } from './form-dropdown';
 import { Redirect } from 'react-router-dom';
 
 import {authContext, adalConfig} from "../../adalConfig";
