@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Title } from '../Title';
 import { TextInput } from './form-text-input';
-import { Dropdown } from './form-dropdown';
+import { Dropdown } from './form-dropdown-list';
 import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
