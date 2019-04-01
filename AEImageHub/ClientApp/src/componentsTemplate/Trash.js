@@ -23,14 +23,18 @@ export class Trash extends Component {
             redirectOption: 0,
             admin: false,
             validId: false,
-            userId: ""
+            userId: "",
+            showRecover: false
+            
         };
 
         this.GetUserTrashedImages = this.GetUserTrashedImages.bind(this);
         this.RecoverSelectedImages = this.RecoverSelectedImages.bind(this);
         this.renderRedirect = this.renderRedirect.bind(this);
         this.deleteSelected = this.deleteSelected.bind(this);
-
+        this.handleChange = this.handleChange.bind(this);
+         this.sendToAnotherPalette = this.sendToAnotherPalette.bind(this);
+        
         this.componentDidMount();
         this.GetUserTrashedImages();
     }
@@ -43,6 +47,8 @@ export class Trash extends Component {
         this.state.admin = isAdmin();
         console.log("isAdminTrash ? " + this.state.admin);
         // todo valid id logic [have to change db]
+
+        this.state.redirect = false;
     }
     
     selectPhoto(event, obj) {
@@ -58,7 +64,16 @@ export class Trash extends Component {
     });
         this.setState({ photos: photos, selectAll: !this.state.selectAll });
     }
-    
+
+    handleChange(event) {
+        const target = event.target;
+        const value =  target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
 
     deleteSelected() {
         const selected = this.state.photos.filter((value, index, array) => {
@@ -156,6 +171,47 @@ export class Trash extends Component {
             });
     }
 
+
+    sendToAnotherPalette(event) {
+        event.preventDefault();
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        let promises = [];
+        const that = this;
+
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                for (let i = 0; i < selected.length; i++) {
+                    selected[i].meta.Trashed = false;
+                    selected[i].meta.UId = that.state.userId;
+                    promises.push(
+                        axios.put("/api/image/" + selected[i].meta.IId, selected[i].meta,
+                            {headers: {'Authorization': "bearer " + token }})
+                    )
+                }
+
+            }).catch(function (err) {
+            console.log("Error: Couldn't get : " + err.response)
+        });
+
+        axios.all(promises)
+            .then(function (res){
+                that.setState({
+                    photos: notSelected
+                });
+            })
+            .catch(function (err){
+                console.log("Recover failed: " + err)
+            });
+    
+    }
+    
     renderRedirect()
     {
         let redirectLink;
@@ -227,16 +283,19 @@ export class Trash extends Component {
     renderFunction() {
         if (isAdmin()) {
             return (
-                <div class="fnbar">
-                    {this.renderRedirect()}
-                    <button onClick={this.onGetInfo}>Get Info</button>
-                    <button onClick={this.RecoverSelectedImages}>Recover</button>
-                    <button onClick={this.deleteSelected}>Delete</button>
+                <div>
+                    <div className="fnbar">
+                       {this.renderRedirect()} 
+                        <button onClick={this.onGetInfo}>Get Info</button>
+                        <button onClick={this.RecoverSelectedImages}>Recover</button>
+                        <button onClick={this.deleteSelected}>Delete</button>
+                    </div>
+                    {this.renderRecoverToAnother()}
                 </div>
             )
         } else {
             return (
-                <div class="fnbar">
+                <div className="fnbar">
                     {this.renderRedirect()}
                     <button onClick={this.onGetInfo}>Get Info</button>
                     <button onClick={this.RecoverSelectedImages}>Recover</button>
@@ -248,21 +307,49 @@ export class Trash extends Component {
     // TODO
     renderContent() {
         return (
-            <div class="toggleButton">
-            <p>
-            <button onClick={this.toggleSelect}>
-            Select All
-        </button>
-        </p>
-        <Gallery
-        photos={this.state.photos}
-        columns={3}
-        onClick={this.selectPhoto}
-        ImageComponent={SelectedImage}
-        margin={4}
-        direction={"row"}
-        />
-        </div>
-    );
+            <div className="toggleButton">
+                <p>
+                    <button onClick={this.toggleSelect}>
+                        Select All
+                    </button>
+                </p>
+                <Gallery
+                    photos={this.state.photos}
+                    columns={3}
+                    onClick={this.selectPhoto}
+                    ImageComponent={SelectedImage}
+                    margin={4}
+                    direction={"row"}
+                />
+            </div>
+        );
+    }
+
+    renderRecoverToAnother() {
+        return (
+            <div>
+                <div className="fnbar">
+                    <button onClick={() => {
+                        this.setState({showRecover: !this.state.showRecover});
+                    }}>Recover To Another Palette
+                    </button>
+                </div>
+                <div className={this.state.showRecover ? '' : 'hidden'}>
+                    <br/>
+                    <form onSubmit={this.sendToAnotherPalette} className="handleTag">
+                        A list of user ids  can be found in the user management tab
+                        <br/>
+                        User ID:
+                        <label>
+                            <input type="text" name="userId" color={'black'} value={this.state.userId}
+                                   onChange={this.handleChange}/>
+                        </label>
+                        <input type="submit" value="Add"/>
+                    </form>
+                    <br/>
+                    <br/>
+                </div>
+            </div>
+        )
     }
 }
