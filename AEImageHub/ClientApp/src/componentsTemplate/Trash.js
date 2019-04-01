@@ -251,7 +251,7 @@ export class Trash extends Component {
         <Title title='TRASH' />
         {this.renderRedirect()}
         {this.renderFunction()}
-        {this.renderRecoverToAnother()}
+        {isAdmin() ? this.renderRecoverToAnother() : null}
         {this.renderContent()}
       </div>
     );
