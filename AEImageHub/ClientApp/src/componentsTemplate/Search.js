@@ -381,7 +381,7 @@ export class Search extends Component {
           case 'Classification':
             for (let i = 0; i < item.meta.TagLink.length; i++)
             {
-              if (item.meta.TagLink[i].toLowerCase().includes(filter.input_1.toLowerCase()))
+              if (item.meta.TagLink[i].TagName.toLowerCase().includes(filter.input_1.toLowerCase()))
               {
                 res = true;
                 break;
@@ -391,7 +391,7 @@ export class Search extends Component {
           case 'Project':
             for (let i = 0; i < item.meta.ProjectLink.length; i++)
             {
-              if (item.meta.ProjectLink[i].toLowerCase().includes(filter.input_1.toLowerCase()))
+              if (item.meta.ProjectLink[i].ProjectName.toLowerCase().includes(filter.input_1.toLowerCase()))
               {
                 res = true;
                 break;
@@ -399,7 +399,7 @@ export class Search extends Component {
             }
             break;
           case 'User':
-            res = item.meta.UserName.toLowerCase().includes(filter.input_1.toLowerCase());
+            res = item.meta.U.UserName.toLowerCase().includes(filter.input_1.toLowerCase());
           case 'Date':
             //let filter_now = item.meta.UploadedDate.split('-')
             let filter_pre = filter.input_1.toString();
