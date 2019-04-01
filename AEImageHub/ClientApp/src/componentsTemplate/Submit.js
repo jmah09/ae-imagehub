@@ -53,8 +53,11 @@ export class Submit extends Component {
                     .then(res => {
                         let projectOptions = [];
                         for(let i = 0 ; i < res.data.length; i++){
-                            let projectName = res.data[i].ProjectName;
-                            projectOptions.push({key: projectName, value: projectName , text: projectName});
+                            let isActive = res.data[i].Active;
+                            if (isActive) {
+                                let projectName = res.data[i].ProjectName;
+                                projectOptions.push({key: projectName, value: projectName, text: projectName});
+                            }
                         }
                         that.setState({projectOptions:projectOptions});
                     })

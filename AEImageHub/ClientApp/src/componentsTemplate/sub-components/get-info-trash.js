@@ -196,6 +196,7 @@ export class GetInfoTrash extends Component {
         const class_options = this.state.classification;
         class_options[''] = placeholder;
 
+        console.log(selected);
         return (
             <div id="getinfo">
                 <div className="float-left">
@@ -227,7 +228,7 @@ export class GetInfoTrash extends Component {
                         <TextInput
                             disabled={true}
                             id='getinfo_user'
-                            value={selected.length > 1 ? 'Various' : selected[0].meta.UId} // TODO -- GET USERNAME
+                            value={selected.length > 1 ? 'Various' : selected[0].meta.U.UserName} 
                             onChange={null} />
                         <br />
                     </p>
