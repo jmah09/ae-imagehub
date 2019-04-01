@@ -93,8 +93,10 @@ export class Search extends Component {
         let array = [];
 
         res.data.forEach((item) => {
-          let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
-          array.push(name);
+          if (item.Active)
+          {
+            array.push(item.TagName);
+          }
         });
 
         this.setState({ classifications: array });
@@ -113,7 +115,10 @@ export class Search extends Component {
         let array = [];
 
         res.data.forEach((item) => {
-          array.push(item.ProjectName);
+          if (item.Active)
+          {
+            array.push(item.ProjectName);
+          }
         })
 
         this.setState({ projects: array });
