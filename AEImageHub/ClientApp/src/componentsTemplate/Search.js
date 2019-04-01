@@ -31,6 +31,10 @@ export class Search extends Component {
       input_1: '',
       input_2: '',
 
+      search_option: '',
+      search_input_1: '',
+      search_input_2: '',
+
       showDateInput: false,
       showInfo: false,
       showResults: false,
@@ -282,7 +286,7 @@ export class Search extends Component {
 
     let curQuery = this.buildQuery();
 
-    if (this.state.option === 'Date' && (isNaN(curQuery.input_1) || isNaN(curQuery.input_2)))
+    if (curQuery.option === 'Date' && (isNaN(curQuery.input_1) || isNaN(curQuery.input_2)))
     {
       alert('Please search with the correct date format: yyyymmdd');
       return;
@@ -294,6 +298,12 @@ export class Search extends Component {
     }
 
     this.getSearch();
+
+    this.setState({
+      search_option: curQuery.option,
+      search_input_1: curQuery.input_1,
+      search_input_2: curQuery.input_2
+    });
   }
 
   resetSearch = () =>
@@ -301,6 +311,10 @@ export class Search extends Component {
     this.setState({
       input_1: '',
       input_2: '',
+
+      search_option: '',
+      search_input_1: '',
+      search_input_2: '',
 
       showInfo: false,
       showResults: false,
@@ -377,7 +391,7 @@ export class Search extends Component {
     return new Promise(resolve => {
       let filtered = photos.filter((item) => {
         let res = false;
-        console.log(JSON.stringify(item,null,2));
+        
         switch (filter.option)
         {
           case 'Name':
@@ -499,6 +513,7 @@ export class Search extends Component {
         <Title title='SEARCH' />
         {this.renderRedirect()}
         {this.renderSearchBar()}
+        {this.renderSearchInfo()}
         {this.renderFilters()}
         {this.renderFunction()}
         {this.renderContent()}
@@ -542,6 +557,36 @@ export class Search extends Component {
           : null}
       </div>
     );
+  }
+
+  renderSearchInfo = () =>
+  {
+    if (this.state.showResults)
+    {
+      if (this.search_option === 'Date')
+      {
+        return (
+          <div id="search-info">
+            <p>
+              Search for: {this.state.search_option}, {this.state.search_input_1}-{this.state.search_input_2}
+            </p>
+          </div>
+        );
+      }
+      else
+      {
+        return (
+          <div id="search-info">
+            <p>
+              Search for: {this.state.search_option}, {this.state.search_input_1}
+            </p>
+          </div>
+        );
+      }
+    }
+    else{
+      return ( null );
+    }
   }
 
   renderFilters = () =>
