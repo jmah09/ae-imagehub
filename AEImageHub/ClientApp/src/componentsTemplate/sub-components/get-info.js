@@ -113,7 +113,9 @@ export class GetInfo extends Component {
   // TODO
   handleClassificationChange = (e) =>
   {
-    let photos = this.state.photos;
+    const photos = this.state.photos.filter((value) => {
+    return value.selected;
+  });
     let tags;
 
     //check if classification exists 
@@ -134,7 +136,7 @@ export class GetInfo extends Component {
   onCancel = () =>
   {
     this.setState({
-      redirectOption: false,
+      //redirectOption: false,
       redirect: true
     });
   };
@@ -153,25 +155,26 @@ export class GetInfo extends Component {
       for (let i = 0; i < photos.length; i++){
         let imageID = photos[i].meta.IId;
         let tags = photos[i].meta.TagLink;
-        promises.push (
-            axios.delete("/api/tag/taglink/" + imageID, request_param).then( response => {
-              console.log(response);
-              for (let k = 0; k < tags.length; k++){
-                axios.post("/api/tag/taglink", {
-                  TagName: tags[k],
-                  IId: imageID,
-                }, request_param)
-              }
-            }).catch (error => {
-              console.log(error);
-            })
-        )
+        console.log("tag length" + tags.length);
+          promises.push (
+              axios.delete("/api/tag/taglink/" + imageID, request_param).then( response => {
+                console.log(response);
+                for (let k = 0; k < tags.length; k++){
+                  axios.post("/api/tag/taglink", {
+                    TagName: tags[k],
+                    IId: imageID,
+                  }, request_param)
+                }
+              }).catch (error => {
+                console.log(error);
+              })
+          )
       }
       
       axios.all(promises).then(function (result){
         console.log(result);
         that.setState({
-          redirectOption: true,
+          //redirectOption: true,
           redirect: true
         });
       }).catch(error => {
