@@ -38,6 +38,12 @@
     border: 1px solid;
 }
 
+#search-form span {
+  font-size: 14px;
+  color: #1B53AD;
+  margin: 0px 10px 0px 5px;
+}
+
 #search-content {
     margin: 15px 0px 0px 15px;
 }

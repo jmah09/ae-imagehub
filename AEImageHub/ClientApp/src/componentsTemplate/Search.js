@@ -36,6 +36,9 @@ export class Search extends Component {
       showResults: false,
 
       photos: [],
+      classifications: [],
+      projects: [],
+
       filters: [],
       filteredPhotos: [],
       selectAll: false,
@@ -63,6 +66,9 @@ export class Search extends Component {
       'Date': 'eg. yyyymmdd'
     }
 
+    this.getClassification();
+    this.getProject();
+
   }
   
   componentDidMount()
@@ -78,6 +84,45 @@ export class Search extends Component {
   //
   // axios request
   //
+  getClassification = () =>
+  {
+    adalGetToken(authContext, adalConfig.endpoints.api)
+    .then((token) => {
+      axios.get("/api/tag",  { headers: { 'Authorization': "bearer " + token }})
+      .then((res) => {
+        let array = [];
+
+        res.data.forEach((item) => {
+          let name = item.TagName.slice(0,1).toUpperCase() + item.TagName.substring(1);
+          array.push(name);
+        });
+
+        this.setState({ classifications: array });
+      })
+      .catch(function (err) { console.log(err.message); });
+    })
+    .catch(function () { console.log("Error: Could not get token"); });
+  }
+
+  getProject = () =>
+  {
+    adalGetToken(authContext, adalConfig.endpoints.api)
+    .then((token) => {
+      axios.get("/api/project", { headers: { 'Authorization': "bearer " + token } })
+      .then(res => {
+        let array = [];
+
+        res.data.forEach((item) => {
+          array.push(item.ProjectName);
+        })
+
+        this.setState({ projects: array });
+      })
+      .catch(function (err) { console.log(err.message); });
+    })
+    .catch(function () { console.log("Error: Could not get token"); });
+  };
+
   getSearch = () => {
     let request_query = '';
     let photos = [];
@@ -104,39 +149,25 @@ export class Search extends Component {
     }
 
     adalGetToken(authContext, adalConfig.endpoints.api)
-      .catch(() => { console.log("Could not get token"); })
-      .then((token) => {
-        const request_param = {headers: {'Authorization': "bearer " + token}};
+    .then((token) => {
+      const request_param = {headers: {'Authorization': "bearer " + token}};
 
-        axios.get(request_query, request_param)
-          .catch((err) => { console.log(err.message); })
-          .then((res) => {
-            let prev = '';
+      axios.get(request_query, request_param)
+      .then((res) => {
+        photos = res.data.map((image, index) => {
+          image.UploadedDate = image.UploadedDate.substring(0, 10);
 
-            // assuming the bug has repeats of the image
-            /* for (let i = 0; i < res.data.length; i++)
-            {
-              let image = res.data[i];
+          return { src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image };
+        });
 
-              if (image.IId !== prev)
-              {
-                prev = image.IId;
-                photos.push({ src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.ImageName, meta: image });
-              }
-            } */
-
-            photos = res.data.map((image, index) => {
-              return { src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image };
-            });
-
-            this.setState({
-              filteredPhotos: photos,
-              photos: photos,
-              showResults: true
-            });
-          });
-      })
-      .catch((err) => { console.log(err.message); });
+        this.setState({
+          filteredPhotos: photos,
+          photos: photos,
+          showResults: true
+        });
+      }).catch(function (err) { alert('Please search with valid input.'); });
+    })
+    .catch(function () { console.log("Error: Could not get token"); });
   }
 
   handleSubmit = () => 
@@ -150,7 +181,6 @@ export class Search extends Component {
         new Promise((resolve, reject) => {
           adalGetToken(authContext, adalConfig.endpoints.api)
           .then(function (token) {
-
             const request_param = {headers: {'Authorization': "bearer " + token}};
             let image = selected[i].meta;
   
@@ -159,22 +189,20 @@ export class Search extends Component {
               ImageName: null,
               Trashed: null,
               Submitted: 'False'
-              }, request_param
-            )
-            .catch((err) => {
-              console.log(err);
-              reject();
-            })
-            .then((res) => {
+              }, request_param)
+            .then(function (res) {
               console.log(res); 
               resolve();
+            })
+            .catch(function (err) {
+              console.log(err);
+              reject();
             });
-
           })
           .catch(function () {
             console.log("Error: Couldn't get token");
             reject();
-          });          
+          });
         })
       );
     }
@@ -195,7 +223,7 @@ export class Search extends Component {
     }
     else {
       this.setState({
-        input_2: null,
+        input_2: '',
         showDateInput: false
       });
     }
@@ -208,8 +236,8 @@ export class Search extends Component {
 
   buildQuery = () =>
   {
-    let input_1 = this.state.input_1 !== '' ? this.state.input_1 : null;
-    let input_2 = this.state.input_1 !== '' ? this.state.input_2 : null;
+    let input_1 = this.state.input_1 !== '' ? this.state.input_1 : '';
+    let input_2 = this.state.input_1 !== '' ? this.state.input_2 : '';
 
     if (this.state.option === 'Date')
     {
@@ -226,7 +254,6 @@ export class Search extends Component {
     return res;
   }
 
-  // TODO
   onPressEnter(e)
   {
     if (e.key === 'Enter')
@@ -245,18 +272,37 @@ export class Search extends Component {
 
     let curQuery = this.buildQuery();
 
-    if (!curQuery.input_1)
-    {
-      return;
-    }
-
-    if (this.state.option === 'Date' && (!curQuery.input_1 || !curQuery.input_2))
+    if (this.state.option === 'Date' && (isNaN(curQuery.input_1) || isNaN(curQuery.input_2)))
     {
       alert('Please search with the correct date format: yyyymmdd');
       return;
     }
 
+    if (!curQuery.input_1)
+    {
+      return;
+    }
+
     this.getSearch();
+  }
+
+  resetSearch = () =>
+  {
+    this.setState({
+      input_1: '',
+      input_2: '',
+
+      showInfo: false,
+      showResults: false,
+
+      photos: [],
+
+      filters: [],
+      filteredPhotos: [],
+      selectAll: false,
+
+      redirect: false
+    });
   }
 
   onAddFilter = async (e) => 
@@ -282,6 +328,27 @@ export class Search extends Component {
       return;
     }
 
+    if (curQuery.option === 'Date')
+    {
+      let filter_pre = curQuery.input_1.toString();
+      let filter_post = curQuery.input_2.toString();
+      
+      if (filter_pre.length !== 8 || filter_post.length !== 8)
+      {
+        alert('Please search with the correct date format: yyyymmdd');
+        return;
+      }
+
+      let date_pre = new Date(filter_pre.substring(0,4) + ',' + filter_pre.substring(4,6) + ',' + filter_pre.substring(6,8));
+      let date_post = new Date(filter_post.substring(0,4) + ',' + filter_post.substring(4,6) + ',' + filter_post.substring(6,8));
+
+      if (date_pre == 'Invalid Date' || date_post == 'Invalid Date')
+      {
+        alert('Please search with valid date(s).');
+        return;
+      }
+    }
+
     let filteredPhotos = await this.performFilter(this.state.filteredPhotos, curQuery);
 
     // add query
@@ -290,38 +357,7 @@ export class Search extends Component {
 
     this.setState({
       filters: allFilters,
-      input_1: '',
-      input_2: '',
 
-      filteredPhotos: filteredPhotos
-    });
-  }
-
-  onRemoveFilter = async (index) =>
-  {
-    if (this.state.filters.length === 1)
-    {
-      this.setState({
-        filters: [],
-        filteredPhotos: this.state.photos
-      });
-      
-      return;
-    }
-
-    let filters = this.state.filters;
-    filters.splice(index, 1);
-    let filteredPhotos = this.state.photos;
-
-    for (let i = 0; i < filters.length; i++)
-    {
-      let filter = filters[0];
-      
-      filteredPhotos = await this.performFilter(filteredPhotos, filter);
-    }
-
-    this.setState({
-      filters: filters,
       filteredPhotos: filteredPhotos
     });
   }
@@ -360,7 +396,18 @@ export class Search extends Component {
           case 'User':
             res = item.meta.UserName.toLowerCase() === filter.input_1.toLowerCase();
           case 'Date':
-            // TODO -- DATE LOGIC
+            let filter_now = item.meta.UploadedDate.split('-')
+            let filter_pre = filter.input_1.toString();
+            let filter_post = filter.input_2.toString();
+
+            let date_now = new Date(filter_now[0] + ',' + filter_now[1] + ',' + filter_now[2]);
+            let date_pre = new Date(filter_pre.substring(0,4) + ',' + filter_pre.substring(4,6) + ',' + filter_pre.substring(6,8));
+            let date_post = new Date(filter_post.substring(0,4) + ',' + filter_post.substring(4,6) + ',' + filter_post.substring(6,8));
+
+            if (date_pre <= date_now && date_now <= date_post)
+            {
+              res = true;
+            }
             break;
           default:
             break;
@@ -370,6 +417,35 @@ export class Search extends Component {
       });
       
       resolve(filtered);
+    });
+  }
+
+  onRemoveFilter = async (index) =>
+  {
+    if (this.state.filters.length === 1)
+    {
+      this.setState({
+        filters: [],
+        filteredPhotos: this.state.photos
+      });
+      
+      return;
+    }
+
+    let filters = this.state.filters;
+    filters.splice(index, 1);
+    let filteredPhotos = this.state.photos;
+
+    for (let i = 0; i < filters.length; i++)
+    {
+      let filter = filters[i];
+      
+      filteredPhotos = await this.performFilter(filteredPhotos, filter);
+    }
+
+    this.setState({
+      filters: filters,
+      filteredPhotos: filteredPhotos
     });
   }
 
@@ -428,12 +504,14 @@ export class Search extends Component {
           id="search-dropdown"
           options={this.dropdown_options}
           onChange={this.handleListChange} />
+        {this.state.showDateInput ? <span>FROM</span> : null}
         <TextInput
           id="input_1"
           option={this.state.option}
           options={this.text_options}
           value={this.state.input_1}
           onChange={this.handleTextChange} />
+        {this.state.showDateInput ? <span>TO</span> : null}
         {this.state.showDateInput
           ? <TextInput
             id="input_2"
@@ -442,17 +520,19 @@ export class Search extends Component {
             value={this.state.input_2}
             onChange={this.handleTextChange} />
           : null}
-        {this.state.showResults && this.state.filteredPhotos.length > 0
+        {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
           ? null
           : <button type="submit" onClick={this.onSearch} onKeyPress={this.onPressEnter}>Search</button>}
-        {this.state.showResults && this.state.filteredPhotos.length > 0
+        {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
           ? <button type="submit" onClick={this.onAddFilter}>Add Filter</button>
+          : null}
+        {this.state.showResults
+          ? <button type="submit" onClick={this.resetSearch}>Reset</button>
           : null}
       </div>
     );
   }
 
-  // TODO
   renderFilters = () =>
   {
     let filters = this.state.filters;
@@ -464,7 +544,11 @@ export class Search extends Component {
 
       if (filter.option === 'Date')
       {
-        //
+        res.push(
+          <button key={i} onClick={() => this.onRemoveFilter(i)}>
+            <img src={cancelIcon} className="cancel-icon"	alt="cancel icon" />{filter.option}: {filter.input_1}-{filter.input_2}
+          </button>
+        );
       }
       else
       {
