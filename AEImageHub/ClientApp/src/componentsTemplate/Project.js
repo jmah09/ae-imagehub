@@ -194,7 +194,7 @@ export class Project extends Component {
               checked={this.state.Active}
               onChange={this.handleChange} />
           </label>
-          <input type="submit" value="ADD" />
+          <input type="submit" value="Add" />
         </form>
       </div>
     )
