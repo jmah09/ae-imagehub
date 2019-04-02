@@ -236,9 +236,7 @@ export class Project extends Component {
 
     for (let i = 0; i < projects.length; i++) {
       let project = {};
-      project.name = <Link to={{ pathname: "/search?project=" + projects[i].ProjectName }}
-        onClick={() => window.location.refresh()}>
-        {projects[i].ProjectName}</Link>;
+      project.name = projects[i].ProjectName;
 
       project.date = projects[i].CreatedDate.substring(0,projects[i].CreatedDate.length-9);
       project.description = projects[i].Description;
