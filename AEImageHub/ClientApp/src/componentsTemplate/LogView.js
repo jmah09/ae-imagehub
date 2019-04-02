@@ -6,7 +6,6 @@ import {adalConfig, authContext, isAdmin} from '../adalConfig';
 import {adalGetToken} from "react-adal";
 
 import { Redirect } from 'react-router-dom'
-import { Button } from 'semantic-ui-react'
 import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 
@@ -160,8 +159,8 @@ export class LogView extends Component {
             <div>
             {this.renderRedirect()}
                 <div className="fnbar">
-                    <Button onClick={this.handleSubmit} primary>Back To Palette</Button>
-                    <Button onClick={this.onCancel} primary>Back</Button>
+                    <button onClick={this.handleSubmit} primary>Back To Palette</button>
+                    <button onClick={this.onCancel} primary>Back</button>
                     <button type="button" onClick={() => this.setState({ isOpen: true })}>
                         Zoom
                     </button>
