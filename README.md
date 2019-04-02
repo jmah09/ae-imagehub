@@ -9,9 +9,9 @@
 
 ## How To Run Image Hub
 1. Clone repository
-2. Install npm packages by running ```npm install``` in \AEImageHub\ClientApp client
-3. Set Azure Active Directory configurations in \AEImageHub\ClientApp\src\adalConfig.js
-4. Set Azure Active Directory configurations and Microsoft SQL Server connection configurations in AEImageHub\appsettings.json
+2. Install npm packages by running ```npm install``` in directory \AEImageHub\ClientApp 
+3. Set Azure Active Directory configurations in directory \AEImageHub\ClientApp\src\adalConfig.js
+4. Set Azure Active Directory configurations and Microsoft SQL Server connection configurations in directory AEImageHub\appsettings.json
 5. Run project on Visual Studio(recommended) or run ```dotnet AEImageHub.dll``` in the top directory
 
 
