@@ -3,7 +3,7 @@ import { Title } from './Title';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import axios from 'axios'
-import { adalConfig, authContext } from '../adalConfig';
+import {adalConfig, authContext, isIE} from '../adalConfig';
 import { Link } from 'react-router-dom';
 import { adalGetToken } from "react-adal";
 
@@ -12,9 +12,8 @@ export class Project extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      projects: {},
+      projects: [],
       showAdd: false,
-      showEdit: false,
       ProjectName: "",
       CreatedDate: "",
       Description: "",
@@ -92,28 +91,34 @@ export class Project extends Component {
   }
 
   // put a project with project name
-  PutProject(event) {
-    event.preventDefault();
-    const that = this;
-    let project = this.state.projects.find(function (project) {
+  PutProject(state, projectName, isActive) {
+    //event.preventDefault();
+    const that = state;
+    /*let project = that.state.projects.find(function (project) {
       return project.ProjectName === that.state.ProjectName;
-    });
+    });*/
 
+    let payload = {
+      CreatedDate: null,
+      ProjectName: null,
+      Description: null,
+      Active: isActive
+    };
     
-    if (project === undefined || project === null) return alert("Project Doesn't Exist");
+   // if (project === undefined || project === null) return alert("Project Doesn't Exist");
     
-    this.setState({ CreatedDate: null });
-    if (this.state.Description === "") {
-      
-      this.setState({Description : project.Description});
-    }
 
     adalGetToken(authContext, adalConfig.endpoints.api) 
       .then(function (token) {
-        axios.put("/api/project/" + that.state.ProjectName, that.state, 
+        axios.put("/api/project/" + projectName, payload, 
             { headers: { 'Authorization': "bearer " + token } })
           .then(response => {
-            window.location.reload(); // todo: maybe use setState for performance
+            alert("Project: " + projectName + " has been set to " + isActive + " for Active.");
+            that.setState({ projects: that.state.projects });
+            // todo test
+            if (isIE()) {
+              window.location.reload();
+            }
           })
           .catch(error => {
             console.log(error);
@@ -151,7 +156,6 @@ export class Project extends Component {
         <Title title='MANAGEMENT : PROJECT' />
         {this.renderFunction()}
         {this.renderAddProject()}
-        {this.renderEditProject()}
         {this.renderContent()}
       </div>
     );
@@ -161,8 +165,7 @@ export class Project extends Component {
   renderFunction() {
     return (
       <div className="fnbar">
-        <button onClick={() => { this.setState({ showAdd: !this.state.showAdd, showEdit: false }); }}>Create Project</button>
-        <button onClick={() => { this.setState({ showEdit: !this.state.showEdit, showAdd: false }); }}>Edit Project</button>
+        <button onClick={() => { this.setState({ showAdd: !this.state.showAdd }); }}>Create Project</button>
       </div>
     )
   }
@@ -197,37 +200,6 @@ export class Project extends Component {
     )
   }
 
-  renderEditProject() {
-    return (
-        <div>
-        <div className={this.state.showEdit ? '' : 'hidden'}>
-          <form onSubmit={this.PutProject} className="handleTag">
-            Edit Project
-            <br />
-            Project Name:
-            <label>
-              <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
-            </label>
-            <br />
-            New Project Description:
-            <label>
-              <input type="text" name="Description" value={this.state.Description} onChange={this.handleChange} />
-            </label>
-            <br />
-            Active?:
-            <label>
-              <input
-                  type="checkbox"
-                  name="Active"
-                  checked={this.state.Active}
-                  onChange={this.handleChange} />
-            </label>
-            <input type="submit" value="EDIT" />
-          </form>
-        </div>
-        </div>
-    )
-  }
 
   // TODO
   renderContent() {
@@ -238,9 +210,12 @@ export class Project extends Component {
       let project = {};
       project.name = projects[i].ProjectName;
 
+      project.uniqueName = projects[i].ProjectName;
       project.date = projects[i].CreatedDate.substring(0,10);
+
       project.description = projects[i].Description;
       project.active = projects[i].Active;
+      project.id = i;
       tableData.push(project);
     }
 
@@ -254,25 +229,24 @@ export class Project extends Component {
         accessor: 'name',
       },
       {
+        Header: 'Status',
+        accessor: 'active',
+        Cell: (props) => <span><input type="checkbox" checked={props.original.active} onChange={(e) => {
+          //alert("Project: " + props.original.uniqueName + " has been set to " + !props.original.active + " for Active.");
+
+          this.state.projects[props.original.id].Active = !this.state.projects[props.original.id].Active;
+          //this.setState({ projects: this.state.projects });
+          this.PutProject(this ,props.original.uniqueName, this.state.projects[props.original.id].Active);
+        }} style={statusStyle} /></span>
+      },
+      {
         Header: 'Date Created',
         accessor: 'date'
       },
       {
-        Header: 'Status',
-        accessor: 'active',
-        getProps: (state, rowInfo, column) => {
-          return {
-            style: {
-              background: rowInfo && rowInfo.row.active ? 'green' : 'red'
-            }
-          }
-        },
-        maxWidth: 100
-
-      },
-      {
         Header: 'Description',
         accessor: 'description',
+        show: false
       },
     ];
     
