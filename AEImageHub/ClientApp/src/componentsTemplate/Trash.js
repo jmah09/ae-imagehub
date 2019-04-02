@@ -145,9 +145,9 @@ export class Trash extends Component {
     axios.all(promises)
       .then(function () {
         that.setState({ photos: notSelected });
-        if (isIE() && selected.length > 0) {
+        /*if (isIE() && selected.length > 0) {
           window.location.reload();
-        }
+        }*/
       })
       .catch(function (err) { console.log(err.message); });
   }
@@ -185,9 +185,9 @@ export class Trash extends Component {
     axios.all(promises)
       .then(function () {
         that.setState({ photos: notSelected });
-        if (isIE() && selected.length > 0) {
+        /*if (isIE() && selected.length > 0) {
           window.location.reload();
-        }
+        }*/
       })
       .catch(function (err) { console.log("Recover failed: " + err.response); });
 
