@@ -79,7 +79,7 @@ export class Project extends Component {
         axios.post("/api/project", payload, { headers: { 'Authorization': "bearer " + token } })
           .then(response => {
             console.log(response);
-            window.location.reload();
+            window.location.reload(); // todo : need to be fixed for IE
           })
           .catch(error => {
             console.log(error);
@@ -116,9 +116,9 @@ export class Project extends Component {
             alert("Project: " + projectName + " has been set to " + isActive + " for Active.");
             that.setState({ projects: that.state.projects });
             // todo test
-            if (isIE()) {
+           /* if (isIE()) {
               window.location.reload();
-            }
+            }*/
           })
           .catch(error => {
             console.log(error);

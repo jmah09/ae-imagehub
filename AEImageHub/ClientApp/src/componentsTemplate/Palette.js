@@ -122,7 +122,8 @@ export class Palette extends Component {
     }
 
 
-    TrashSelectedImages() {
+    TrashSelectedImages(event) {
+        event.preventDefault();
         const selected = this.state.photos.filter((value) => {
             return value.selected;
         });
@@ -147,14 +148,14 @@ export class Palette extends Component {
 
 
         axios.all(promises)
-            .then(function (){
+            .then(function (res){
                 that.setState({
                     photos: notSelected
                 });
                 // todo test
-                if (isIE() && selected.length > 0) {
+               /* if (isIE() && selected.length > 0) {
                     window.location.reload();
-                }
+                }*/
             })
             .catch(function (err){
                 console.log(err.response);

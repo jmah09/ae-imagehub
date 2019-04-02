@@ -84,12 +84,9 @@ export class Trash extends Component {
       .catch(function (err) { console.log("Could not authorize: " + err.response); });
 
     axios.all(promises)
-      .then(function () { 
-        if (isIE() && selected.length > 0) {
-          window.location.reload();
-        } else if (selected.length > 0) {
-          that.setState( {photos: notSelected})
-        }
+      .then(function () {
+        that.setState( {photos: notSelected})
+        
       })
       .catch(function (err) { console.log("Delete failed: " + err.response); });
   }
