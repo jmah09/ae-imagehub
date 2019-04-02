@@ -14,14 +14,16 @@ export class Project extends Component {
     this.state = {
       projects: {},
       showAdd: false,
+      showEdit: false,
       ProjectName: "",
       CreatedDate: "",
       Description: "",
-      Active: true
+      Active: true,
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.PostProject = this.PostProject.bind(this);
+    this.PutProject = this.PutProject.bind(this);
   }
 
   handleChange(event) {
@@ -90,12 +92,28 @@ export class Project extends Component {
   }
 
   // put a project with project name
-  PutProject(projectname, payload) {
-    adalGetToken(authContext, adalConfig.endpoints.api)
+  PutProject(event) {
+    event.preventDefault();
+    const that = this;
+    let project = this.state.projects.find(function (project) {
+      return project.ProjectName === that.state.ProjectName;
+    });
+
+    
+    if (project === undefined || project === null) return alert("Project Doesn't Exist");
+    
+    this.setState({ CreatedDate: null });
+    if (this.state.Description === "") {
+      
+      this.setState({Description : project.Description});
+    }
+
+    adalGetToken(authContext, adalConfig.endpoints.api) 
       .then(function (token) {
-        axios.put("/api/project" + projectname, payload, { headers: { 'Authorization': "bearer " + token } })
+        axios.put("/api/project/" + that.state.ProjectName, that.state, 
+            { headers: { 'Authorization': "bearer " + token } })
           .then(response => {
-            console.log(response);
+            window.location.reload(); // todo: maybe use setState for performance
           })
           .catch(error => {
             console.log(error);
@@ -133,6 +151,7 @@ export class Project extends Component {
         <Title title='MANAGEMENT : PROJECT' />
         {this.renderFunction()}
         {this.renderAddProject()}
+        {this.renderEditProject()}
         {this.renderContent()}
       </div>
     );
@@ -142,7 +161,8 @@ export class Project extends Component {
   renderFunction() {
     return (
       <div className="fnbar">
-        <button onClick={() => { this.setState({ showAdd: !this.state.showAdd }); }}>Create Project</button>
+        <button onClick={() => { this.setState({ showAdd: !this.state.showAdd, showEdit: false }); }}>Create Project</button>
+        <button onClick={() => { this.setState({ showEdit: !this.state.showEdit, showAdd: false }); }}>Edit Project</button>
       </div>
     )
   }
@@ -151,8 +171,10 @@ export class Project extends Component {
     return (
       <div className={this.state.showAdd ? '' : 'hidden'}>
         <form onSubmit={this.PostProject} className="handleTag">
+          Add Project
+          <br />
           Project Name:
-                <label>
+          <label>
             <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
           </label>
           <br />
@@ -169,9 +191,41 @@ export class Project extends Component {
               checked={this.state.Active}
               onChange={this.handleChange} />
           </label>
-          <input type="submit" value="Add" />
+          <input type="submit" value="ADD" />
         </form>
       </div>
+    )
+  }
+
+  renderEditProject() {
+    return (
+        <div>
+        <div className={this.state.showEdit ? '' : 'hidden'}>
+          <form onSubmit={this.PutProject} className="handleTag">
+            Edit Project
+            <br />
+            Project Name:
+            <label>
+              <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
+            </label>
+            <br />
+            New Project Description:
+            <label>
+              <input type="text" name="Description" value={this.state.Description} onChange={this.handleChange} />
+            </label>
+            <br />
+            Active?:
+            <label>
+              <input
+                  type="checkbox"
+                  name="Active"
+                  checked={this.state.Active}
+                  onChange={this.handleChange} />
+            </label>
+            <input type="submit" value="EDIT" />
+          </form>
+        </div>
+        </div>
     )
   }
 
@@ -188,6 +242,7 @@ export class Project extends Component {
 
       project.date = projects[i].CreatedDate;
       project.description = projects[i].Description;
+      project.active = projects[i].Active;
       tableData.push(project);
     }
 
@@ -198,21 +253,32 @@ export class Project extends Component {
     const columns = [
       {
         Header: 'Name',
-        accessor: 'name'
-      },
-      {
-        Header: 'Status',
-        Cell: () => <span><input type="checkbox" style={statusStyle}></input></span>
+        accessor: 'name',
       },
       {
         Header: 'Date Created',
         accessor: 'date'
       },
       {
+        Header: 'Status',
+        accessor: 'active',
+        getProps: (state, rowInfo, column) => {
+          return {
+            style: {
+              background: rowInfo && rowInfo.row.active ? 'green' : 'red'
+            }
+          }
+        },
+        maxWidth: 100
+
+      },
+      {
         Header: 'Description',
-        accessor: 'description'
-      }
-    ]
+        accessor: 'description',
+      },
+    ];
+    
+    
     return (
       <div>
         <ReactTable
@@ -220,6 +286,7 @@ export class Project extends Component {
           columns={columns}
           defaultPageSize={10}
           minRows={10}
+          defaultSorted={[{ id: "date", desc: true }]}
         />
       </div>
     )
