@@ -52,7 +52,7 @@ export class Log extends Component {
       log.name = <a href={"/logview?src=" + JSON.stringify(logs[i].LId)}>{logs[i].LId}</a>
       //<Link to={{ pathname: "/logview?src=" + JSON.stringify(logs[i].LId)}}>{logs[i].LId}</Link>;
       log.user = logs[i].U.UserName;
-      log.date = logs[i].CreatedDate.substring(0,logs[i].CreatedDate.length-13)
+      log.date = logs[i].CreatedDate
       tableData.push(log);
     }
 

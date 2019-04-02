@@ -238,7 +238,7 @@ export class Project extends Component {
       let project = {};
       project.name = projects[i].ProjectName;
 
-      project.date = projects[i].CreatedDate.substring(0,projects[i].CreatedDate.length-9);
+      project.date = projects[i].CreatedDate.substring(0,10);
       project.description = projects[i].Description;
       project.active = projects[i].Active;
       tableData.push(project);
