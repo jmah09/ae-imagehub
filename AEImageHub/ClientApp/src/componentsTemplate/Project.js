@@ -67,7 +67,7 @@ export class Project extends Component {
   // post a project
   PostProject(event) {
     event.preventDefault();
-    let date = new Date();
+    let date = new Date(Date.now());
     const that = this;
 
     if (this.state.ProjectName === "") return alert("Please fill in the Project Name");
@@ -208,12 +208,11 @@ export class Project extends Component {
 
     for (let i = 0; i < projects.length; i++) {
       let project = {};
-      project.name = <Link to={{ pathname: "/search?project=" + projects[i].ProjectName }}
-        onClick={() => window.location.refresh()}>
-        {projects[i].ProjectName}</Link>;
+      project.name = projects[i].ProjectName;
 
       project.uniqueName = projects[i].ProjectName;
-      project.date = projects[i].CreatedDate;
+      project.date = projects[i].CreatedDate.substring(0,10);
+
       project.description = projects[i].Description;
       project.active = projects[i].Active;
       project.id = i;

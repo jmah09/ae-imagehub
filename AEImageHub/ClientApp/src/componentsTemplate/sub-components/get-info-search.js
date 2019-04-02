@@ -262,7 +262,6 @@ export class GetInfoSearch extends Component {
                 <div key={i}>
                     <img key={i} src={this.state.photos[i].src} />
                     <p style={{textAlign: 'center'}}>{this.state.photos[i].meta.ImageName}</p>
-                    <p>Size : X Y</p>
                 </div>
             );
         }
