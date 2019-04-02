@@ -122,8 +122,7 @@ export class Palette extends Component {
     }
 
 
-    TrashSelectedImages(event) {
-        event.preventDefault();
+    TrashSelectedImages() {
         const selected = this.state.photos.filter((value) => {
             return value.selected;
         });
