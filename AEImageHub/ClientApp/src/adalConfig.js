@@ -44,3 +44,8 @@ export const withAdalLoginApi = withAdalLogin(authContext, adalConfig.endpoints.
 export const getUser = () => {
     return authContext.getCachedUser();
 };
+
+// returns true if current browser is IE, false otherwise
+export const isIE = () => {
+   return /*@cc_on!@*/false || !!document.documentMode;
+};

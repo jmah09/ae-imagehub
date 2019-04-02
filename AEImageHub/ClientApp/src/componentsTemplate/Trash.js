@@ -4,7 +4,7 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import { authContext, isAdmin, adalConfig, getUser } from '../adalConfig';
+import {authContext, isAdmin, adalConfig, getUser, isIE} from '../adalConfig';
 import { Redirect } from "react-router-dom";
 import { adalGetToken } from "react-adal";
 
@@ -65,8 +65,12 @@ export class Trash extends Component {
       return value.selected;
     });
 
-    let promises = [];
+    const notSelected = this.state.photos.filter((value, index, array) => {
+      return !value.selected;
+    });
 
+    let promises = [];
+    const that = this;
     adalGetToken(authContext, adalConfig.endpoints.api)
       .then(function (token) {
         for (let i = 0; i < selected.length; i++)
@@ -80,7 +84,13 @@ export class Trash extends Component {
       .catch(function (err) { console.log("Could not authorize: " + err.response); });
 
     axios.all(promises)
-      .then(function () { window.location.reload(); })
+      .then(function () { 
+        if (isIE() && selected.length > 0) {
+          window.location.reload();
+        } else if (selected.length > 0) {
+          that.setState( {photos: notSelected})
+        }
+      })
       .catch(function (err) { console.log("Delete failed: " + err.response); });
   }
 
