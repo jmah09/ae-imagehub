@@ -1,3 +1,13 @@
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+::-ms-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
 #getinfo {
   float: left;
   width: 100%;
@@ -22,8 +32,7 @@
 }
 
 #getinfo img {
-  display: inline-block;
-  width: auto;
+  display: block;
   min-width: 0px;
   max-width: 300px;
   margin-right: auto;
@@ -40,7 +49,7 @@
 
 #getinfo select {
   margin: 0px 5px 0px 0px;
-  min-width: 140px;
+  width: 100%;
   min-height: 25px;
   border: 1px solid;
   text-align: justify;
@@ -54,7 +63,7 @@
 #getinfo input {
   margin: 0px 5px 0px 0px;
   padding: 0px 0px 0px 5px;
-  min-width: 140px;
+  width: 100%;
   height: 25px;
   border: 1px solid;
 }
