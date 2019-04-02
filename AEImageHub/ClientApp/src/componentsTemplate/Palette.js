@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { Title } from './Title';
 import axios from 'axios';
-import {getUser, isAdmin, adalConfig, authContext} from '../adalConfig';
+import {getUser, isAdmin, adalConfig, authContext, isIE} from '../adalConfig';
 import {adalGetToken} from "react-adal";
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
@@ -100,7 +100,8 @@ export class Palette extends Component {
                         });
 
                         // TODO -- question efficiency
-                        for (let i = 0; i < that.state.photos.length; i++)
+                        // todo -- what is this doing here
+                     /*   for (let i = 0; i < that.state.photos.length; i++)
                         {
                             for (let j = 0; j < images.length; j++)
                             {
@@ -110,7 +111,7 @@ export class Palette extends Component {
                                     break;
                                 }
                             }
-                        }
+                        }*/
 
                         that.setState({photos: images})
                     })
@@ -121,31 +122,43 @@ export class Palette extends Component {
     }
 
 
-    TrashSelectedImages()
-    {
-        const selected = this.state.photos.filter((value) => { return value.selected; });
-        const notSelected = this.state.photos.filter((value) => { return !value.selected; });
+    TrashSelectedImages() {
+        const selected = this.state.photos.filter((value) => {
+            return value.selected;
+        });
+        const notSelected = this.state.photos.filter((value) => {
+            return !value.selected;
+        });
+        let promises = [];
 
-        selected.map((image, index) => {
-            image.meta.Trashed = true;
-            const that = this;
-            adalGetToken(authContext, adalConfig.endpoints.api)
-                .then(function (token) {
-                    axios.put("/api/image/" + image.meta.IId, image.meta, { headers: { 'Authorization': "bearer " + token } })
-                        .then(response => {
-                            console.log(response);
-                            that.setState({
-                                photos: notSelected
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                }).catch(function (err) {
-                console.log("Error: Couldn't get token")
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                selected.map(function (image) {
+                    image.meta.Trashed = true;
+                    promises.push(
+                        axios.put("/api/image/" + image.meta.IId, image.meta,
+                            {headers: {'Authorization': "bearer " + token}})
+                    )
+                });
+            }).catch(function (err) {
+            console.log("Error: Couldn't get token")
+        });
+
+
+        axios.all(promises)
+            .then(function (){
+                that.setState({
+                    photos: notSelected
+                });
+                // todo test
+                if (isIE() && selected.length > 0) {
+                    window.location.reload();
+                }
+            })
+            .catch(function (err){
+                console.log(err.response);
             });
-
-        })
     }
     
 
