@@ -277,7 +277,7 @@ export class Trash extends Component {
       <div>
         <Gallery
           photos={this.state.photos}
-          columns={3}
+          columns={4}
           onClick={this.selectPhoto}
           ImageComponent={SelectedImage}
           margin={4}

@@ -116,7 +116,7 @@ export class User extends Component {
             Cell: ({value}) => (<div class="fnbar">
             <button onClick={()=>{
             this.makeAdmin(value);
-        }}>MAKE ADMIN
+        }}>Make Admin
         </button>
         </div>)
     });
@@ -128,7 +128,7 @@ export class User extends Component {
             <button onClick={() => {
             this.viewPalette(value);
             // TODO
-        }}>VIEW PALETTE
+        }}>View Palette
         </button>
         </div>)
     });
@@ -140,7 +140,7 @@ export class User extends Component {
                 <button onClick={() => {
                     this.viewTrash(value);
                     // TODO
-                }}>VIEW TRASH
+                }}>View Trash
                 </button>
             </div>)
         });
@@ -150,7 +150,12 @@ export class User extends Component {
             <div>
             <br />
             <br />
-            <ReactTable data={this.state.users} columns={sub_columns} />
+            <ReactTable
+              data={this.state.users}
+              columns={sub_columns}
+              defaultPageSize={10}
+              minRows={10}
+            />
         </div>
     )
     }

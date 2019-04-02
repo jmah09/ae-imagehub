@@ -144,7 +144,7 @@ export class Project extends Component {
         return (
             <div>
             <div className="fnbar">
-                <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>CREATE PROJECT</button>
+                <button onClick={()=>{this.setState({showAdd: !this.state.showAdd});}}>Create Project</button>
             </div>
                 <div className={this.state.showAdd ? '' : 'hidden'}>
                 <br />
@@ -246,7 +246,16 @@ export class Project extends Component {
             }
         ]
         return (
-            <div><br /><br /><ReactTable data={tableData} columns={columns} /></div>
+            <div>
+                <br />
+                <br />
+                <ReactTable 
+                    data={tableData}
+                    columns={columns}
+                    defaultPageSize={10}
+                    minRows={10}
+                />
+            </div>
         )
     }
 
