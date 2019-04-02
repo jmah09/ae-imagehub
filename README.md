@@ -2,7 +2,7 @@
 
 ## Runtime Environment
 * .Net Core 2.1 (Back-end)
-* React 16.8.3 or above (Front-end)
+* npm with React 16.8.3 or above (Front-end)
 * Azure Active Directory (Authentication)
 * Microsoft SQL Server (Database)
 
