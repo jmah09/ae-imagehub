@@ -337,7 +337,7 @@ export class GetInfo extends Component {
         onSave = () => {
             adalGetToken(authContext, adalConfig.endpoints.api).then(async (token) => {
 
-                if (this.state.selected_images.length === 0) {
+                if (this.state.selected_images.length === 1) {
                     let image = this.state.selected_images[0];
 
                     await this.handleChangeImageName(image, token);
