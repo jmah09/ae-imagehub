@@ -184,7 +184,7 @@ export class Trash extends Component {
 
     if (selected.length > 0)
     {
-      this.setState({ redirect: true });
+      this.setState({ redirect: true, redirectOption: 1 });
       return;
     }
 
