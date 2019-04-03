@@ -18,7 +18,7 @@ export class GetInfo extends Component {
         super(props);
 
         this.state = {
-            classifications: [],
+            classifications: new Set(),
             projects: [],
             selected_images: props.location.state.photos,
 
@@ -41,7 +41,9 @@ export class GetInfo extends Component {
                 axios.get("/api/tag", { headers: { 'Authorization': "bearer " + token } })
                     .then((res) => {
                         for (let tag of res.data) {
-                            that.state.classifications.push(tag);
+                            if (tag.Active) {
+                                that.state.classifications.add(tag);
+                            }
                         }
                     }).catch((err) => { console.log(err); });
             }).catch(function (err) {
@@ -397,8 +399,7 @@ export class GetInfo extends Component {
                     newtags.push(tag);
                 }
             }
-
-            if (!newtags.length == 0) {
+            if (newtags.length !== 0) {
                 await axios.post("/api/tag/taglinks",
                     {
                         TagNames: newtags,

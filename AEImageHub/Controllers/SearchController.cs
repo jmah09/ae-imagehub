@@ -51,7 +51,7 @@ namespace AEImageHub.Controllers
                 else
                 {      
                     var images = this.CreateImageModel()
-                        .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed);
+                        .Where(i => i.ImageName.Contains(imagename) && i.Submitted && !i.Trashed).ToHashSet();
 
                     return JsonConvert.SerializeObject(images);
                 }
@@ -68,7 +68,7 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                List<TagLink> taglinks;
+                HashSet<TagLink> taglinks;
                 if (!tagname.Contains("\""))
                 {
                     taglinks = _context.TagLink.Select(tl => new TagLink
@@ -76,7 +76,7 @@ namespace AEImageHub.Controllers
                         TlinkId = tl.TlinkId,
                         TagName = tl.TagName,
                         I = tl.I
-                    }).Where(tl => tl.TagName.Contains(tagname)).ToList();
+                    }).Where(tl => tl.TagName.Contains(tagname)).ToHashSet();
                 }
                 else
                 {
@@ -88,10 +88,10 @@ namespace AEImageHub.Controllers
                         IId = tl.IId,
                         I = tl.I
                     })
-                    .Where(tl => tl.TagName == tagname).ToList();
+                    .Where(tl => tl.TagName == tagname).ToHashSet();
                 }
 
-                var images = new List<Image>();
+                var images = new HashSet<Image>();
 
                 foreach (var tl in taglinks)
                 {
@@ -128,7 +128,7 @@ namespace AEImageHub.Controllers
         [HttpGet("project/{projectname}")]
         public Object GetImagesWithProjectname(string projectname)
         {
-            List<ProjectLink> projectlinks;
+            HashSet<ProjectLink> projectlinks;
             try
             {
                 if (!projectname.Contains("\""))
@@ -138,7 +138,7 @@ namespace AEImageHub.Controllers
                         PlinkId = pl.PlinkId,
                         ProjectName = pl.ProjectName,
                         I = pl.I
-                    }).Where(pl => pl.ProjectName.Contains(projectname)).ToList();
+                    }).Where(pl => pl.ProjectName.Contains(projectname)).ToHashSet();
                 }
                 else
                 {
@@ -148,10 +148,10 @@ namespace AEImageHub.Controllers
                         PlinkId = pl.PlinkId,
                         ProjectName = pl.ProjectName,
                         I = pl.I
-                    }).Where(pl => pl.ProjectName == projectname).ToList();
+                    }).Where(pl => pl.ProjectName == projectname).ToHashSet();
                 }
 
-                var images = new List<Image>();
+                var images = new HashSet<Image>();
                 foreach (var pl in projectlinks)
                 {
                     if (pl.I.Submitted && !pl.I.Trashed)
@@ -161,13 +161,13 @@ namespace AEImageHub.Controllers
                             TlinkId = tl2.TlinkId,
                             TagName = tl2.TagName,
                             IId = tl2.IId,
-                        }).Where(tl2 => tl2.IId == pl.I.IId).ToList();
+                        }).Where(tl2 => tl2.IId == pl.I.IId).ToHashSet();
                         pl.I.ProjectLink = _context.ProjectLink.Select(pl2 => new ProjectLink
                         {
                             PlinkId = pl2.PlinkId,
                             ProjectName = pl2.ProjectName,
                             IId = pl2.IId,
-                        }).Where(pl2 => pl2.IId == pl.I.IId).ToList();
+                        }).Where(pl2 => pl2.IId == pl.I.IId).ToHashSet();
                         pl.I.U = _context.User.Select(u2 => new User
                         {
                             UId = u2.UId,
@@ -191,7 +191,7 @@ namespace AEImageHub.Controllers
         {
             try
             {
-                List<User> users;
+                HashSet<User> users;
                 if (!username.Contains("\""))
                 {
                     users = _context.User.Select(u => new User
@@ -199,7 +199,7 @@ namespace AEImageHub.Controllers
                         UId = u.UId,
                         UserName = u.UserName,
                         Image = u.Image
-                    }).Where(u => u.UserName.Contains(username)).ToList();
+                    }).Where(u => u.UserName.Contains(username)).ToHashSet();
                 }
                 else
                 {
@@ -209,11 +209,11 @@ namespace AEImageHub.Controllers
                         UId = u.UId,
                         UserName = u.UserName,
                         Image = u.Image
-                    }).Where(u => u.UserName == username).ToList();
+                    }).Where(u => u.UserName == username).ToHashSet();
                 }
 
 
-                var images = new List<Image>();
+                var images = new HashSet<Image>();
                 foreach (var u in users)
                 {
                     foreach (var i in u.Image)
