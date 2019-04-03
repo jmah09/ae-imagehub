@@ -16,6 +16,7 @@ import { ImageEditor } from './componentsTemplate/ImageEditor'
 import { Submit } from './componentsTemplate/Submit'
 import { LogView } from './componentsTemplate/LogView'
 import {GetInfoTrash} from "./componentsTemplate/sub-components/get-info-trash";
+import {RecoverTrash} from "./componentsTemplate/RecoverTrash";
 
 export default class App extends Component {
     displayName = App.name
@@ -37,6 +38,7 @@ export default class App extends Component {
                 <Route path='/project' component={Project} />
                 <Route path='/metadata' component={Metadata} />
                 <Route path='/user' component={User} />
+                <Route path='/recover' component={RecoverTrash} />
             </Layout>
         );
     }
