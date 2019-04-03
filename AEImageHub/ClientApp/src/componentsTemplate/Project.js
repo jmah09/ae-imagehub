@@ -174,16 +174,9 @@ export class Project extends Component {
     return (
       <div className={this.state.showAdd ? '' : 'hidden'}>
         <form onSubmit={this.PostProject} className="handleTag">
-          Add Project
-          <br />
           Project Name:
           <label>
             <input type="text" name="ProjectName" value={this.state.ProjectName} onChange={this.handleChange} />
-          </label>
-          <br />
-          Project Description:
-                <label>
-            <input type="text" name="Description" value={this.state.Description} onChange={this.handleChange} />
           </label>
           <br />
           Active?:
