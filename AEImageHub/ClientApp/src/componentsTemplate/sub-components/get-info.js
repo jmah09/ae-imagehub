@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Title } from '../Title';
 import { TextInput } from './form-text-input';
-import { Dropdown } from './form-dropdown-list';
 import { Redirect } from 'react-router-dom';
 import Select from "react-dropdown-select";
 import axios from 'axios';
@@ -12,7 +11,6 @@ import Lightbox from "react-image-lightbox";
 import "react-image-lightbox/style.css";
 import { adalGetToken } from "react-adal";
 import { authContext, adalConfig } from "../../adalConfig";
-import { Tag } from '../../components/backend_test/Tag';
 
 export class GetInfo extends Component {
 
@@ -55,14 +53,14 @@ export class GetInfo extends Component {
     // render
     //
     render() {
-
-
         return (
             <div>
                 <Title title='GET INFO' />
                 {this.renderRedirect()}
                 {this.renderFunction()}
                 {this.renderGetInfo()}
+
+
 
             </div>
         );
@@ -72,15 +70,14 @@ export class GetInfo extends Component {
     // redirect
     //
     renderRedirect = () => {
-        console.log("excuted")
-        //window.location.reload();
+        console.log(this.state.redirectLink)
+
         if (this.state.redirect) {
             if (this.state.redirectOption) {
                 return <Redirect to={{
                     pathname: this.state.redirectLink,
                 }} />
-            }
-            else {
+            } else {
                 return <Redirect to={this.state.redirectLink} />;
             }
         }
@@ -122,197 +119,317 @@ export class GetInfo extends Component {
 
     }
 
+    /* map of renderGetInfo
+       (trash || search)
+           (multiple)
+           (single)
+       (palette)
+           (multiple)
+           (single) 
+     */
     renderGetInfo() {
-        if (this.state.selected_images.length <= 1) {
-            let image = this.state.selected_images[0];
+        if (this.state.redirectLink == "trash" || this.state.redirectLink == "search") {
+            if (this.state.selected_images.length > 1) {
+                return (
+                    <div id="getinfo">
+                        <div className="float-left">
+                            {this.renderImages()}
+                        </div>
 
-            return (
-                <div id="getinfo">
-                    <div className="float-left">
-                        {this.renderImages()}
+                        <div className="float-right">
+                            <h2>IMAGE NAME :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_name'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED DATE :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_date'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED BY :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_user'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>CLASSIFICATION :</h2>
+                            <Select
+                                multi
+                                disabled={true}
+                                values={['multi-images selected']}
+                                labelField="TagName"
+                                valueField="TagName"
+                                options={this.state.classifications}
+                            />
+                            <h2>PROJECT :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_proj'
+                                value={'multi-images selected'}
+                            />
+                        </div>
                     </div>
+                );
+            } else {
+                let image = this.state.selected_images[0];
+                let projects = Array.from(image.meta.ProjectLink).map(function (pl) {
+                    return pl.ProjectName;
+                })
+                return (
+                    <div id="getinfo">
+                        <div className="float-left">
+                            {this.renderImages()}
+                        </div>
 
-                    <div className="float-right">
-                        <h2>IMAGE NAME :</h2>
-                        <TextInput
-                            //                              disabled={selected.length > 1}
-                            id='getinfo_name'
-                            defaultValue={''}
-                            placeholder={image.meta.ImageName}
-                        />
-                        <br />
-                        <h2>UPLOADED DATE :</h2>
-                        <TextInput
-                            disabled={true}
-                            id='getinfo_date'
-                            value={image.meta.UploadedDate}
-                        />
-                        <br />
-                        <h2>UPLOADED BY :</h2>
-                        <TextInput
-                            disabled={true}
-                            id='getinfo_user'
-                            value={image.meta.U.UserName} // TODO -- GET USERNAME
-                        />
-                        <br />
-                        <h2>CLASSIFICATION :</h2>
-                        <Select
-                            multi
-                            values={image.meta.TagLink}
-                            labelField="TagName"
-                            valueField="TagName"
-                            options={this.state.classifications}
-                        />
-                        <h2>PROJECT :</h2>
-                        <TextInput
-                            disabled={true}
-                            id='getinfo_proj'
-                            placeholder={image.meta.ProjectLink.toString()}
-                            onChange={null}
-                        />
+                        <div className="float-right">
+                            <h2>IMAGE NAME :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_name'
+                                value={image.meta.ImageName}
+                            />
+                            <br />
+                            <h2>UPLOADED DATE :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_date'
+                                value={image.meta.UploadedDate}
+                            />
+                            <br />
+                            <h2>UPLOADED BY :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_user'
+                                value={image.meta.U.UserName} // TODO -- GET USERNAME
+                            />
+                            <br />
+                            <h2>CLASSIFICATION :</h2>
+                            <Select
+                                multi
+                                disabled={true}
+                                values={image.meta.TagLink}
+                                labelField="TagName"
+                                valueField="TagName"
+                                options={this.state.classifications}
+                            />
+                            <h2>PROJECT :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_proj'
+                                value={projects}
+                            />
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            }
+        } else {
+            // palette case      
+            if (this.state.selected_images.length > 1) {
+                return (
+                    <div id="getinfo">
+                        <div className="float-left">
+                            {this.renderImages()}
+                        </div>
+
+                        <div className="float-right">
+                            <h2>IMAGE NAME :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_name'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED DATE :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_date'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED BY :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_user'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>CLASSIFICATION :</h2>
+                            <Select
+                                multi
+                                values={[]}
+                                labelField="TagName"
+                                valueField="TagName"
+                                options={this.state.classifications}
+                            />
+                            <h2>PROJECT :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_proj'
+                                value={'multi-images selected'}
+                            />
+                        </div>
+                    </div>
+                );
+            } else {
+                let image = this.state.selected_images[0];
+                let projects = Array.from(image.meta.ProjectLink).map(function (pl) {
+                    return pl.ProjectName;
+                })
+                return (
+                    <div id="getinfo">
+                        <div className="float-left">
+                            {this.renderImages()}
+                        </div>
+
+                        <div className="float-right">
+                            <h2>IMAGE NAME :</h2>
+                            <TextInput
+                                //                              disabled={selected.length > 1}
+                                id='getinfo_name'
+                                defaultValue={''}
+                                placeholder={image.meta.ImageName}
+                            />
+                            <br />
+                            <h2>UPLOADED DATE :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_date'
+                                value={image.meta.UploadedDate}
+                            />
+                            <br />
+                            <h2>UPLOADED BY :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_user'
+                                value={image.meta.U.UserName} // TODO -- GET USERNAME
+                            />
+                            <br />
+                            <h2>CLASSIFICATION :</h2>
+                            <Select
+                                multi
+                                values={image.meta.TagLink}
+                                labelField="TagName"
+                                valueField="TagName"
+                                options={this.state.classifications}
+                            />
+                            <h2>PROJECT :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_proj'
+                                value={projects}
+                            />
+                        </div>
+                    </div>
+                );
+            }
         }
     }
 
-    /*
-    handleClassificationsChange = (e) =>
-    {
-      const images = this.state.selected_images;
-//      let tags;
-  
-      //check if classification exists 
-      images.forEach((image) => {
-          tags = image.meta.TagLink;
-          try
-          {
-              for (var tagname of e.target.values) {
-                  adalGetToken(authContext, adalConfig.endpoints.api)
-                      .then(function (token) {
-                          axios.post("/api/tag/taglink",
-                              { TagName = tagname,
-                                IId = img.IId },
-                              { headers: { 'Authorization': "bearer " + token } })
-                              .then((res) => {
-                                  console.log(res);
-                              }).catch((err) => { console.log(err); });
-                      }).catch(function (err) {
-                          console.log("Error: Couldn't get token")
-                      });
-              }
-          }
-        let options = e.target.options;
-        for (let i = 0; i < options.length; i++){
-          let option = options[i].selected;
-          if (option && !tags.includes(options[i].value)){
-            tags.push(options[i].value)
-          }
-        }
-        this.setState({ photos: photos});
-        console.log(this.state.photos);
-      });
-    };
-    */
 
+        onSave = () => {
+            adalGetToken(authContext, adalConfig.endpoints.api).then(async (token) => {
 
-    // TODO -- SAVE METADATA TO DATABASE INSTEAD
-    // TODO -- ^ IF COMPLETED REMOVE ALL INSTANCES OF redirectOption AND RELATED IF STATEMENTS
-    onSave = () => {
-        let that = this;
-        let promise1 = [];
-        let promise2 = [];
-        let promise3 = [];
+                if (this.state.selected_images.length > 1) {
+                    let images = this.state.selected_images;
 
-        let image = this.state.selected_images[0];
-        promise1.push(adalGetToken(authContext, adalConfig.endpoints.api).then((token) => {
+                    for (var image of images) {
+                        await this.handlePostTags(image, token);
+                    }
+                } else {
+                    let image = this.state.selected_images[0];
 
-            if (this.state.selected_images.length <= 1) {
-
-                // imagename
-                let imagename = document.getElementById("getinfo_name").value;
-
-                if (imagename != '') {
-                    promise2.push(axios.put("/api/image/" + image.meta.IId,
-                        {
-                            ImageName: imagename,
-                            UId: null,
-                            Trashed: null,
-                            Submitted: null,
-                        },
-                        {
-                            headers: {
-                                'Authorization': "bearer " + token
-                            }
-                        })
-                        .then(() => {
-                            image.meta.ImageName = imagename;
-                        }).catch((err) => { console.log(err); }));
+                    await this.handleChangeImageName(image, token);
+                    await this.handleCleanTags(image, token);
+                    await this.handlePostTags(image, token);
                 }
 
-                // tags
-                let selected_tags = Array.from(document.getElementsByClassName("react-dropdown-select-option-label")).map(function (cn) {
-                    return cn.innerText;
+                this.setState({
+                    redirect: true
                 });
 
-                promise2.push(axios.delete("/api/tag/taglink/" + image.meta.IId,
-                    { headers: { 'Authorization': "bearer " + token } })
-                    .then((res) => {
-                        console.log("tags on the " + image.meta.ImageName + "are cleaned")
-                    }).then(selected_tags.map((tagname) => {
-                        (axios.post("/api/tag/taglink", {
-                            TagName: tagname,
-                            IId: image.meta.IId,
-                        }, { headers: { 'Authorization': "bearer " + token } })
-                            .then(() => {
-                                console.log(tagname + " is added on " + image.meta.ImageName);
-                                image.meta.TagLink = selected_tags;
-                            }).catch((err) => { console.log(err); }));
-                    })));
-                return Promise.all(promise2);
-            }
-        })  .catch((err) => {
-                console.log("can't get token");
-                console.log(err);
-            }));
-
-        Promise.all(promise1).then(function (result) {
-            //console.log(result);
-            that.setState({
-                //redirectOption: true,
-                redirect: true
-
-            });
-        }).catch(error => {
-            console.log(error);
-        });
-        return <Redirect to={{
-            pathname: this.state.redirectLink,
-        }} />
-    }
-
-
-
-    onCancel = () => {
-        this.setState({
-            //redirectOption: false,
-            redirect: true
-        });
-    };
-
-    renderImages = () => {
-        let render = [];
-
-        for (let i = 0; i < this.state.selected_images.length; i++) {
-            render.push(
-                <div key={i}>
-                    <img key={i} src={this.state.selected_images[i].src} />
-                    <p style={{ textAlign: 'center' }}>{this.state.selected_images[i].meta.ImageName}</p>
-                    <p>Size : X Y</p>
-                </div>
-            );
+            })
         }
 
-        return render;
+        handleChangeImageName = async (image, token) => {
+            let imagename = document.getElementById("getinfo_name").value;
+
+            if (imagename != '') {
+                await axios.put("/api/image/" + image.meta.IId,
+                    {
+                        ImageName: imagename,
+                        UId: null,
+                        Trashed: null,
+                        Submitted: null,
+                    },
+                    {
+                        headers: {
+                            'Authorization': "bearer " + token
+                        }
+                    })
+                    .then(() => {
+                        image.meta.ImageName = imagename;
+                    }).catch((err) => { console.log(err); });
+            }
+        }
+
+        handleCleanTags = async (image, token) => {
+            await axios.delete("/api/tag/taglink/" + image.meta.IId,
+                { headers: { 'Authorization': "bearer " + token } })
+                .then((res) => {
+                    console.log("tags on the " + image.meta.ImageName + "are cleaned")
+                }).catch((err) => { console.log(err); })
+        };
+
+        handlePostTags = async (image, token) => {
+            let selected_tags = Array.from(document.getElementsByClassName("react-dropdown-select-option-label")).map(function (cn) {
+                return cn.innerText;
+            });
+
+            var newtags = [];
+            for (var tag of selected_tags) {
+                if (!image.meta.TagLink.includes(tag)) {
+                    newtags.push(tag);
+                }
+            }
+
+            if (!newtags.length == 0) {
+                await axios.post("/api/tag/taglinks",
+                    {
+                        TagNames: newtags,
+                        IId: image.meta.IId,
+                    },
+                    { headers: { 'Authorization': "bearer " + token } }
+                ).then(() => {
+                    console.log("tags are added on " + image.meta.ImageName);
+                    image.meta.TagLink.concat(newtags);
+                }).catch((err) => { console.log(err); });
+            }
+        }
+
+        onCancel = () => {
+            this.setState({
+                //redirectOption: false,
+                redirect: true
+            });
+        };
+
+        renderImages = () => {
+            let render = [];
+            for (let i = 0; i < this.state.selected_images.length; i++) {
+                var image = this.state.selected_images[i];
+                render.push(
+                    <div key={i}>
+                        <img key={i} id={image.meta.IId} src={image.src} />
+                        <p style={{ textAlign: 'center' }}>{image.meta.ImageName}</p>
+                    </div>
+                );
+            }
+            return render;
+        }
     }
-}
