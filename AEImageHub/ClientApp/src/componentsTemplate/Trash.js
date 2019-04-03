@@ -220,7 +220,7 @@ export class Trash extends Component {
     switch (this.state.redirectOption)
     {
       case 1: // get info
-        redirectLink = 'trashinfo';
+        redirectLink = 'getinfo';
         if (this.state.redirect)
         {
           const selected = this.state.photos.filter((value, index, array) => {
