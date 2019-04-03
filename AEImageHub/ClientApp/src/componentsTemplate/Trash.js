@@ -35,7 +35,6 @@ export class Trash extends Component {
     this.renderRedirect = this.renderRedirect.bind(this);
     this.deleteSelected = this.deleteSelected.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.sendToAnotherPalette = this.sendToAnotherPalette.bind(this);
     this.selectPhoto = this.selectPhoto.bind(this);
     this.toggleSelect = this.toggleSelect.bind(this);
 
@@ -44,6 +43,7 @@ export class Trash extends Component {
 
   }
 
+    
   componentDidMount()
   {
     let param = this.props.location.search;
@@ -151,47 +151,7 @@ export class Trash extends Component {
       })
       .catch(function (err) { console.log(err.message); });
   }
-
-
-  sendToAnotherPalette(event) {
-    event.preventDefault();
-    const selected = this.state.photos.filter((value, index, array) => {
-      return value.selected;
-    });
-
-    const notSelected = this.state.photos.filter((value, index, array) => {
-      return !value.selected;
-    });
-
-    let promises = [];
-    const that = this;
-
-    adalGetToken(authContext, adalConfig.endpoints.api)
-      .then(function (token) {
-        for (let i = 0; i < selected.length; i++)
-        {
-          selected[i].meta.Trashed = false;
-          selected[i].meta.UId = that.state.userId;
-          promises.push(
-            axios.put("/api/image/" + selected[i].meta.IId, selected[i].meta,
-              { headers: { 'Authorization': "bearer " + token } })
-          );
-        }
-
-      }).catch(function (err) {
-        console.log("Error: Could not get : " + err.response);
-      });
-
-    axios.all(promises)
-      .then(function () {
-        that.setState({ photos: notSelected });
-        /*if (isIE() && selected.length > 0) {
-          window.location.reload();
-        }*/
-      })
-      .catch(function (err) { console.log("Recover failed: " + err.response); });
-
-  }
+  
   
   handleChange(event)
   {
@@ -200,6 +160,22 @@ export class Trash extends Component {
     const name = target.name;
 
     this.setState({ [name]: value });
+  }
+
+  onRecoverBtnClick = () => {
+    const selected = this.state.photos.filter((value, index, array) => {
+      return value.selected;
+    })
+
+    if (selected.length <= 0) {
+      alert("please select at least one image");
+    } else {
+      this.setState({
+        redirectLink: encodeURIComponent(JSON.stringify(selected)),
+        redirectOption: 3,
+        redirect: true
+      });
+    }
   }
 
   onGetInfo = () =>
@@ -239,21 +215,35 @@ export class Trash extends Component {
   //
   renderRedirect()
   {
-    let redirectLink = 'trashinfo';
+    let redirectLink;
+
+    switch (this.state.redirectOption)
+    {
+      case 1: // get info
+        redirectLink = 'trashinfo';
+        if (this.state.redirect)
+        {
+          const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+          });
+          return <Redirect to={{
+            pathname: redirectLink,
+            state: {
+              photos: selected,
+              redirectLink: 'trash'
+            }}} />;
+        }
+        break;
+      case 2: // edit image
+        redirectLink = 'edit?src=' + this.state.redirectLink;
+        break;
+      case 3:
+        redirectLink = 'recover?src=' + this.state.redirectLink;
+    }
 
     if (this.state.redirect)
     {
-      const selected = this.state.photos.filter((value, index, array) => {
-        return value.selected;
-      });
-
-      return <Redirect to={{
-        pathname: redirectLink,
-        state: {
-          photos: selected,
-          redirectLink: 'trash'
-        }
-      }} />;
+      return <Redirect to={redirectLink} />;
     }
   }
 
@@ -264,7 +254,6 @@ export class Trash extends Component {
         <Title title='TRASH' />
         {this.renderRedirect()}
         {this.renderFunction()}
-        {isAdmin() ? this.renderRecoverToAnother() : null}
         {this.renderContent()}
       </div>
     );
@@ -276,7 +265,9 @@ export class Trash extends Component {
     return (
       <div className="fnbar">
         <button onClick={this.onGetInfo}>Get Info</button>
-        <button onClick={this.RecoverSelectedImages}>Recover</button>
+        {isAdmin() ?
+            <button onClick={this.onRecoverBtnClick}>Recover</button> : 
+            <button onClick={this.RecoverSelectedImages}>Recover</button>}
         <button onClick={this.toggleSelect}>Select All</button>
         {isAdmin() ? <button onClick={this.deleteSelected}>Delete</button>: null}
       </div>
@@ -300,32 +291,4 @@ export class Trash extends Component {
     );
   }
 
-  renderRecoverToAnother()
-  {
-    return (
-      <div>
-        <div className="fnbar">
-          <button onClick={() => {
-            this.setState({ showRecover: !this.state.showRecover });
-          }}>Recover To Another Palette
-                    </button>
-        </div>
-        <div className={this.state.showRecover ? '' : 'hidden'}>
-          <br />
-          <form onSubmit={this.sendToAnotherPalette} className="handleTag">
-            A list of user ids  can be found in the user management tab
-                        <br />
-            User ID:
-                        <label>
-              <input type="text" name="userId" color={'black'} value={this.state.userId}
-                onChange={this.handleChange} />
-            </label>
-            <input type="submit" value="Add" />
-          </form>
-          <br />
-          <br />
-        </div>
-      </div>
-    );
-  }
 }
