@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Title } from './Title';
-import Select from 'react-dropdown-select';
+import Select from 'react-select';
 import { adalConfig, authContext, isAdmin } from '../adalConfig';
 import { adalGetToken } from "react-adal";
 import axios from 'axios';
