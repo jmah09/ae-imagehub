@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Title } from './Title';
 import { Dropdown } from './sub-components/form-dropdown';
 import { TextInput } from './sub-components/form-text-input';
-import { adalConfig, authContext, getUser, isAdmin } from '../adalConfig';
+import { adalConfig, authContext, getUser } from '../adalConfig';
 import { adalGetToken } from "react-adal";
 import axios from 'axios';
 import Gallery from './custom-photo-gallery';
@@ -257,6 +257,8 @@ export class Search extends Component {
     }
 
     onSearch = async (e) => {
+        e.preventDefault();
+
         if (this.state.option === '') {
             alert('Please select an option.');
             return;
@@ -507,36 +509,38 @@ export class Search extends Component {
     renderSearchBar = () => {
         return (
             <div id="search-form">
-                <Dropdown
-                    multiple={false}
-                    id="search-dropdown"
-                    options={this.dropdown_options}
-                    onChange={this.handleListChange} />
-                {this.state.showDateInput ? <span>FROM</span> : null}
-                <TextInput
-                    id="input_1"
-                    option={this.state.option}
-                    options={this.text_options}
-                    value={this.state.input_1}
-                    onChange={this.handleTextChange} />
-                {this.state.showDateInput ? <span>TO</span> : null}
-                {this.state.showDateInput
-                    ? <TextInput
-                        id="input_2"
-                        option={this.state.option}
-                        options={this.text_options}
-                        value={this.state.input_2}
-                        onChange={this.handleTextChange} />
-                    : null}
-                {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
-                    ? null
-                    : <button type="submit" onClick={this.onSearch} onKeyPress={this.onPressEnter}>Search</button>}
-                {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
-                    ? <button type="submit" onClick={this.onAddFilter}>Add Filter</button>
-                    : null}
-                {this.state.showResults
-                    ? <button type="submit" onClick={this.resetSearch}>Reset</button>
-                    : null}
+                <form>
+                    <Dropdown
+                          multiple={false}
+                          id="search-dropdown"
+                          options={this.dropdown_options}
+                          onChange={this.handleListChange} />
+                      {this.state.showDateInput ? <span>FROM</span> : null}
+                      <TextInput
+                          id="input_1"
+                          option={this.state.option}
+                          options={this.text_options}
+                          value={this.state.input_1}
+                          onChange={this.handleTextChange} />
+                      {this.state.showDateInput ? <span>TO</span> : null}
+                      {this.state.showDateInput
+                          ? <TextInput
+                              id="input_2"
+                              option={this.state.option}
+                              options={this.text_options}
+                              value={this.state.input_2}
+                              onChange={this.handleTextChange} />
+                          : null}
+                      {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
+                          ? null
+                          : <button type="submit" onClick={this.onSearch} onKeyPress={this.onPressEnter}>Search</button>}
+                      {(this.state.showResults && this.state.filteredPhotos.length > 0) || this.state.filters.length > 0
+                          ? <button type="submit" onClick={this.onAddFilter}>Add Filter</button>
+                          : null}
+                      {this.state.showResults
+                          ? <button type="submit" onClick={this.resetSearch}>Reset</button>
+                          : null}
+                </form>
             </div>
         );
     }
