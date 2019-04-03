@@ -38,7 +38,7 @@ export class Upload extends Component {
                 withPreview = {true}
                 onChange = {this.onDrop}
                 imgExtension = {['.jpg', '.gif', '.png', '.gif', '.PNG', '.jpeg', '.JPEG']}
-                maxFileSize = {5242880} />
+                maxFileSize = {52428800} />
         )
     }
 
