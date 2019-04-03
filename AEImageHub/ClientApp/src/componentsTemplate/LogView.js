@@ -194,7 +194,7 @@ export class LogView extends Component {
                 <p>{this.state.images.length + " Image(s) submitted"}</p>
                 <Gallery
                     photos={this.state.images}
-                    columns={1}
+                    columns={3}
                     onClick={this.selectPhoto}
                     ImageComponent={SelectedImage}
                     margin={6}
