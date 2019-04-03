@@ -278,9 +278,9 @@ export class Palette extends Component {
             <div className="fnbar">
                 {this.renderRedirect()}
                 <button onClick={this.onSubmitBtnClick}>Submit</button>
+                <button onClick={this.TrashSelectedImages}>Trash</button>
                 <button onClick={this.onEditImage}>Edit Image</button>
                 <button onClick={this.onGetInfo}>Get Info</button>
-                <button onClick={this.TrashSelectedImages}>Delete</button>
                 <button onClick={this.toggleSelect}>Select All</button>
             </div>
         );
