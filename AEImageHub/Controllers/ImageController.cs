@@ -136,7 +136,7 @@ namespace ImageServer.Controllers
 
         /*
         PUT
-        API Endpoint: api/submit
+        API Endpoint: api/image/{imageid}
         Description: Modify metadata or the image itself.
         Request Requirements:
         1. User JWT in header field

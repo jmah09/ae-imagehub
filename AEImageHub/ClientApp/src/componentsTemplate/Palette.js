@@ -90,7 +90,7 @@ export class Palette extends Component {
         const that = this;
         adalGetToken(authContext, adalConfig.endpoints.api)
             .then(function (token) {
-                axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token } })
+                axios.get("/api/user/" + userid + "/images", { headers: { 'Authorization': "bearer " + token, 'Pragma': 'no-cache' } })
                     .then(res => {
 
                         res.data.map((image, index) => {
