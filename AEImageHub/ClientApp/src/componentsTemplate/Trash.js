@@ -4,7 +4,7 @@ import '../index.css';
 import Gallery from './custom-photo-gallery';
 import SelectedImage from './SelectedImage';
 import axios from 'axios'
-import {authContext, isAdmin, adalConfig, getUser, isIE} from '../adalConfig';
+import { authContext, isAdmin, adalConfig, getUser, isIE } from '../adalConfig';
 import { Redirect } from "react-router-dom";
 import { adalGetToken } from "react-adal";
 
@@ -80,37 +80,84 @@ export class Trash extends Component {
               { headers: { 'Authorization': "bearer " + token } })
           )
         }
-      })
-      .catch(function (err) { console.log("Could not authorize: " + err.response); });
 
-    axios.all(promises)
-      .then(function () {
-        that.setState( {photos: notSelected})
-        
-      })
-      .catch(function (err) { console.log("Delete failed: " + err.response); });
-  }
-
-  // get Images with the userid
-  GetUserTrashedImages() {
-    let userid = getUser().profile.oid;
-
-    // TODO -- add check for validId
-    if (this.state.admin && this.state.validId)
-    {
-      userid = this.state.userId;
+        const that = this;
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
+                    .then(res => {
+                        var images = [];
+                        res.data.map((image, index) => {
+                            images.push({
+                                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
+                            });
+                        });
+                        that.setState({ photos: images });
+                    })
+            })
+            .catch(function () { console.log("Error: Could not get token"); });
     }
 
-    const that = this;
-    adalGetToken(authContext, adalConfig.endpoints.api)
-      .then(function (token) {
-        axios.get("/api/user/" + userid + "/images/trashed", { headers: { 'Authorization': "bearer " + token } })
-          .then(res => {
-            var images = [];
-            res.data.map((image, index) => {
-              images.push({
-                src: "/api/image/" + image.IId, width: 5, height: 4, alt: image.IId, meta: image
-              });
+    RecoverSelectedImages() {
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        let promises = [];
+
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                for (let i = 0; i < selected.length; i++) {
+                    selected[i].meta.Trashed = false;
+                    promises.push(
+                        axios.put("/api/image/" + selected[i].meta.IId, selected[i].meta,
+                            { headers: { 'Authorization': "bearer " + token } })
+                    )
+                }
+            }).catch(function (err) { console.log(err.message); });
+
+        const that = this;
+        axios.all(promises)
+            .then(function () {
+                that.setState({ photos: notSelected });
+                /*if (isIE() && selected.length > 0) {
+                  window.location.reload();
+                }*/
+            })
+            .catch(function (err) { console.log(err.message); });
+    }
+
+
+    sendToAnotherPalette(event) {
+        event.preventDefault();
+        const selected = this.state.photos.filter((value, index, array) => {
+            return value.selected;
+        });
+
+        const notSelected = this.state.photos.filter((value, index, array) => {
+            return !value.selected;
+        });
+
+        let promises = [];
+        const that = this;
+
+        adalGetToken(authContext, adalConfig.endpoints.api)
+            .then(function (token) {
+                for (let i = 0; i < selected.length; i++) {
+                    selected[i].meta.Trashed = false;
+                    selected[i].meta.UId = that.state.userId;
+                    promises.push(
+                        axios.put("/api/image/" + selected[i].meta.IId, selected[i].meta,
+                            { headers: { 'Authorization': "bearer " + token } })
+                    );
+                }
+
+            }).catch(function (err) {
+                console.log("Error: Could not get : " + err.response);
             });
             that.setState({ photos: images });
           })
