@@ -180,9 +180,9 @@ export class Search extends Component {
                     adalGetToken(authContext, adalConfig.endpoints.api)
                         .then(function (token) {
                             const request_param = { headers: { 'Authorization': "bearer " + token } };
-                            let image = selected[i].meta;
 
                             for (let i = 0; i < selected.length; i++) {
+                                let image = selected[i].meta;
                                 promise.push(
                                     axios.put("/api/image/" + image.IId, {
                                         UId: getUser().profile.oid,
@@ -199,7 +199,11 @@ export class Search extends Component {
                         });
 
         const that = this;
-        axios.all(promise).then(() => { this.setState({ filteredPhotos: notSelected, redirect: false }); });
+        axios.all(promise)
+            .then(() => { this.setState({ filteredPhotos: notSelected, redirect: false }); })
+            .catch((e) => {
+                console.log(e);
+            });
     };
 
     //
