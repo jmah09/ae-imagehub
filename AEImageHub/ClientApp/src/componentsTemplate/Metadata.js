@@ -200,26 +200,13 @@ export class Metadata extends Component {
           <button onClick={() => { this.setState({ showAdd: !this.state.showAdd }); }}>Add Classification</button>
         </div>
         <div className={this.state.showAdd ? '' : 'hidden'}>
-          <br />
           <form onSubmit={this.handleSubmit} className="handleTag">
-            ADD NEW CLASSIFICATION
-                        <br />
             New Classification Name:
                         <label>
               <input type="text" name="newTag" color={'black'} value={this.state.newTag} onChange={this.handleChange} />
             </label>
-            <br />
-            New Description Name:
-                        <label>
-              <input type="text" name="newDescription" color={'black'} value={this.state.newDescription} onChange={this.handleChange} />
-            </label>
             <input type="submit" value="Add" />
           </form>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
         </div>
       </div>
     )
@@ -256,7 +243,6 @@ export class Metadata extends Component {
           Header: 'Active',
           accessor: 'Active',
           Cell: (props) => <span><input type="checkbox" checked={props.original.Active} onChange={(e) => {
-            alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Active + " for Active.");
             if (this.state.metadata[props.original.id].Active) {
               this.state.metadata[props.original.id].Mandatory = false;
             }
@@ -270,7 +256,6 @@ export class Metadata extends Component {
           accessor: 'Mandatory',
           Cell: (props) => <span><input type="checkbox" checked={props.original.Mandatory} onChange={(e) => {
             if (this.state.metadata[props.original.id].Active) {
-              alert("Metadata: " + props.original.MetaName + " has been set to " + !props.original.Mandatory + " for Mandatory.");
               this.state.metadata[props.original.id].Mandatory = !this.state.metadata[props.original.id].Mandatory;
               this.setState({ metadata: this.state.metadata });
               this.changeMetaTag(props.original.MetaName, props.original.Active, !props.original.Mandatory);
@@ -328,7 +313,6 @@ export class Metadata extends Component {
           accessor: 'Active',
           // Checked grabs the active value from props, and changes this with changeActiveTag(TagName, opposite of current value for Active).
           Cell: (props) => <span><input type="checkbox" checked={props.original.Active} onChange={(e) => {
-            alert("Classification: " + props.original.TagName + " has been set to " + !props.original.Active + ".");
             this.state.classification[props.original.id].Active = !this.state.classification[props.original.id].Active;
             this.setState({ classification: this.state.classification });
             this.changeActiveTag(props.original.TagName, !props.original.Active, props.original.Description, props.original.TagLink);
