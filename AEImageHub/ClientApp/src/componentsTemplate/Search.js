@@ -174,41 +174,37 @@ export class Search extends Component {
 
     handleSubmit = () => {
         let selected = this.state.photos.filter((value) => { return value.selected; });
+        let notSelected = this.state.photos.filter((value) => { return !value.selected; });
         let promise = [];
 
-        for (let i = 0; i < selected.length; i++) {
-            promise.push(
-                new Promise((resolve, reject) => {
                     adalGetToken(authContext, adalConfig.endpoints.api)
                         .then(function (token) {
                             const request_param = { headers: { 'Authorization': "bearer " + token } };
-                            let image = selected[i].meta;
 
-                            axios.put("/api/image/" + image.IId, {
-                                UId: getUser().profile.oid,
-                                ImageName: null,
-                                Trashed: null,
-                                Submitted: 'False'
-                            }, request_param)
-                                .then(function (res) {
-                                    console.log(res);
-                                    resolve();
-                                })
-                                .catch(function (err) {
-                                    console.log(err);
-                                    reject();
-                                });
+                            for (let i = 0; i < selected.length; i++) {
+                                let image = selected[i].meta;
+                                promise.push(
+                                    axios.put("/api/image/" + image.IId, {
+                                        UId: getUser().profile.oid,
+                                        ImageName: null,
+                                        Trashed: null,
+                                        Submitted: 'False'
+                                    }, request_param)
+                                )
+                            }
+                                
                         })
                         .catch(function () {
                             console.log("Error: Couldn't get token");
-                            reject();
                         });
-                })
-            );
-        }
 
-        Promise.all(promise).then(() => { this.setState({ redirect: true }); });
-    }
+        const that = this;
+        axios.all(promise)
+            .then(() => { this.setState({ filteredPhotos: notSelected, redirect: false }); })
+            .catch((e) => {
+                console.log(e);
+            });
+    };
 
     //
     // handle
