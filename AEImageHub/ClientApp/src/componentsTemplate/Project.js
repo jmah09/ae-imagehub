@@ -201,7 +201,10 @@ export class Project extends Component {
 
     for (let i = 0; i < projects.length; i++) {
       let project = {};
-      project.name = projects[i].ProjectName;
+      project.name = <Link to={{ pathname: "/search?project=" + '"' + projects[i].ProjectName + '"' }}
+                           >
+        {projects[i].ProjectName}</Link>;
+
 
       project.uniqueName = projects[i].ProjectName;
       project.date = projects[i].CreatedDate.substring(0,10);
