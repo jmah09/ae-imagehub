@@ -25,7 +25,8 @@ export class Palette extends Component {
             validId: false,
             userId: '',
             redirectLink: '',
-            redirectOption: 0
+            redirectOption: 0,
+            selected: []
         };
 
         if (props.location.state && Array.isArray(props.location.state.photos))
@@ -244,7 +245,14 @@ export class Palette extends Component {
                 redirectLink = 'edit?src=' + this.state.redirectLink;
                 break;
             case 3:
-                redirectLink = 'submit?src=' + this.state.redirectLink;
+                if (this.state.redirect)
+                {
+                    return <Redirect to={{
+                        pathname: "/submit",
+                        search: "?src",
+                        state: {selected: this.state.selected}}} />;
+                }
+                break;
         }
 
         if (this.state.redirect)
@@ -264,7 +272,7 @@ export class Palette extends Component {
             alert("please select at least one image");
         } else {
             this.setState({
-                redirectLink: encodeURIComponent(JSON.stringify(selected)),
+                selected: selected,
                 redirectOption: 3,
                 redirect: true
             });

@@ -21,6 +21,7 @@ export class Trash extends Component {
       userId: "",
 
       photos: [],
+      selected: [],
 
       selectAll: false,
       showRecover: false,
@@ -50,7 +51,6 @@ export class Trash extends Component {
     this.state.validId = param.includes("?"); // todo : temp fix
     this.state.userId = param.substring(1);
     this.state.admin = isAdmin();
-    console.log("isAdminTrash ? " + this.state.admin);
     // todo valid id logic [have to change db]
 
     this.state.redirect = false;
@@ -171,7 +171,7 @@ export class Trash extends Component {
       alert("please select at least one image");
     } else {
       this.setState({
-        redirectLink: encodeURIComponent(JSON.stringify(selected)),
+        selected: selected,
         redirectOption: 3,
         redirect: true
       });
@@ -238,7 +238,14 @@ export class Trash extends Component {
         redirectLink = 'edit?src=' + this.state.redirectLink;
         break;
       case 3:
-        redirectLink = 'recover?src=' + this.state.redirectLink;
+        if (this.state.redirect)
+        {
+          return <Redirect to={{
+            pathname: "/recover",
+            search: "?src",
+            state: {selected: this.state.selected}}} />;
+        }
+        break;
     }
 
     if (this.state.redirect)

@@ -16,10 +16,9 @@ export class RecoverTrash extends Component {
 
         super(props);
 
-        let params = new URLSearchParams(window.location.search);
 
         this.state = {
-            images: JSON.parse(params.get('src')),
+            images: this.props.location.state.selected,
             redirect: false,
             admin: false,
             validId: false,

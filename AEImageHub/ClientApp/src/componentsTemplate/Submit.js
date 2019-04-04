@@ -16,10 +16,9 @@ export class Submit extends Component {
 
     super(props);
 
-    let params = new URLSearchParams(window.location.search);
 
     this.state = {
-      images: JSON.parse(params.get('src')),
+      images: this.props.location.state.selected,
       redirect: false,
       admin: false,
       validId: false,
@@ -37,7 +36,6 @@ export class Submit extends Component {
   componentDidMount()
   {
     let param = this.props.location.search;
-    this.state.userId = param.substring(1, param.indexOf("@"));
     this.state.admin = isAdmin();
     // todo valid id logic [have to change db]
   }
