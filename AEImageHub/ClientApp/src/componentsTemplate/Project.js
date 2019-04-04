@@ -201,8 +201,10 @@ export class Project extends Component {
 
     for (let i = 0; i < projects.length; i++) {
       let project = {};
-      project.name = <Link to= {{ pathname: "/search?project=" + '"' + projects[i].ProjectName + '"' } }
-                           target="_blank"  >
+      project.name = <Link to= {{ pathname: "/search",
+                                  hash: "project",
+                                    state: {projectName: projects[i].ProjectName } }}
+                            >
         {projects[i].ProjectName} </Link>;
 
 
