@@ -26,7 +26,11 @@ export class GetInfo extends Component {
             redirectOption: false,
             redirect: false,
             photoIndex: 0,
-            isOpen: false
+            isOpen: false,
+        }
+        if (this.props.location.state.redirectLink === "search"){
+            this.state.searchString = this.props.location.state.searchString;
+            this.state.searchOption = this.props.location.state.searchOption;
         }
         this.getClassifications();
     }
@@ -127,11 +131,62 @@ export class GetInfo extends Component {
            (single)
        (palette)
            (multiple)
-           (single) 
+           (single)  str[0] == "'" && str[str.length - 1] == "'"
      */
     renderGetInfo() {
-        if (this.state.redirectLink == "trash" || this.state.redirectLink == "search") {
-            if (this.state.selected_images.length > 1) {
+        let str = this.state.searchString;
+        console.log(JSON.stringify(str));
+        if (this.state.redirectLink === "trash" || this.state.redirectLink === "search") {
+            if (this.state.redirectLink === "search" && this.state.selected_images.length > 1
+            && this.state.searchOption === "Project" && str.indexOf('"') === 0 && str.lastIndexOf('"') === str.length - 1) {
+                return (
+                    <div id="getinfo">
+                        <div className="float-left">
+                            {this.renderImages()}
+                        </div>
+
+                        <div className="float-right">
+                            <h2>IMAGE NAME :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_name'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED DATE :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_date'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>UPLOADED BY :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_user'
+                                value={'multi-images selected'}
+                            />
+                            <br />
+                            <h2>CLASSIFICATION :</h2>
+                            <Select
+                                multi
+                                disabled={true}
+                                values={['multi-images selected']}
+                                labelField="TagName"
+                                valueField="TagName"
+                                options={this.state.classifications}
+                            />
+                            <h2>PROJECT :</h2>
+                            <TextInput
+                                disabled={true}
+                                id='getinfo_proj'
+                                value={this.state.searchString}
+                            />
+                        </div>
+                    </div>
+                );
+            }
+             else if (this.state.selected_images.length > 1) {
                 return (
                     <div id="getinfo">
                         <div className="float-left">

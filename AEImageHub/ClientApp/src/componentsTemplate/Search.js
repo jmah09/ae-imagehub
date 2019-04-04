@@ -69,15 +69,15 @@ export class Search extends Component {
             'Date': 'eg. yyyymmdd'
         }
 
+
+
         this.getClassification();
         this.getProject();
-
     }
 
     componentDidMount() {
-        let param = this.props.location.search;
-        if (param.includes("?project=")) {
-            this.state.input_1 = param.split("=")[1];
+        if (this.props.location.hash.includes("#project")) {
+            this.state.input_1 = '"' + this.props.location.state.projectName + '"' ;
             this.state.option = "Project";
             this.getSearch();
         }
@@ -483,7 +483,9 @@ export class Search extends Component {
                 pathname: redirectLink,
                 state: {
                     photos: selected,
-                    redirectLink: 'search'
+                    redirectLink: 'search',
+                    searchString: this.state.input_1,
+                    searchOption: "Project"
                 }
             }} />;
         }
