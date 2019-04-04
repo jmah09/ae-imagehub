@@ -18,7 +18,7 @@ export class GetInfo extends Component {
         super(props);
 
         this.state = {
-            classifications: new Set(),
+            classifications: [],
             projects: [],
             selected_images: props.location.state.photos,
 
@@ -42,7 +42,7 @@ export class GetInfo extends Component {
                     .then((res) => {
                         for (let tag of res.data) {
                             if (tag.Active) {
-                                that.state.classifications.add(tag);
+                                that.state.classifications.push(tag);
                             }
                         }
                     }).catch((err) => { console.log(err); });
