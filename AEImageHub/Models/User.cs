@@ -1,11 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace AEImageHub.Models
 {
-    public class User
+    public partial class User
     {
+        public User()
+        {
+            Image = new HashSet<Image>();
+            Log = new HashSet<Log>();
+        }
+
+        public string UId { get; set; }
+        public string UserName { get; set; }
+        public string Role { get; set; }
+        public bool Active { get; set; }
+
+        public ICollection<Image> Image { get; set; }
+        
+        [JsonIgnore]
+        public ICollection<Log> Log { get; set; }
     }
 }

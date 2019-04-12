@@ -1,48 +1,228 @@
-﻿/*
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using AEImageHub.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Security.Claims;
+using AEImageHub.Models;
+using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
 
-namespace AEImageHub.Controllers
+namespace ImageServer.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ImageController : ControllerBase
+    [Authorize]
+    [Route("api/image")]
+    public class ImageController : Controller
     {
-        // GET: api/Image
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ihubDBContext _context;
+        private readonly IImageRepository _repo;
+
+        
+        public ImageController(ihubDBContext context, IImageRepository repo)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
+            _repo = repo;
         }
 
-        // GET: api/Image/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        /* POST
+        API Endpoint: api/image/
+        Description: Uploads image to the server
+        Request Requirements:
+        1. User JWT in header field
+        2. Image file attachment
+        3. Metadata(optional)
+
+        Server response and status code:
+        201 - image upload was successful server should return a link to the image and its metadata
+        400 - malformed request due to unsupported file extension or etc
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        409 - image already exists on the server
+        */
+        public IActionResult UploadImage([FromForm]IFormFile image)
         {
-            return "value";
+            // check if image is passed in and also if it's valid image type
+            if(image == null)
+            {
+                return BadRequest("no image passed in");
+            } else if (!_repo.IsImageFileType(image))
+            {
+                return BadRequest("invalid file extension");
+            }
+
+            // check if image exists
+            Image img = GetImageModel(image);
+            if (ImageExists(img.IId))
+            {
+                Image dbImgRecord = (Image)_context.Image.Where(i => i.IId == img.IId).First();
+                if (dbImgRecord.Trashed)
+                {
+                    dbImgRecord.Trashed = false;
+                    _context.Update(dbImgRecord);
+                    _context.SaveChanges();
+                    return Created(dbImgRecord.IId, img);
+                }
+                else
+                {
+                    return Conflict("image already exists");
+                }
+            }
+
+            // add image meta data into database
+            try
+            {
+                _context.Add(img);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Debug.Write("SQL exception" + e.Message);
+                return BadRequest("malform request");
+            }
+
+            // store image onto disk
+            string uri = _repo.StoreImageToDisk(image);
+            img.IId = uri; // change database iId type
+            return Created(uri, img);
         }
 
-        // POST: api/Image
-        [HttpPost]
-        public void Post([FromBody] string value)
+        private Image GetImageModel(IFormFile image)
         {
+            string fn = Path.GetFileNameWithoutExtension(image.FileName);
+            Image img = new Image()
+            {
+                IId = ImageWriter.GetImageHash(image),
+                UId = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier"),
+                ImageName = fn,
+                Size = (Int32)image.Length,
+                UploadedDate = DateTime.Now,
+                Type = _repo.GetFileExtension(image),
+                Trashed = false,
+                Submitted = false,
+                UploadedBy = HttpContext.User.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier")
+            };
+            return img;
         }
 
-        // PUT: api/Image/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        /* GET
+        API Endpoint: api/image/:image_id
+        Description: Retrieves image from the server as well as its metadata
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - image retrive successful server should return an image
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to view image
+        404 - image does not exist
+        */
+        [HttpGet("{filename}")]
+        [AllowAnonymous]
+        public IActionResult GetImage(string filename)
         {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", filename);
+            Debug.Write(path);
+            bool exists = System.IO.File.Exists(path);
+            if (exists)
+            {
+                var image = System.IO.File.OpenRead(path);
+                return File(image, "image/jpeg");
+            }
+            else{
+                return NotFound();
+            }
         }
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        /*
+        PUT
+        API Endpoint: api/image/{imageid}
+        Description: Modify metadata or the image itself.
+        Request Requirements:
+        1. User JWT in header field
+        2. Image file attachment
+        3. Metadata(optional)
+
+        Server response and status code:
+        200 - image put request was successful server should return the modified image_id
+        400 - malformed request
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        404 - image does not exist
+        */
+        [HttpPut("{imageid}")]
+        [AllowAnonymous]
+        public Object PutImage(string imageid, [FromBody] JObject payload)
         {
+            
+            try
+            { 
+                Image image = (Image)_context.Image.Where(i => i.IId == imageid).First();
+                if (payload["UId"].Type != JTokenType.Null) { image.UId = (string)payload["UId"]; };
+                if (payload["ImageName"].Type != JTokenType.Null) { image.ImageName = (string)payload["ImageName"]; };
+                if (payload["Trashed"].Type != JTokenType.Null) { image.Trashed = (bool)payload["Trashed"]; };
+                if (payload["Submitted"].Type != JTokenType.Null)
+                {
+                    image.Submitted = (bool)payload["Submitted"];
+                    if (!image.Submitted)
+                    {
+                        var projectlinks = _context.ProjectLink.Where(pl => pl.IId == imageid);
+                        var loglinks = _context.LogLink.Where(ll => ll.IId == imageid);
+                        foreach(var pl in projectlinks)
+                        {
+                            _context.ProjectLink.Remove(pl);
+                        }
+
+                        foreach (var ll in loglinks)
+                        {
+                            _context.LogLink.Remove(ll);
+                        }
+                    }
+                };
+                
+                _context.SaveChanges();
+                return imageid;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Reached 169");
+                Console.WriteLine(e.Message);
+                return e;
+            }
+        }
+       
+
+        /* DELETE
+        API Endpoint: api/image/:image_id
+        Description: Deletes image from the server
+        Request Requirements:
+        1. User JWT in header field
+
+        Server response and status code:
+        200 - image delete was successful
+        401 - the JWT attached to the header is invalid or expired(should redirect to login)
+        403 - user not authorized to delete image
+        404 - image does not exist
+        */
+
+        [Authorize (Policy = "Admins")]
+        [HttpDelete(("{uri}"))]
+        public IActionResult DeleteImage(string uri)
+        {
+            Image image =  _context.Image.Find(uri);
+            if (image == null)
+            {
+                return NotFound();
+            }
+            _context.Image.Remove(image);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "ImageResources", uri);
+            _context.SaveChanges();
+            System.IO.File.Delete(path);
+            return Accepted();
+        }
+        
+        private bool ImageExists(string id)
+        {
+            return _context.Image.Any(e => e.IId.Equals(id));
         }
     }
 }
-*/
