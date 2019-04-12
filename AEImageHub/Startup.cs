@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using AEImageHub.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AEImageHub.Models;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AEImageHub
 {
@@ -20,13 +25,41 @@ namespace AEImageHub
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-         
+
+            // Add db context
+            services.AddDbContext<ihubDBContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
            
+            // Dependency injection
+            services.AddScoped<IImageWriter, ImageWriter>();
+            services.AddScoped<IImageRepository, ImageRepository>();
+
+            // Azure AD authentication
+            // todo - configure cookies
+            services
+                .AddAuthentication(sharedOptions =>
+                {
+                    sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = Configuration["AzureAd:ClientId"];
+                    options.Authority = $"{Configuration["AzureAd:Instance"]}{Configuration["AzureAd:TenantId"]}";
+                });
+            
+            // Authorization
+            services.AddAuthorization(options => {
+                options.AddPolicy("Admins",
+                    policyBuilder => policyBuilder.RequireClaim("groups",
+                        "e76d7410-92be-4073-9709-2d8b737f1d44"));
+            });
+            
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
             });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +76,8 @@ namespace AEImageHub
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseAuthentication();
+            
 
             app.UseMvc(routes =>
             {
@@ -50,6 +85,8 @@ namespace AEImageHub
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
             });
+
+
 
             app.UseSpa(spa =>
             {
@@ -60,6 +97,20 @@ namespace AEImageHub
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+
+            
+            app.Use(async (context, next) =>
+            {
+                if (!context.User.Identity.IsAuthenticated)
+                {
+                    await context.ChallengeAsync();
+                }
+                else
+                {
+                    await next();
+                }
+            });
+            
         }
     }
 }
