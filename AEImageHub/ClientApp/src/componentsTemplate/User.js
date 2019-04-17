@@ -31,7 +31,7 @@ export class User extends Component {
     console.log(userId);
     adalGetToken(authContext, adalConfig.endpoints.api)
       .then(function (token) {
-        axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + token } })
+        axios.put("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + token } })
           .then(res => {
             console.log(res);
             alert("The selected User has been made an admin.");
@@ -63,6 +63,26 @@ export class User extends Component {
       }).catch(function (err) {
         console.log("Error: Couldn't get token")
       });
+  }
+
+  deleteUser (uid) {
+    const that = this;
+    let users = this.state.users;
+    adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(token => {
+          axios.delete("api/graph/" + uid, { headers: { 'Authorization': "bearer " + token } })
+              .then(res => {
+                let index = users.map(value => {
+                  return value.uid;
+                }).indexOf(uid);
+                
+                users.splice(index, 1);
+                this.setState( {users: users});
+              })
+              .catch(err => {
+              console.log(err);
+              });
+        })
   }
 
   render() {
@@ -127,7 +147,6 @@ export class User extends Component {
       Cell: ({ value }) => (<div className="fnbar">
         <button onClick={() => {
           this.viewPalette(value);
-          // TODO
         }}>View Palette
         </button>
       </div>)
@@ -139,12 +158,21 @@ export class User extends Component {
       Cell: ({ value }) => (<div className="fnbar">
         <button onClick={() => {
           this.viewTrash(value);
-          // TODO
         }}>View Trash
                 </button>
       </div>)
     });
-
+    
+    sub_columns.push({
+      id: 'button4',
+      accessor: 'uid',
+      Cell: ({ value }) => (<div className="fnbar">
+        <button onClick={() => {
+          this.deleteUser(value);
+        }}>Delete User
+        </button>
+      </div>)
+    });
     return (
       <div>
         <div className='fnbar'></div>
