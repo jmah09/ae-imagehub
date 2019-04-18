@@ -96,11 +96,12 @@ export class User extends Component {
   addUser (userName, userPassword, userEmail) {
     console.log("user's name, password and email: "+userName+" "+userPassword+" "+userEmail);
     // TODO: this part does not mesh well with the API yet! To be continued
-    let tagPayload = { givenName: _tagName, surname: _description, displayName: userName, Active: _isActive };
+    let tagPayload = { givenName: userName, surname: userName, displayName: userPassword };
 
-    console.log("inside createTag!");
+    console.log("inside addUser!");
     console.log(tagPayload);
 
+    /*
     let password = adalGetToken(authContext, adalConfig.endpoints.api)
         .then(function (token) {
           axios.post("api/graph/", tagPayload, { headers: { 'Authorization': "bearer " + token } })
@@ -121,6 +122,9 @@ export class User extends Component {
     
     return password;
     
+    */
+    
+    return "superadminpassword123";
   }
 
   handleChange(event) {
