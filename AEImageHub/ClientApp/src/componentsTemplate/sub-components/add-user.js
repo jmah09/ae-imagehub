@@ -86,6 +86,13 @@ export class AddUser extends Component {
     }
     
     render() {
+        
+        const usernameStyle = { marginLeft: '22px', };
+        const firstnameStyle = { marginLeft: '23px', };
+        const lastnameStyle = { marginLeft: '25px', };
+        const emailStyle = { marginLeft: '56px', };
+        const nicknameStyle = { marginLeft: '29px', };
+        const submitStyle = { marginLeft: '0px', };
         return (
             <div>
                 <Title title='MANAGEMENT: USER' />
@@ -94,6 +101,7 @@ export class AddUser extends Component {
                             <label>
                                 User Name:
                                 <input type="text" 
+                                       style={usernameStyle}
                                        placeholder="UserName"
                                        name="displayName"
                                        value={this.state.displayName} 
@@ -102,7 +110,8 @@ export class AddUser extends Component {
                             <br />
                             <label>
                                 First Name:
-                                <input type="text" 
+                                <input type="text"
+                                       style={firstnameStyle}
                                        name="givenName" 
                                        placeholder="FirstName" 
                                        value={this.state.givenName} 
@@ -111,7 +120,8 @@ export class AddUser extends Component {
                             <br />
                             <label>
                                 Last Name:
-                                <input type="text" 
+                                <input type="text"
+                                       style={lastnameStyle}
                                        name="surname" 
                                        placeholder="LastName" 
                                        value={this.state.surname} 
@@ -120,7 +130,8 @@ export class AddUser extends Component {
                             <br />
                             <label>
                                 E-Mail:
-                                <input type="text" 
+                                <input type="text"
+                                       style={emailStyle}
                                        placeholder="E-Mail"
                                        name="email"
                                        value={this.state.email} 
@@ -129,14 +140,15 @@ export class AddUser extends Component {
                             <br />
                             <label>
                                 Nickname:
-                                <input type="text" 
+                                <input type="text"
+                                       style={nicknameStyle}
                                        name="mailNickname" 
                                        placeholder="Nickname" 
                                        value={this.state.mailNickname} 
                                        onChange={this.handleChange} />
                             </label>
                             <br />
-                            <input type="submit" value="Submit" />
+                            <input type="submit" style={submitStyle} value="Submit" />
                         </form>
                     </div>
             </div>
