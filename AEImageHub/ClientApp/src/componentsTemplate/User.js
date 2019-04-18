@@ -5,6 +5,7 @@ import { adalConfig, authContext, getToken } from '../adalConfig';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import { adalGetToken } from "react-adal";
+import {Redirect} from "react-router-dom";
 
 export class User extends Component {
 
@@ -15,6 +16,7 @@ export class User extends Component {
 
     this.state = {
       users: [],
+      redirect: false
 
     };
   }
@@ -26,6 +28,10 @@ export class User extends Component {
   viewTrash(userid) {
     this.props.history.push("/trash?" + userid);
   }
+  
+  onAddUser = () => {
+    this.setState({ redirect: true});
+  };
 
   makeAdmin(userId) {
     console.log(userId);
@@ -85,12 +91,26 @@ export class User extends Component {
         })
   }
 
+  renderRedirect() {
+    let  redirectLink = 'adduser';
+    
+    if (this.state.redirect) {
+      return <Redirect to={{
+        pathname: redirectLink,
+      }}/>;
+    }
+  }
+
   render() {
     return (
       <div>
+        {this.renderRedirect()}
+        
         <div>
           <div>
             <Title title='MANAGEMENT: USER' />
+            <div className="fnbar">
+            </div>
           </div>
         </div>
         <div id="palcontent">
@@ -175,7 +195,9 @@ export class User extends Component {
     });
     return (
       <div>
-        <div className='fnbar'></div>
+        <div className='fnbar'>
+          <button onClick={this.onAddUser}>Add User</button>
+        </div>
         <div>
           <ReactTable
             data={this.state.users}
