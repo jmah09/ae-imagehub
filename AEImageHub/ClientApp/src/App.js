@@ -17,6 +17,7 @@ import { Submit } from './componentsTemplate/Submit'
 import { LogView } from './componentsTemplate/LogView'
 import {GetInfoTrash} from "./componentsTemplate/sub-components/get-info-trash";
 import {RecoverTrash} from "./componentsTemplate/RecoverTrash";
+import {AddUser} from "./componentsTemplate/sub-components/add-user";
 
 export default class App extends Component {
     displayName = App.name
@@ -39,6 +40,7 @@ export default class App extends Component {
                 <Route path='/metadata' component={Metadata} />
                 <Route path='/user' component={User} />
                 <Route path='/recover' component={RecoverTrash} />
+                <Route path='/adduser' component={AddUser} />
             </Layout>
         );
     }

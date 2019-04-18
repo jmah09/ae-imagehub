@@ -90,7 +90,7 @@ namespace AEImageHub.Controllers
        400 - bad request : user is already an admin
         */
         [HttpPost("{email}")]
-        public IActionResult CreateGuestUser(string email)
+        public IActionResult CreateGuestUser(string email, [FromBody] JObject payload)
         {
             var invitation = new Invitation
             {
@@ -117,27 +117,33 @@ namespace AEImageHub.Controllers
         [HttpPost("")]
         public Object CreateUser([FromBody] JObject payload)
         {
-            var password = CreatePassword(9);
+            var password = CreatePassword(5);
             var passwordProfile = new PasswordProfile
             {
                 Password = password
             };
-            var newUser = new User
+            try
             {
-                AccountEnabled = true,
-                DisplayName = (string)payload["displayName"],
-                GivenName = (string)payload["givenName"],
-                Surname = (string)payload["surname"],
-                MailNickname = (string)payload["nickName"],
-                UserPrincipalName = (string)payload["userPrincipalName"],
-                PasswordProfile = passwordProfile
-            };
-            
-            Console.WriteLine("Password is: " + password);
-            var result =  _graphClient.Users.Request().AddAsync(newUser).Result;
-            if (result != null) return password;
-
-            return BadRequest("something went wrong while creating a new user");
+                var newUser = new User
+                {
+                    AccountEnabled = true,
+                    DisplayName = (string) payload["displayName"],
+                    GivenName = (string) payload["givenName"],
+                    Surname = (string) payload["surname"],
+                    MailNickname = (string) payload["mailNickname"],
+                    UserPrincipalName = (string) payload["userPrincipalName"],
+                    PasswordProfile = passwordProfile
+                };
+                Console.WriteLine("Password is: " + password);
+                var result =  _graphClient.Users.Request().AddAsync(newUser).Result;
+                return password;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Reached");
+                Console.WriteLine(e.Message);
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpDelete("{oid}")]
@@ -151,6 +157,7 @@ namespace AEImageHub.Controllers
             const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             var res = new StringBuilder();
             var rnd = new Random();
+            res.Append("ksB1@");
             while (0 < length--)
             {
                 res.Append(valid[rnd.Next(valid.Length)]);
