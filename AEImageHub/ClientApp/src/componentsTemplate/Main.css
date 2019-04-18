@@ -181,6 +181,10 @@ h2 {
    width: 150px;
  }
 
+.handleTag input[type="password"] {
+  width: 150px;
+}
+
 .handleTag input[type="text"][name="newTag"] {
   margin: 2px 0px 2px 9px;
   width: 150px;

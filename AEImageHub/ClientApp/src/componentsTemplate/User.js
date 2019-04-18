@@ -15,8 +15,16 @@ export class User extends Component {
 
     this.state = {
       users: [],
-
+      newUserName: "",
+      newUserPassword: "",
+      newUserEmail: "",
+      editUserEmail: "",
+      showAdd: false,
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    
   }
 
   viewPalette(userid) {
@@ -84,6 +92,53 @@ export class User extends Component {
               });
         })
   }
+  
+  addUser (userName, userPassword, userEmail) {
+    console.log("user's name, password and email: "+userName+" "+userPassword+" "+userEmail);
+    // TODO: this part does not mesh well with the API yet! To be continued
+    let tagPayload = { givenName: _tagName, surname: _description, displayName: userName, Active: _isActive };
+
+    console.log("inside createTag!");
+    console.log(tagPayload);
+
+    let password = adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(function (token) {
+          axios.post("api/graph/", tagPayload, { headers: { 'Authorization': "bearer " + token } })
+              .then(res => {
+                console.log("successfully created tag!");
+                // alert("New Classification Created. Name: " + this.state.newTag + ", Description: " + _description);
+                console.log(res);
+                window.location.reload()
+
+              })
+              .catch(res => {
+                console.log("caught error for creating tag!");
+                console.log(res);
+              })
+        }).catch(function (err) {
+      console.log("Error: Couldn't get token")
+    });
+    
+    return password;
+    
+  }
+
+  handleChange(event) {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    
+    if ((!(this.state.newUserName === "") && !(this.state.newUserPassword === ""))) {
+      let newPassword = this.addUser(this.state.newUserName, this.state.newUserPassword, this.state.newUserEmail);
+      alert("New account. Please save this password to somewhere you can easily reference: " + newPassword);
+    }
+    else {
+      alert("Please input valid username and password for new user.");
+    }
+
+  }
 
   render() {
     return (
@@ -94,10 +149,45 @@ export class User extends Component {
           </div>
         </div>
         <div id="palcontent">
+          {this.renderAddButton()}
+          {this.renderAddUser()}
           {this.renderContent()}
         </div>
       </div>
     );
+  }
+
+  renderAddButton() {
+    return (
+        <div className="fnbar">
+          <button onClick={() => { this.setState({ showAdd: !this.state.showAdd }); }}>Create New User</button>
+        </div>
+    )
+  }
+  
+  renderAddUser() {
+    return (
+        <div className={this.state.showAdd ? '' : 'hidden'}>
+          <form onSubmit={this.handleSubmit} className="handleTag">
+            Username:
+            <label>
+              <input type="text" name="newUserName" value={this.state.ProjectName} onChange={this.handleChange} />
+            </label>
+            <br />
+            Password:
+            <label>
+              <input type="password" name="newUserPassword" value={this.state.ProjectName} onChange={this.handleChange} />
+            </label>
+            <br />
+            Email:
+            <label>
+              <input type="text" name="newUserEmail" value={this.state.ProjectName} onChange={this.handleChange} />
+            </label>
+            <br />
+            <input type="submit" value="Add User" />
+          </form>
+        </div>
+    )
   }
 
 
