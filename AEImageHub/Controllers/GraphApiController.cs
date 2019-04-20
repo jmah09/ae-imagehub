@@ -6,6 +6,8 @@ using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 
@@ -62,7 +64,7 @@ namespace AEImageHub.Controllers
         202 - accepted
         400 - bad request : user is already an admin
          */
-        [HttpPost("{oid}")]
+        [HttpPut("{oid}")]
         public IActionResult EditUsers(string oid)
         {
             const string adminGroup = "e76d7410-92be-4073-9709-2d8b737f1d44";
@@ -76,5 +78,91 @@ namespace AEImageHub.Controllers
             return BadRequest("User is already an Admin");
         }
         
+        /**
+        * Post
+       API Endpoint: api/graph/:oid
+       Description: Invites a guest user
+       Request Requirements:
+       1. A valid JWT token of an admin user
+
+       Server response and status code:
+       200 - OK
+       400 - bad request : user is already an admin
+        */
+        [HttpPost("{email}")]
+        public IActionResult CreateGuestUser(string email, [FromBody] JObject payload)
+        {
+            var invitation = new Invitation
+            {
+                SendInvitationMessage = true,
+                InvitedUserEmailAddress = email,
+                InviteRedirectUrl = "https://aeimagehub.azurewebsites.net/"
+            };
+            
+            var result = _graphClient.Invitations.Request().AddAsync(invitation).Result;
+            return Ok();
+        }
+        
+        /**
+        * Post
+       API Endpoint: api/graph/:oid
+       Description: Create a new user
+       Request Requirements:
+       1. A valid JWT token of an admin user
+
+       Server response and status code:
+       200 - returns the password of the newly created user
+       400 - bad request
+        */
+        [HttpPost("")]
+        public Object CreateUser([FromBody] JObject payload)
+        {
+            var password = CreatePassword(5);
+            var passwordProfile = new PasswordProfile
+            {
+                Password = password
+            };
+            try
+            {
+                var newUser = new User
+                {
+                    AccountEnabled = true,
+                    DisplayName = (string) payload["displayName"],
+                    GivenName = (string) payload["givenName"],
+                    Surname = (string) payload["surname"],
+                    MailNickname = (string) payload["mailNickname"],
+                    UserPrincipalName = (string) payload["userPrincipalName"],
+                    PasswordProfile = passwordProfile
+                };
+                Console.WriteLine("Password is: " + password);
+                var result =  _graphClient.Users.Request().AddAsync(newUser).Result;
+                return password;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Reached");
+                Console.WriteLine(e.Message);
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{oid}")]
+        public async Task<IActionResult> DeleteUser(string oid)
+        {
+            await _graphClient.Users[oid].Request().DeleteAsync();
+            return Ok();
+        }
+        private static string CreatePassword(int length)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            var res = new StringBuilder();
+            var rnd = new Random();
+            res.Append("ksB1@");
+            while (0 < length--)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+            }
+            return res.ToString();
+        }
     }
 }

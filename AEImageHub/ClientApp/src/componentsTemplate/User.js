@@ -5,6 +5,7 @@ import { adalConfig, authContext, getToken } from '../adalConfig';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import { adalGetToken } from "react-adal";
+import {Redirect} from "react-router-dom";
 
 export class User extends Component {
 
@@ -15,6 +16,7 @@ export class User extends Component {
 
     this.state = {
       users: [],
+      redirect: false
 
     };
   }
@@ -26,12 +28,16 @@ export class User extends Component {
   viewTrash(userid) {
     this.props.history.push("/trash?" + userid);
   }
+  
+  onAddUser = () => {
+    this.setState({ redirect: true});
+  };
 
   makeAdmin(userId) {
     console.log(userId);
     adalGetToken(authContext, adalConfig.endpoints.api)
       .then(function (token) {
-        axios.post("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + token } })
+        axios.put("/api/graph/" + userId, null, { headers: { 'Authorization': "bearer " + token } })
           .then(res => {
             console.log(res);
             alert("The selected User has been made an admin.");
@@ -65,12 +71,46 @@ export class User extends Component {
       });
   }
 
+  deleteUser (uid) {
+    const that = this;
+    let users = this.state.users;
+    adalGetToken(authContext, adalConfig.endpoints.api)
+        .then(token => {
+          axios.delete("api/graph/" + uid, { headers: { 'Authorization': "bearer " + token } })
+              .then(res => {
+                let index = users.map(value => {
+                  return value.uid;
+                }).indexOf(uid);
+                
+                users.splice(index, 1);
+                this.setState( {users: users});
+              })
+              .catch(err => {
+              console.log(err);
+              });
+        })
+  }
+
+  renderRedirect() {
+    let  redirectLink = 'adduser';
+    
+    if (this.state.redirect) {
+      return <Redirect to={{
+        pathname: redirectLink,
+      }}/>;
+    }
+  }
+
   render() {
     return (
       <div>
+        {this.renderRedirect()}
+        
         <div>
           <div>
             <Title title='MANAGEMENT: USER' />
+            <div className="fnbar">
+            </div>
           </div>
         </div>
         <div id="palcontent">
@@ -127,7 +167,6 @@ export class User extends Component {
       Cell: ({ value }) => (<div className="fnbar">
         <button onClick={() => {
           this.viewPalette(value);
-          // TODO
         }}>View Palette
         </button>
       </div>)
@@ -139,15 +178,26 @@ export class User extends Component {
       Cell: ({ value }) => (<div className="fnbar">
         <button onClick={() => {
           this.viewTrash(value);
-          // TODO
         }}>View Trash
                 </button>
       </div>)
     });
-
+    
+    sub_columns.push({
+      id: 'button4',
+      accessor: 'uid',
+      Cell: ({ value }) => (<div className="fnbar">
+        <button onClick={() => {
+          this.deleteUser(value);
+        }}>Delete User
+        </button>
+      </div>)
+    });
     return (
       <div>
-        <div className='fnbar'></div>
+        <div className='fnbar'>
+          <button onClick={this.onAddUser}>Add User</button>
+        </div>
         <div>
           <ReactTable
             data={this.state.users}
